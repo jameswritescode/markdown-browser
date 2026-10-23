@@ -1,0 +1,47 @@
+{
+  "name": "mdb",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A markdown browser for the terminal, drawn with real pixels.",
+  "license": "MIT",
+  "bin": {
+    "mdb": "bin/mdb.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md"
+  ],
+  "main": "dist/main/main.js",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "dependencies": {
+    "@zenbu-labs/pixel": "0.2.9",
+    "highlight.js": "11.12.0",
+    "ignore": "7.0.13",
+    "markdown-it": "15.0.3",
+    "markdown-it-anchor": "10.0.0",
+    "markdown-it-footnote": "4.0.0",
+    "markdown-it-task-lists": "2.1.1",
+    "pele": "1.9.0",
+    "react": "18.3.1",
+    "sanitize-html": "2.18.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "14.2.0",
+    "@types/node": "^24.19.2",
+    "@types/react": "^18.3.31",
+    "@types/sanitize-html": "2.16.2",
+    "esbuild": "0.28.2",
+    "oxfmt": "0.74.0",
+    "oxlint": "1.89.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  },
+  "packageManager": "pnpm@12.6.0"
+}

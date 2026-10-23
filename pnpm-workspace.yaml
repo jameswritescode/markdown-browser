@@ -1,0 +1,5 @@
+allowBuilds:
+  "@zenbu-labs/pixel": true
+  esbuild: true
+minimumReleaseAgeExclude:
+  - pele@1.9.0
