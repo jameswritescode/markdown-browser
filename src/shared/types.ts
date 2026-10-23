@@ -47,3 +47,22 @@ export interface RenderedDoc {
 export type MissingDoc = { missing: true; path: string };
 
 export type Background = "transparent" | "solid";
+
+export interface StartOptions {
+  root: string;
+  openPath: string | null;
+  background: Background;
+}
+
+export interface MdbBridge {
+  start(): Promise<StartOptions>;
+  scan(root: string): Promise<ScanResult>;
+  search(root: string, query: string): Promise<SearchHit[]>;
+  render(path: string): Promise<RenderedDoc | MissingDoc>;
+  classifyLink(href: string, docPath: string): Promise<LinkTarget>;
+  watch(path: string | null): void;
+  onChanged(cb: (path: string) => void): () => void;
+  openExternal(url: string): void;
+  openPath(path: string): void;
+  copy(text: string): void;
+}

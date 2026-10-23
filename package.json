@@ -18,7 +18,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "oxlint",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "build": "node scripts/build.mjs",
+    "check:dist": "pnpm build && git diff --exit-code -- dist",
+    "tophat": "pnpm build && node scripts/tophat.mjs",
+    "smoke": "pnpm build && node scripts/smoke.mjs"
   },
   "dependencies": {
     "@zenbu-labs/pixel": "0.2.9",

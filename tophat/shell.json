@@ -1,0 +1,5 @@
+{
+  "args": ["../test/fixtures/docs"],
+  "out": "../build/tophat/shell",
+  "steps": [{ "wait": 500 }, { "shot": "start" }]
+}
