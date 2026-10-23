@@ -1,10 +1,12 @@
 import type { Dirent } from "node:fs";
 import { open, readFile, readdir, stat } from "node:fs/promises";
+import { homedir } from "node:os";
 import { basename, extname, join, relative, sep } from "node:path";
 import ignore, { type Ignore } from "ignore";
 import type { DocEntry, ScanResult } from "../shared/types.ts";
+import { SCAN_LIMIT } from "./scan-limit.ts";
 
-export const SCAN_LIMIT = 5000;
+export { SCAN_LIMIT };
 
 const MARKDOWN_EXTENSIONS = new Set([".md", ".markdown", ".mdx"]);
 const TITLE_READ_BYTES = 64 * 1024;
@@ -81,7 +83,12 @@ async function toEntry(root: string, path: string): Promise<DocEntry | null> {
   }
 }
 
-export async function scanDocs(root: string, limit: number = SCAN_LIMIT): Promise<ScanResult> {
+export async function scanDocs(
+  root: string,
+  limit: number = SCAN_LIMIT,
+  home: string = homedir(),
+): Promise<ScanResult> {
+  const library = join(home, "Library");
   const found: string[] = [];
   let truncated = false;
   const queue: { dir: string; scopes: IgnoreScope[] }[] = [{ dir: root, scopes: [] }];
@@ -101,7 +108,7 @@ export async function scanDocs(root: string, limit: number = SCAN_LIMIT): Promis
       if (entry.name.startsWith(".") || entry.name === "node_modules") continue;
       const path = join(dir, entry.name);
       if (entry.isDirectory()) {
-        if (!isIgnored(path, true, scopes)) queue.push({ dir: path, scopes });
+        if (path !== library && !isIgnored(path, true, scopes)) queue.push({ dir: path, scopes });
       } else if (entry.isFile() && isMarkdownPath(entry.name)) {
         if (isIgnored(path, false, scopes)) continue;
         if (found.length >= limit) {
@@ -118,6 +125,7 @@ export async function scanDocs(root: string, limit: number = SCAN_LIMIT): Promis
     const batch = await Promise.all(found.slice(i, i + 32).map((p) => toEntry(root, p)));
     for (const entry of batch) if (entry) docs.push(entry);
   }
-  docs.sort((a, b) => a.relPath.localeCompare(b.relPath));
+  const depth = (doc: DocEntry) => doc.relPath.split("/").length;
+  docs.sort((a, b) => depth(a) - depth(b) || a.relPath.localeCompare(b.relPath));
   return { root, docs, truncated };
 }

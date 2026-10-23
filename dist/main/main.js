@@ -65894,9 +65894,14 @@ var import_node_url = require("node:url");
 
 // src/core/scan.ts
 var import_promises = require("node:fs/promises");
+var import_node_os = require("node:os");
 var import_node_path = require("node:path");
 var import_ignore = __toESM(require_ignore());
+
+// src/core/scan-limit.ts
 var SCAN_LIMIT = 5e3;
+
+// src/core/scan.ts
 var MARKDOWN_EXTENSIONS = /* @__PURE__ */ new Set([".md", ".markdown", ".mdx"]);
 var TITLE_READ_BYTES = 64 * 1024;
 function isMarkdownPath(p) {
@@ -65960,7 +65965,8 @@ async function toEntry(root2, path) {
     return null;
   }
 }
-async function scanDocs(root2, limit = SCAN_LIMIT) {
+async function scanDocs(root2, limit = SCAN_LIMIT, home = (0, import_node_os.homedir)()) {
+  const library = (0, import_node_path.join)(home, "Library");
   const found = [];
   let truncated = false;
   const queue = [{ dir: root2, scopes: [] }];
@@ -65979,7 +65985,7 @@ async function scanDocs(root2, limit = SCAN_LIMIT) {
       if (entry.name.startsWith(".") || entry.name === "node_modules") continue;
       const path = (0, import_node_path.join)(dir, entry.name);
       if (entry.isDirectory()) {
-        if (!isIgnored(path, true, scopes)) queue.push({ dir: path, scopes });
+        if (path !== library && !isIgnored(path, true, scopes)) queue.push({ dir: path, scopes });
       } else if (entry.isFile() && isMarkdownPath(entry.name)) {
         if (isIgnored(path, false, scopes)) continue;
         if (found.length >= limit) {
@@ -65995,7 +66001,8 @@ async function scanDocs(root2, limit = SCAN_LIMIT) {
     const batch = await Promise.all(found.slice(i, i + 32).map((p) => toEntry(root2, p)));
     for (const entry of batch) if (entry) docs.push(entry);
   }
-  docs.sort((a, b) => a.relPath.localeCompare(b.relPath));
+  const depth = (doc) => doc.relPath.split("/").length;
+  docs.sort((a, b) => depth(a) - depth(b) || a.relPath.localeCompare(b.relPath));
   return { root: root2, docs, truncated };
 }
 

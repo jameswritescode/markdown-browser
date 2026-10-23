@@ -1,3 +1,6 @@
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { expect, test } from "vitest";
 import { scanDocs } from "../src/core/scan.ts";
 import { searchDocs } from "../src/core/search.ts";
@@ -29,14 +32,10 @@ test("respects maxHits", async () => {
 });
 
 test("snippets stay short around long lines", async () => {
-  const fake = [{ ...docs[0]!, path: FIXTURES + "/long.md" }];
-  const { writeFileSync, rmSync } = await import("node:fs");
-  writeFileSync(fake[0]!.path, "x".repeat(500) + " needle " + "y".repeat(500));
-  try {
-    const [hit] = await searchDocs(fake, "needle");
-    expect(hit!.snippet.length).toBeLessThanOrEqual(120);
-    expect(hit!.snippet.slice(...hit!.range)).toBe("needle");
-  } finally {
-    rmSync(fake[0]!.path);
-  }
+  const dir = mkdtempSync(join(tmpdir(), "mdb-search-"));
+  const path = join(dir, "long.md");
+  writeFileSync(path, "x".repeat(500) + " needle " + "y".repeat(500));
+  const [hit] = await searchDocs([{ ...docs[0]!, path }], "needle");
+  expect(hit!.snippet.length).toBeLessThanOrEqual(120);
+  expect(hit!.snippet.slice(...hit!.range)).toBe("needle");
 });

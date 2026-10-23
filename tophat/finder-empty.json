@@ -1,0 +1,7 @@
+{
+  "args": ["../build/tophat/empty-folder"],
+  "out": "../build/tophat/finder-empty",
+  "width": 900,
+  "height": 240,
+  "steps": [{ "wait": 400 }, { "shot": "empty" }]
+}

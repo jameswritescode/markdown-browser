@@ -1,0 +1,23 @@
+{
+  "args": ["../test/fixtures/docs"],
+  "out": "../build/tophat/finder",
+  "width": 1000,
+  "height": 420,
+  "steps": [
+    { "wait": 400 },
+    { "shot": "1-list" },
+    { "type": "gst" },
+    { "shot": "2-filter-gst" },
+    { "key": "Escape" },
+    { "key": "/" },
+    { "type": "kitty" },
+    { "wait": 400 },
+    { "shot": "3-search-kitty" },
+    { "key": "Escape" },
+    { "key": "Escape" },
+    { "shot": "4-back-to-list" },
+    { "key": "Down" },
+    { "key": "Return" },
+    { "eval": "document.getElementById('app').dataset.opened" }
+  ]
+}

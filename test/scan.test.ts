@@ -1,4 +1,4 @@
-import { mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
@@ -14,6 +14,15 @@ test("finds markdown, skips ignored, hidden and node_modules", async () => {
   ]);
   expect(r.truncated).toBe(false);
   expect(r.root).toBe(FIXTURES);
+});
+
+test("lists shallower files before deeper ones", async () => {
+  const r = await scanDocs(FIXTURES);
+  expect(r.docs.map((d) => d.relPath)).toEqual([
+    "README.md",
+    "guide/no-heading.md",
+    "guide/setup.md",
+  ]);
 });
 
 test("entries carry absolute path, title and mtime", async () => {
@@ -41,6 +50,17 @@ test("does not follow symlinked directories", async () => {
   writeFileSync(join(dir, "a.md"), "# A");
   symlinkSync(dir, join(dir, "loop"));
   expect((await scanDocs(dir)).docs.map((d) => d.relPath)).toEqual(["a.md"]);
+});
+
+test("skips the Library folder directly under home", async () => {
+  const home = mkdtempSync(join(tmpdir(), "mdb-home-"));
+  for (const dir of ["Library/App", "notes/Library"]) {
+    mkdirSync(join(home, dir), { recursive: true });
+    writeFileSync(join(home, dir, "x.md"), "# X");
+  }
+  expect((await scanDocs(home, undefined, home)).docs.map((d) => d.relPath)).toEqual([
+    "notes/Library/x.md",
+  ]);
 });
 
 test("recognises markdown extensions case-insensitively", () => {
