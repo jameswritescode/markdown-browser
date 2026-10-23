@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "description": "A markdown browser for the terminal, drawn with real pixels.",
-  "license": "MIT",
   "bin": {
     "mdb": "bin/mdb.js"
   },

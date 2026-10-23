@@ -3,3 +3,4 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - pele@1.9.0
+sideEffectsCache: false
