@@ -10,3 +10,17 @@ export interface ScanResult {
   docs: DocEntry[];
   truncated: boolean;
 }
+
+export interface FilterMatch {
+  entry: DocEntry;
+  score: number;
+  titleRanges: [number, number][];
+  pathRanges: [number, number][];
+}
+
+export interface SearchHit {
+  entry: DocEntry;
+  line: number;
+  snippet: string;
+  range: [number, number];
+}
