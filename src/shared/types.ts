@@ -30,3 +30,20 @@ export type LinkTarget =
   | { kind: "doc"; path: string; anchor: string | null; exists: boolean }
   | { kind: "file"; path: string }
   | { kind: "external"; url: string };
+
+export interface OutlineItem {
+  level: number;
+  text: string;
+  id: string;
+}
+
+export interface RenderedDoc {
+  path: string;
+  title: string;
+  html: string;
+  outline: OutlineItem[];
+}
+
+export type MissingDoc = { missing: true; path: string };
+
+export type Background = "transparent" | "solid";
