@@ -24,3 +24,9 @@ export interface SearchHit {
   snippet: string;
   range: [number, number];
 }
+
+export type LinkTarget =
+  | { kind: "anchor"; id: string }
+  | { kind: "doc"; path: string; anchor: string | null; exists: boolean }
+  | { kind: "file"; path: string }
+  | { kind: "external"; url: string };
