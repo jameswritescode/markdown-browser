@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { app, BrowserWindow } from "@zenbu-labs/pixel/electron";
 import { parseArgs } from "../core/args.ts";
 import { registerIpc } from "../main/ipc.ts";
+import { lockNavigation } from "../main/navigation.ts";
 
 type Step =
   | { wait: number }
@@ -99,7 +100,9 @@ async function run(): Promise<void> {
     (text) => clipboard.push(text),
     () => contents,
   );
-  await win.loadURL(pathToFileURL(join(__dirname, "..", "..", "dist", "page", "index.html")).href);
+  const pageUrl = pathToFileURL(join(__dirname, "..", "..", "dist", "page", "index.html")).href;
+  lockNavigation(contents, pageUrl);
+  await win.loadURL(pageUrl);
   await sleep(300);
 
   for (const step of script.steps) {

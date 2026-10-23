@@ -21694,14 +21694,15 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
     };
     article.addEventListener("click", async (event) => {
       const link = event.target.closest?.("a[href]");
-      if (!link || !current) return;
+      if (!link) return;
       event.preventDefault();
+      if (!current) return;
       const href = link.getAttribute("href");
       const target = await window.mdb.classifyLink(href, current.path);
       if (target.kind === "anchor") scrollToId(target.id);
       else if (target.kind === "doc" && target.exists) await navigate(target.path, target.anchor);
       else if (target.kind === "doc") showNotice(link, `Not found: ${href}`);
-      else if (target.kind === "file") window.mdb.openPath(target.path);
+      else if (target.kind === "file") window.mdb.reveal(target.path);
       else window.mdb.openExternal(target.url);
     });
     const unsubscribe = window.mdb.onChanged(async (path) => {

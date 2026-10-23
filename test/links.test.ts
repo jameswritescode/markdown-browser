@@ -1,6 +1,6 @@
 import { pathToFileURL } from "node:url";
 import { expect, test } from "vitest";
-import { classifyLink } from "../src/core/links.ts";
+import { classifyLink, isOpenableUrl } from "../src/core/links.ts";
 import { FIX } from "./helpers.ts";
 
 const doc = FIX("guide/setup.md");
@@ -51,4 +51,26 @@ test("file URLs resolve to paths", () => {
     path: FIX("README.md"),
     exists: true,
   });
+});
+
+test("malformed percent-encoding does not throw", () => {
+  expect(classifyLink("100%", doc)).toMatchObject({ kind: "file" });
+  expect(classifyLink("#a%zz", doc)).toEqual({ kind: "anchor", id: "a%zz" });
+});
+
+test("file URLs with a host are treated as external, not opened locally", () => {
+  expect(classifyLink("file://host/x.md", doc)).toEqual({
+    kind: "external",
+    url: "file://host/x.md",
+  });
+});
+
+test("only web and mail URLs may be opened externally", () => {
+  expect(isOpenableUrl("https://example.com")).toBe(true);
+  expect(isOpenableUrl("http://example.com")).toBe(true);
+  expect(isOpenableUrl("mailto:a@b.c")).toBe(true);
+  expect(isOpenableUrl("file:///Applications/Calculator.app")).toBe(false);
+  expect(isOpenableUrl("vscode://file/x")).toBe(false);
+  expect(isOpenableUrl("javascript:alert(1)")).toBe(false);
+  expect(isOpenableUrl("not a url")).toBe(false);
 });

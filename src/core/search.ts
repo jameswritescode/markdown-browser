@@ -48,7 +48,7 @@ export async function searchDocs(
 ): Promise<SearchHit[]> {
   const needle = query.trim().toLowerCase();
   if (!needle) return [];
-  const results: SearchHit[][] = new Array(docs.length);
+  const results = Array.from<SearchHit[]>({ length: docs.length });
   let next = 0;
   const worker = async () => {
     while (next < docs.length) {

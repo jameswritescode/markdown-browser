@@ -18,6 +18,7 @@
     { "shot": "4-back-to-list" },
     { "key": "Down" },
     { "key": "Return" },
-    { "eval": "document.getElementById('app').dataset.opened" }
+    { "wait": 400 },
+    { "eval": "document.title" }
   ]
 }

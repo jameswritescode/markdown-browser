@@ -14,7 +14,7 @@ const bridge: MdbBridge = {
     return () => ipcRenderer.off("mdb:changed", listener);
   },
   openExternal: (url) => ipcRenderer.send("mdb:open-external", url),
-  openPath: (path) => ipcRenderer.send("mdb:open-path", path),
+  reveal: (path) => ipcRenderer.send("mdb:reveal", path),
   copy: (text) => ipcRenderer.send("mdb:copy", text),
 };
 

@@ -62,7 +62,7 @@ If the terminal is narrow, mdb hides the outline. Press `ctrl+b` to show or hide
 | A link to a heading (`#name`)                 | mdb goes to the heading.                      |
 | A link to a markdown file                     | mdb opens the file. Press `cmd+[` to go back. |
 | A link to a markdown file that does not exist | mdb shows "Not found" next to the link.       |
-| A link to a different local file              | macOS opens the file with its default app.    |
+| A link to a different local file              | Finder shows the file. mdb does not open it.  |
 | A web link                                    | Your default browser opens the link.          |
 
 ### Changes to the file

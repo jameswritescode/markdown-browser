@@ -53,7 +53,7 @@ var bridge = {
     return () => import_electron.ipcRenderer.off("mdb:changed", listener);
   },
   openExternal: (url) => import_electron.ipcRenderer.send("mdb:open-external", url),
-  openPath: (path) => import_electron.ipcRenderer.send("mdb:open-path", path),
+  reveal: (path) => import_electron.ipcRenderer.send("mdb:reveal", path),
   copy: (text) => import_electron.ipcRenderer.send("mdb:copy", text)
 };
 import_electron.contextBridge.exposeInMainWorld("mdb", bridge);

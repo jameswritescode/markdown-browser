@@ -48,3 +48,15 @@ test("loadDoc renders a file, or reports it missing", async () => {
   expect(((await loadDoc(FIX("README.md"))) as { title: string }).title).toBe("Fixture Docs");
   expect(await loadDoc(FIX("gone.md"))).toEqual({ missing: true, path: FIX("gone.md") });
 });
+
+test("malformed percent-encoding in an image does not break the document", () => {
+  const r = renderMarkdown('# T\n\n<img src="100%.png">\n', FIX("README.md"));
+  expect(r.title).toBe("T");
+  expect(r.html).toContain("<img");
+});
+
+test("image query strings and hashes are dropped from local paths", () => {
+  const r = renderMarkdown("![x](image.png?raw=true)\n\n![y](image.png#light)\n", FIX("README.md"));
+  const href = pathToFileURL(FIX("image.png")).href;
+  expect(r.html.match(new RegExp(`src="${href}"`, "g"))).toHaveLength(2);
+});

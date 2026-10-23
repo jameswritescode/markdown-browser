@@ -65999,7 +65999,6 @@ function MenuRow({
 }
 
 // src/main/ipc.ts
-var import_node_fs2 = require("node:fs");
 var import_electron = require("@zenbu-labs/pixel/electron");
 
 // src/core/links.ts
@@ -66123,26 +66122,50 @@ async function scanDocs(root2, limit = SCAN_LIMIT, home = (0, import_node_os.hom
 
 // src/core/links.ts
 var SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+var OPENABLE_PROTOCOLS = /* @__PURE__ */ new Set(["http:", "https:", "mailto:"]);
+function safeDecode(text2) {
+  try {
+    return decodeURIComponent(text2);
+  } catch {
+    return text2;
+  }
+}
+function isOpenableUrl(url) {
+  try {
+    return OPENABLE_PROTOCOLS.has(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}
 function splitHash(href) {
   const hash = href.indexOf("#");
   if (hash === -1) return [href, null];
-  return [href.slice(0, hash), decodeURIComponent(href.slice(hash + 1)) || null];
+  return [href.slice(0, hash), safeDecode(href.slice(hash + 1)) || null];
+}
+function fromFileUrl(href) {
+  try {
+    const url = new URL(href);
+    const anchor2 = url.hash ? safeDecode(url.hash.slice(1)) : null;
+    url.hash = "";
+    return { path: (0, import_node_url.fileURLToPath)(url), anchor: anchor2 };
+  } catch {
+    return null;
+  }
 }
 function classifyLink(href, docPath) {
-  if (href.startsWith("#")) return { kind: "anchor", id: decodeURIComponent(href.slice(1)) };
+  if (href.startsWith("#")) return { kind: "anchor", id: safeDecode(href.slice(1)) };
   let target;
   let anchor2;
   if (/^file:/i.test(href)) {
-    const url = new URL(href);
-    anchor2 = url.hash ? decodeURIComponent(url.hash.slice(1)) : null;
-    url.hash = "";
-    target = (0, import_node_url.fileURLToPath)(url);
+    const local = fromFileUrl(href);
+    if (!local) return { kind: "external", url: href };
+    ({ path: target, anchor: anchor2 } = local);
   } else if (SCHEME.test(href)) {
     return { kind: "external", url: href };
   } else {
     const [path, hash] = splitHash(href);
     anchor2 = hash;
-    target = (0, import_node_path2.resolve)((0, import_node_path2.dirname)(docPath), decodeURIComponent(path.split("?")[0]));
+    target = (0, import_node_path2.resolve)((0, import_node_path2.dirname)(docPath), safeDecode(path.split("?")[0]));
   }
   if (isMarkdownPath(target))
     return { kind: "doc", path: target, anchor: anchor2, exists: (0, import_node_fs.existsSync)(target) };
@@ -71125,7 +71148,8 @@ function sanitize(html, docPath) {
       img: (tagName, attribs) => {
         const src = attribs.src;
         if (src && !SCHEME2.test(src) && !src.startsWith("//")) {
-          const path = src.startsWith("/") ? src : (0, import_node_path3.resolve)(docDir, decodeURIComponent(src));
+          const local = safeDecode(src.split(/[?#]/)[0]);
+          const path = local.startsWith("/") ? local : (0, import_node_path3.resolve)(docDir, local);
           attribs.src = (0, import_node_url2.pathToFileURL)(path).href;
         }
         return { tagName, attribs };
@@ -71203,7 +71227,7 @@ async function searchFile(entry, needle) {
 async function searchDocs(docs, query, maxHits = 200) {
   const needle = query.trim().toLowerCase();
   if (!needle) return [];
-  const results = new Array(docs.length);
+  const results = Array.from({ length: docs.length });
   let next = 0;
   const worker = async () => {
     while (next < docs.length) {
@@ -71215,8 +71239,10 @@ async function searchDocs(docs, query, maxHits = 200) {
   return results.flat().slice(0, maxHits);
 }
 
-// src/main/ipc.ts
+// src/main/watcher.ts
+var import_node_fs2 = require("node:fs");
 var WATCH_DEBOUNCE_MS = 100;
+var RETRY_MS = 500;
 var DocWatcher = class {
   constructor(notify) {
     this.notify = notify;
@@ -71225,27 +71251,30 @@ var DocWatcher = class {
   watcher = null;
   path = null;
   timer = null;
+  retry = null;
   set(path) {
     this.close();
     this.path = path;
-    if (path) this.arm(path);
+    if (path) this.arm(path, false);
   }
-  arm(path) {
+  arm(path, recovering) {
+    if (this.path !== path) return;
     try {
       this.watcher = (0, import_node_fs2.watch)(path, (event) => {
-        if (event === "rename") this.rearm();
+        if (event === "rename") this.rearm(path);
         this.schedule();
       });
+      if (recovering) this.schedule();
     } catch {
       this.watcher = null;
-      setTimeout(() => this.rearm(), 500);
+      this.retry = setTimeout(() => this.arm(path, true), RETRY_MS);
     }
   }
-  rearm() {
-    const path = this.path;
+  rearm(path) {
     this.watcher?.close();
     this.watcher = null;
-    if (path) setTimeout(() => this.path === path && !this.watcher && this.arm(path), 50);
+    if (this.retry) clearTimeout(this.retry);
+    this.retry = setTimeout(() => this.arm(path, true), 50);
   }
   schedule() {
     if (this.timer) clearTimeout(this.timer);
@@ -71254,10 +71283,13 @@ var DocWatcher = class {
   close() {
     this.watcher?.close();
     this.watcher = null;
-    if (this.timer) clearTimeout(this.timer);
+    for (const timer of [this.timer, this.retry]) if (timer) clearTimeout(timer);
     this.timer = null;
+    this.retry = null;
   }
 };
+
+// src/main/ipc.ts
 function registerIpc(options2, copy, contents) {
   const scans = /* @__PURE__ */ new Map();
   const scan = (dir) => {
@@ -71284,9 +71316,23 @@ function registerIpc(options2, copy, contents) {
     (_event, href, docPath) => classifyLink(href, docPath)
   );
   import_electron.ipcMain.on("mdb:watch", (_event, path) => watcher.set(path));
-  import_electron.ipcMain.on("mdb:open-external", (_event, url) => void import_electron.shell.openExternal(url));
-  import_electron.ipcMain.on("mdb:open-path", (_event, path) => void import_electron.shell.openPath(path));
+  import_electron.ipcMain.on("mdb:open-external", (_event, url) => {
+    if (isOpenableUrl(url)) void import_electron.shell.openExternal(url);
+  });
+  import_electron.ipcMain.on("mdb:reveal", (_event, path) => import_electron.shell.showItemInFolder(path));
   import_electron.ipcMain.on("mdb:copy", (_event, text2) => copy(text2));
+}
+
+// src/main/navigation.ts
+function lockNavigation(contents, pageUrl) {
+  const block2 = (event, url) => {
+    if (url !== pageUrl) event.preventDefault();
+  };
+  contents.on("will-navigate", block2);
+  contents.on("will-redirect", block2);
+  contents.on("will-frame-navigate", (event) => {
+    if (event.url !== pageUrl) event.preventDefault();
+  });
 }
 
 // src/main/main.tsx
@@ -71339,6 +71385,7 @@ function App() {
       import_pixel2.WebView,
       {
         ref: (handle) => {
+          if (handle && handle !== view) lockNavigation(handle.webContents, PAGE_URL);
           view = handle;
         },
         src: PAGE_URL,

@@ -63,6 +63,6 @@ export interface MdbBridge {
   watch(path: string | null): void;
   onChanged(cb: (path: string) => void): () => void;
   openExternal(url: string): void;
-  openPath(path: string): void;
+  reveal(path: string): void;
   copy(text: string): void;
 }

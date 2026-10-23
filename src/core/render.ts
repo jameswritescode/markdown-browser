@@ -8,6 +8,7 @@ import footnote from "markdown-it-footnote";
 import taskLists from "markdown-it-task-lists";
 import sanitizeHtml from "sanitize-html";
 import type { MissingDoc, OutlineItem, RenderedDoc } from "../shared/types.ts";
+import { safeDecode } from "./links.ts";
 import { titleOf } from "./scan.ts";
 
 const ALERT_TYPES = ["NOTE", "TIP", "IMPORTANT", "WARNING", "CAUTION"] as const;
@@ -120,7 +121,8 @@ function sanitize(html: string, docPath: string): string {
       img: (tagName, attribs) => {
         const src = attribs.src;
         if (src && !SCHEME.test(src) && !src.startsWith("//")) {
-          const path = src.startsWith("/") ? src : resolve(docDir, decodeURIComponent(src));
+          const local = safeDecode(src.split(/[?#]/)[0]!);
+          const path = local.startsWith("/") ? local : resolve(docDir, local);
           attribs.src = pathToFileURL(path).href;
         }
         return { tagName, attribs };
