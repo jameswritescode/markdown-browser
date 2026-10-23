@@ -56385,13 +56385,13 @@ __export(dist_exports, {
   Script: () => Script,
   Style: () => Style,
   Tag: () => Tag,
-  Text: () => Text,
+  Text: () => Text2,
   isTag: () => isTag
 });
 function isTag(element) {
   return element.type === ElementType.Tag || element.type === ElementType.Script || element.type === ElementType.Style;
 }
-var ElementType, Root, Text, Directive, Comment, Script, Style, Tag, CDATA, Doctype;
+var ElementType, Root, Text2, Directive, Comment, Script, Style, Tag, CDATA, Doctype;
 var init_dist2 = __esm({
   "node_modules/.pnpm/domelementtype@3.0.0/node_modules/domelementtype/dist/index.js"() {
     (function(ElementType2) {
@@ -56406,7 +56406,7 @@ var init_dist2 = __esm({
       ElementType2["Doctype"] = "doctype";
     })(ElementType || (ElementType = {}));
     Root = ElementType.Root;
-    Text = ElementType.Text;
+    Text2 = ElementType.Text;
     Directive = ElementType.Directive;
     Comment = ElementType.Comment;
     Script = ElementType.Script;
@@ -56442,7 +56442,7 @@ function hasChildren(node) {
 function cloneNode(node, recursive = false) {
   let result;
   if (isText(node)) {
-    result = new Text2(node.data);
+    result = new Text3(node.data);
   } else if (isComment(node)) {
     result = new Comment2(node.data);
   } else if (isTag2(node)) {
@@ -56504,7 +56504,7 @@ function cloneChildren(childs) {
   }
   return children;
 }
-var Node, DataNode, Text2, Comment2, ProcessingInstruction, NodeWithChildren, CDATA2, Document, Element;
+var Node, DataNode, Text3, Comment2, ProcessingInstruction, NodeWithChildren, CDATA2, Document, Element;
 var init_node = __esm({
   "node_modules/.pnpm/domhandler@6.0.1/node_modules/domhandler/dist/node.js"() {
     init_dist2();
@@ -56579,7 +56579,7 @@ var init_node = __esm({
         this.data = data;
       }
     };
-    Text2 = class extends DataNode {
+    Text3 = class extends DataNode {
       type = ElementType.Text;
       get nodeType() {
         return 3;
@@ -56792,7 +56792,7 @@ var init_dist3 = __esm({
             lastNode.endIndex = this.parser.endIndex;
           }
         } else {
-          const node = new Text2(data);
+          const node = new Text3(data);
           this.addNode(node);
           this.lastNode = node;
         }
@@ -56810,7 +56810,7 @@ var init_dist3 = __esm({
         this.lastNode = null;
       }
       oncdatastart() {
-        const text2 = new Text2("");
+        const text2 = new Text3("");
         const node = new CDATA2([text2]);
         this.addNode(node);
         text2.parent = node;
@@ -57040,7 +57040,7 @@ function renderNode(node, options2, xmlMode) {
     case Tag: {
       return renderTag(node, options2, xmlMode);
     }
-    case Text: {
+    case Text2: {
       const element = node;
       const data = element.data || "";
       if ((options2.encodeEntities ?? options2.decodeEntities) !== false && !(!xmlMode && element.parent && unencodedElements.has(element.parent.name))) {
@@ -65880,8 +65880,123 @@ var require_sanitize_html = __commonJS({
 // src/main/main.tsx
 var import_node_path4 = require("node:path");
 var import_node_url3 = require("node:url");
-var import_pixel = require("@zenbu-labs/pixel");
+var import_pixel2 = require("@zenbu-labs/pixel");
 var import_react = require("react");
+
+// src/main/context-menu.tsx
+var import_pixel = require("@zenbu-labs/pixel");
+var import_jsx_runtime = require("react/jsx-runtime");
+function ContextMenu({
+  x,
+  y,
+  bounds,
+  items,
+  rem,
+  theme,
+  onAction,
+  onClose
+}) {
+  const rowH = Math.round(rem * 1.55);
+  const charW = rem * 0.82 * 0.6;
+  const shortcutW = rem * 0.72 * 0.6;
+  const width = Math.round(
+    items.reduce((widest, item) => {
+      let row = rem * 1.4 + item.label.length * charW;
+      if (item.shortcut) row += rem * 0.6 + item.shortcut.length * shortcutW;
+      return Math.max(widest, row);
+    }, rem * 9)
+  );
+  const height = items.length * rowH;
+  const left = Math.max(2, Math.min(x, bounds.width - width - 4));
+  const top = Math.max(2, Math.min(y, bounds.height - height - 4));
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+    import_pixel.Box,
+    {
+      style: {
+        position: "absolute",
+        inset: { top, left },
+        width,
+        flexDirection: "column",
+        background: theme.field,
+        cornerRadius: rem * 0.45,
+        border: { width: 1, color: theme.fieldBorder },
+        overflow: "hidden"
+      },
+      onClickOutside: onClose,
+      children: items.map((item, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        MenuRow,
+        {
+          item,
+          rowH,
+          rem,
+          theme,
+          onAction,
+          first: i === 0,
+          last: i === items.length - 1
+        },
+        item.id
+      ))
+    }
+  );
+}
+function MenuRow({
+  item,
+  rowH,
+  rem,
+  theme,
+  onAction,
+  first,
+  last
+}) {
+  const radius = Math.max(2, rem * 0.45 - 1);
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+    import_pixel.Box,
+    {
+      style: {
+        height: rowH,
+        alignItems: "center",
+        padding: { left: rem * 0.7, right: rem * 0.7 },
+        hoverBackground: item.enabled ? theme.hover : void 0,
+        cornerRadius: {
+          topLeft: first ? radius : 0,
+          topRight: first ? radius : 0,
+          bottomLeft: last ? radius : 0,
+          bottomRight: last ? radius : 0
+        },
+        flexShrink: 0
+      },
+      onClick: item.enabled ? () => onAction(item.id) : void 0,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          import_pixel.Text,
+          {
+            style: {
+              flexGrow: 1,
+              flexBasis: 0,
+              fontSize: rem * 0.82,
+              color: item.enabled ? theme.fg : theme.disabled,
+              wrap: false,
+              selectable: false
+            },
+            children: item.label
+          }
+        ),
+        item.shortcut && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          import_pixel.Text,
+          {
+            style: {
+              fontSize: rem * 0.72,
+              color: item.enabled ? theme.muted : theme.disabled,
+              wrap: false,
+              selectable: false
+            },
+            children: item.shortcut
+          }
+        )
+      ]
+    }
+  );
+}
 
 // src/main/ipc.ts
 var import_node_fs2 = require("node:fs");
@@ -71175,18 +71290,27 @@ function registerIpc(options2, copy, contents) {
 }
 
 // src/main/main.tsx
-var import_jsx_runtime = require("react/jsx-runtime");
+var import_jsx_runtime2 = require("react/jsx-runtime");
 var options = JSON.parse(process.argv[2] ?? "null");
 if (!options) throw new Error("mdb: start options missing; run mdb through bin/mdb.js");
 var PAGE_URL = (0, import_node_url3.pathToFileURL)((0, import_node_path4.join)(__dirname, "..", "page", "index.html")).href;
 var PRELOAD = (0, import_node_path4.join)(__dirname, "preload.js");
+var COPY_SHORTCUT = process.platform === "darwin" ? "cmd+c" : "ctrl+shift+c";
 var view = null;
-var root = (0, import_pixel.createRoot)({
+async function copySelection() {
+  const text2 = await view?.webContents.executeJavaScript("getSelection().toString()");
+  if (text2) root.setClipboard(text2);
+}
+var root = (0, import_pixel2.createRoot)({
   name: "mdb",
   onKey(event) {
-    if (event.kind !== "press" || !event.mods.ctrl) return false;
-    if (event.key === "c" || event.key === "q") {
+    if (event.kind !== "press") return false;
+    if (event.mods.ctrl && (event.key === "c" || event.key === "q")) {
       root.stop();
+      return true;
+    }
+    if (event.mods.super && event.key === "c") {
+      void copySelection();
       return true;
     }
     return false;
@@ -71198,22 +71322,56 @@ registerIpc(
   (text2) => root.setClipboard(text2),
   () => view?.webContents ?? null
 );
-function App() {
-  const ref = (0, import_react.useRef)(null);
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-    import_pixel.WebView,
-    {
-      ref: (handle) => {
-        ref.current = handle;
-        view = handle;
-      },
-      src: PAGE_URL,
-      preload: PRELOAD,
-      autoFocus: true,
-      onOpenWindow: "deny",
-      browserWindowOptions: { transparent: true, backgroundColor: "#00000000" },
-      style: { width: "100%", height: "100%" }
-    }
-  );
+function menuItems(menu) {
+  const items = [];
+  if (menu.selectionText)
+    items.push({ id: "copy", label: "Copy", enabled: true, shortcut: COPY_SHORTCUT });
+  if (menu.linkURL)
+    items.push({ id: "copy-link", label: "Copy link address", enabled: true, shortcut: "" });
+  return items;
 }
-root.render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App, {}));
+function App() {
+  const [menu, setMenu] = (0, import_react.useState)(null);
+  const theme = (0, import_pixel2.makeTheme)((0, import_pixel2.useTerminalColors)());
+  const items = menu ? menuItems(menu) : [];
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      import_pixel2.WebView,
+      {
+        ref: (handle) => {
+          view = handle;
+        },
+        src: PAGE_URL,
+        preload: PRELOAD,
+        autoFocus: true,
+        onOpenWindow: "deny",
+        browserWindowOptions: { transparent: true, backgroundColor: "#00000000" },
+        style: { width: "100%", height: "100%" },
+        onContextMenu: (params) => setMenu({
+          x: params.x * root.displayScale,
+          y: params.y * root.displayScale,
+          selectionText: params.selectionText.trim(),
+          linkURL: params.linkURL
+        })
+      }
+    ),
+    menu && items.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+      ContextMenu,
+      {
+        x: menu.x,
+        y: menu.y,
+        bounds: { width: root.info.width, height: root.info.height },
+        items,
+        rem: root.info.basePx,
+        theme,
+        onAction: (id) => {
+          if (id === "copy") root.setClipboard(menu.selectionText);
+          if (id === "copy-link") root.setClipboard(menu.linkURL);
+          setMenu(null);
+        },
+        onClose: () => setMenu(null)
+      }
+    )
+  ] });
+}
+root.render(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)(App, {}));
