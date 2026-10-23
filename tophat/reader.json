@@ -1,0 +1,34 @@
+{
+  "args": ["../test/fixtures/docs/README.md"],
+  "out": "../build/tophat/reader",
+  "width": 1200,
+  "height": 900,
+  "steps": [
+    { "wait": 600 },
+    { "shot": "1-top" },
+    { "eval": "document.querySelector('.outline a.active')?.textContent" },
+    { "scroll": 700 },
+    { "shot": "2-middle" },
+    { "eval": "document.querySelector('.outline a.active')?.textContent" },
+    {
+      "eval": "document.querySelector('.diagram svg') ? 'svg' : document.querySelector('.diagram')?.textContent"
+    },
+    { "key": "b", "modifiers": ["control"] },
+    { "shot": "3-outline-hidden" },
+    { "key": "b", "modifiers": ["control"] },
+    { "key": "g" },
+    { "click": "a[href='guide/setup.md']" },
+    { "wait": 300 },
+    { "eval": "document.title" },
+    { "shot": "4-linked-doc" },
+    { "key": "[", "modifiers": ["meta"] },
+    { "wait": 300 },
+    { "eval": "document.title" },
+    { "click": "a[href='missing.md']" },
+    { "eval": "document.querySelector('.link-notice')?.textContent" },
+    { "key": "Escape" },
+    { "wait": 800 },
+    { "eval": "document.querySelector('.finder') && !document.querySelector('.finder').hidden" },
+    { "shot": "5-finder-after-esc" }
+  ]
+}

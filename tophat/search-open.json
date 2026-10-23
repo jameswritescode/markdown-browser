@@ -1,0 +1,16 @@
+{
+  "args": ["../test/fixtures/docs"],
+  "out": "../build/tophat/search-open",
+  "width": 1000,
+  "height": 500,
+  "steps": [
+    { "wait": 400 },
+    { "key": "/" },
+    { "type": "kitty" },
+    { "wait": 400 },
+    { "key": "Return" },
+    { "wait": 600 },
+    { "eval": "[document.title, window.getSelection()?.toString()]" },
+    { "shot": "opened" }
+  ]
+}

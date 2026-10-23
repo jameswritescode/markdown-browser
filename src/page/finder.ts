@@ -7,12 +7,12 @@ import { relativeTime } from "./time.ts";
 interface Row {
   entry: DocEntry;
   render(): HTMLElement;
-  line?: number;
+  find?: string;
 }
 
 export interface FinderOptions {
   scan: ScanResult;
-  onOpen(path: string, line?: number): void;
+  onOpen(path: string, find?: string): void;
 }
 
 const SEARCH_DEBOUNCE_MS = 150;
@@ -65,7 +65,7 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
 
   const hitRow = (hit: SearchHit): Row => ({
     entry: hit.entry,
-    line: hit.line,
+    find: hit.snippet.slice(...hit.range),
     render: () => {
       const li = el("li", "row");
       const main = el("div", "row-main");
@@ -156,7 +156,7 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
 
   const open = (i: number) => {
     const row = rows[i];
-    if (row) opts.onOpen(row.entry.path, row.line);
+    if (row) opts.onOpen(row.entry.path, row.find);
   };
 
   const setMode = (next: "filter" | "search") => {

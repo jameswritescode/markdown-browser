@@ -24,6 +24,7 @@ interface Script {
   background?: string;
   theme?: { foreground: number[]; background: number[]; ansi: (number[] | null)[] };
   out: string;
+  files?: Record<string, string>;
   steps: Step[];
 }
 
@@ -48,6 +49,11 @@ const base = dirname(scriptPath);
 const out = resolve(base, script.out);
 const cwd = resolve(base, script.cwd ?? ".");
 mkdirSync(out, { recursive: true });
+
+for (const [file, text] of Object.entries(script.files ?? {})) {
+  mkdirSync(dirname(resolve(base, file)), { recursive: true });
+  writeFileSync(resolve(base, file), text);
+}
 
 const options = parseArgs(script.args, cwd, process.env);
 if ("error" in options) {
@@ -115,7 +121,7 @@ async function run(): Promise<void> {
       await sleep(250);
     } else if ("click" in step) {
       const box = (await contents.executeJavaScript(
-        `(() => { const r = document.querySelector(${JSON.stringify(step.click)})?.getBoundingClientRect(); return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null })()`,
+        `(() => { const e = document.querySelector(${JSON.stringify(step.click)}); if (!e) return null; e.scrollIntoView({ block: "center" }); const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 } })()`,
       )) as { x: number; y: number } | null;
       if (!box) record(`click: no element for ${step.click}`);
       else {
