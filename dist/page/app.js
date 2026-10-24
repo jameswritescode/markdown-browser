@@ -21852,7 +21852,6 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
     const onKey = (event) => {
       if (root.hidden || event.target === findInput) return;
       const plain = !event.metaKey && !event.ctrlKey && !event.altKey;
-      const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
       const page = scroller.clientHeight * 0.9;
       if (event.key === "Escape" && findRanges.length) clearFind();
       else if (event.key === "Escape") opts.onExit();
@@ -21866,9 +21865,9 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       else if (event.ctrlKey && event.key === "b") {
         outlineShown = !outlineShown;
         layout();
-      } else if ((plain || ctrl) && (event.key === "j" || event.key === "ArrowDown"))
+      } else if (plain && (event.key === "j" || event.key === "ArrowDown"))
         scroller.scrollBy({ top: 60 });
-      else if ((plain || ctrl) && (event.key === "k" || event.key === "ArrowUp"))
+      else if (plain && (event.key === "k" || event.key === "ArrowUp"))
         scroller.scrollBy({ top: -60 });
       else if (plain && (event.key === " " || event.key === "PageDown") && !event.shiftKey)
         scroller.scrollBy({ top: page });

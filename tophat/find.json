@@ -14,12 +14,10 @@
       "shot": "1-bar"
     },
     {
-      "key": "j",
-      "modifiers": ["control"]
+      "key": "j"
     },
     {
-      "key": "j",
-      "modifiers": ["control"]
+      "key": "j"
     },
     {
       "eval": "document.querySelector('.reader-scroll').scrollTop"
@@ -28,7 +26,13 @@
       "eval": "document.querySelector('.where')?.textContent"
     },
     {
-      "key": "k",
+      "key": "k"
+    },
+    {
+      "eval": "document.querySelector('.reader-scroll').scrollTop"
+    },
+    {
+      "key": "j",
       "modifiers": ["control"]
     },
     {

@@ -63,7 +63,6 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 | ---------------------- | ------------------------------------------- |
 | `esc`                  | Go back to the file list.                   |
 | `j` `k`, `↓` `↑`       | Scroll down or up.                          |
-| `ctrl+j` `ctrl+k`      | Scroll down or up.                          |
 | `/`                    | Find text in the document.                  |
 | `n`, `N`               | Go to the next or the previous match.       |
 | `space`, `shift+space` | Scroll one page down or up.                 |
