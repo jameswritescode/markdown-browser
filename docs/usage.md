@@ -29,7 +29,7 @@ Type text to filter the list. mdb compares the text to the title and the path of
 
 Press `/` when the filter is empty. Then type text. mdb finds the text in the documents and shows the line with the text. mdb shows a maximum of 3 results for each file.
 
-Press `enter` to open the document. mdb selects the text that you searched for.
+Press `enter` to open the document. mdb highlights the text that you searched for. Press `n` and `N` to go to the other matches.
 
 Press `esc` to clear the text. Press `esc` again to go back to the filter.
 
@@ -48,6 +48,24 @@ mdb shows these items:
 - Mermaid diagrams in ` ```mermaid ` code blocks.
 
 mdb does not run scripts in documents.
+
+### Status line
+
+The status line is at the bottom of the document. It shows the path of the document and how far you scrolled. It also shows the keys that you can use.
+
+### Find text in the document
+
+1. Press `/`. A text field opens in the status line.
+2. Type the text. mdb highlights all the matches and goes to the first match below the top of the page. The status line shows the number of matches.
+3. Press `enter` to close the text field. The highlights stay.
+4. Press `n` to go to the next match. Press `N` to go to the previous match.
+5. Press `esc` to remove the highlights.
+
+If you press `esc` while you type, mdb closes the text field and removes the highlights.
+
+mdb does not find text that crosses formatting, for example text that is part bold and part not bold.
+
+When you open a document from a text search in the file list, mdb highlights the text that you searched for.
 
 ### Outline
 

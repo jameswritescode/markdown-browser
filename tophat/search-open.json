@@ -10,7 +10,9 @@
     { "wait": 400 },
     { "key": "Return" },
     { "wait": 600 },
-    { "eval": "[document.title, window.getSelection()?.toString()]" },
+    {
+      "eval": "[document.title, document.querySelector('.where')?.textContent, CSS.highlights.get('mdb-find-current')?.size]"
+    },
     { "shot": "opened" }
   ]
 }

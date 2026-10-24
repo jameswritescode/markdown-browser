@@ -282,8 +282,10 @@
     input.addEventListener("input", () => mode === "filter" ? refilter() : research());
     input.addEventListener("keydown", (event) => {
       const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
-      if (event.key === "ArrowDown" || ctrl && event.key === "n") select(selected + 1);
-      else if (event.key === "ArrowUp" || ctrl && event.key === "p") select(selected - 1);
+      if (event.key === "ArrowDown" || ctrl && (event.key === "n" || event.key === "j"))
+        select(selected + 1);
+      else if (event.key === "ArrowUp" || ctrl && (event.key === "p" || event.key === "k"))
+        select(selected - 1);
       else if (event.key === "PageDown") select(selected + 10);
       else if (event.key === "PageUp") select(selected - 10);
       else if (event.key === "Enter") open(selected);
@@ -21515,6 +21517,25 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
   var yS = [Mc, tE, rb, Yy, Dy, EA, Cy, Tg, fE, bS, tA, qb, Dm, a0, A0, jy, SE, YA, hy, G0, cy, pg, qm, jE, Em, $A, Wg, rS, hb, Px, Hx, xy, dA];
   lh(...yS);
 
+  // src/page/find.ts
+  function findMatches(texts, query) {
+    if (!query.trim()) return [];
+    const needle = query.toLowerCase();
+    const matches = [];
+    texts.forEach((text, index) => {
+      const haystack = text.toLowerCase();
+      for (let at2 = haystack.indexOf(needle); at2 !== -1; at2 = haystack.indexOf(needle, at2)) {
+        matches.push({ index, start: at2, end: at2 + needle.length });
+        at2 += needle.length;
+      }
+    });
+    return matches;
+  }
+  function stepMatch(current, count, by2) {
+    if (count === 0) return -1;
+    return (current + by2 + count) % count;
+  }
+
   // src/page/history.ts
   var History = class {
     entries = [];
@@ -21549,12 +21570,30 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
   // src/page/reader.ts
   var NARROW_WIDTH = 760;
   var OUTLINE_MAX_LEVEL = 3;
+  var FIND_HIGHLIGHT = "mdb-find";
+  var FIND_CURRENT_HIGHLIGHT = "mdb-find-current";
   function mountReader(host, opts) {
     const root = el("div", "reader");
     const outline = el("nav", "outline");
     outline.setAttribute("aria-label", "On this page");
     const article = el("article", "markdown-body");
-    root.append(outline, article);
+    const scroller = el("div", "reader-scroll");
+    const content = el("div", "reader-content");
+    content.append(outline, article);
+    scroller.append(content);
+    const status = el("div", "status");
+    const where = el("span", "where");
+    const findBox = el("label", "find");
+    const findInput = el("input", "find-query");
+    findInput.spellcheck = false;
+    findInput.autocomplete = "off";
+    findInput.setAttribute("aria-label", "Find in document");
+    const findCount = el("span", "find-count");
+    findBox.append(el("span", "sigil", "/"), findInput, findCount);
+    findBox.hidden = true;
+    const hints = el("span", "hints");
+    status.append(where, findBox, hints);
+    root.append(scroller, status);
     host.append(root);
     const history = new History();
     let current = null;
@@ -21562,9 +21601,33 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
     let observer = null;
     let headings = [];
     let pendingFind = null;
+    let findQuery = "";
+    let findRanges = [];
+    let findAt = -1;
     const outlineVisible = () => outlineToggled ?? window.innerWidth >= NARROW_WIDTH;
     const layout = () => {
-      root.classList.toggle("with-outline", outlineVisible() && (current?.outline.length ?? 0) > 0);
+      content.classList.toggle(
+        "with-outline",
+        outlineVisible() && (current?.outline.length ?? 0) > 0
+      );
+    };
+    const relPath = (path) => path.startsWith(`${opts.root}/`) ? path.slice(opts.root.length + 1) : path;
+    const paintStatus = () => {
+      const path = history.current?.path;
+      const range = scroller.scrollHeight - scroller.clientHeight;
+      const percent = range > 0 ? Math.round(scroller.scrollTop / range * 100) : 100;
+      where.textContent = path ? `${relPath(path)} \xB7 ${current ? `${percent}%` : "missing"}` : "";
+      const finding = !findBox.hidden;
+      where.hidden = finding;
+      if (findQuery) {
+        findCount.textContent = findRanges.length ? `${findAt + 1} of ${findRanges.length}` : "no matches";
+      } else findCount.textContent = "";
+      if (finding) hints.textContent = "enter done \xB7 esc cancel";
+      else if (findRanges.length) {
+        where.textContent = `/${findQuery} \xB7 ${findAt + 1} of ${findRanges.length}`;
+        hints.textContent = "n next \xB7 N previous \xB7 esc clear";
+      } else if (current) hints.textContent = "/ find \xB7 esc files \xB7 ctrl+b outline \xB7 cmd+[ back";
+      else hints.textContent = "esc files";
     };
     const paintOutline = (items) => {
       const title = el("p", "outline-title", "On this page");
@@ -21584,7 +21647,7 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       outline.replaceChildren(title, list);
     };
     const markActive = () => {
-      const top = Math.min(120, window.innerHeight * 0.25);
+      const top = scroller.getBoundingClientRect().top + Math.min(120, scroller.clientHeight * 0.25);
       let active = null;
       for (const heading of headings) {
         if (heading.getBoundingClientRect().top <= top) active = heading;
@@ -21596,10 +21659,15 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       }
       outline.querySelector(".active")?.scrollIntoView({ block: "nearest" });
     };
+    const scrollToTop = (viewportTop) => {
+      scroller.scrollTo({
+        top: viewportTop - scroller.getBoundingClientRect().top + scroller.scrollTop
+      });
+    };
     const scrollToId = (id2) => {
       const target = document.getElementById(id2) ?? document.getElementById(`user-content-${id2}`);
       if (!target) return false;
-      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 16 });
+      scrollToTop(target.getBoundingClientRect().top - 16);
       return true;
     };
     const renderDiagrams = () => {
@@ -21625,12 +21693,76 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       headings = [
         ...article.querySelectorAll("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]")
       ];
-      observer = new IntersectionObserver(markActive, { rootMargin: "0px 0px -75% 0px" });
+      observer = new IntersectionObserver(markActive, {
+        root: scroller,
+        rootMargin: "0px 0px -75% 0px"
+      });
       for (const heading of headings) observer.observe(heading);
       markActive();
     };
+    const paintFind = () => {
+      const active = findRanges[findAt];
+      CSS.highlights.set(FIND_HIGHLIGHT, new Highlight(...findRanges.filter((r) => r !== active)));
+      if (active) CSS.highlights.set(FIND_CURRENT_HIGHLIGHT, new Highlight(active));
+      else CSS.highlights.delete(FIND_CURRENT_HIGHLIGHT);
+      paintStatus();
+    };
+    const showMatch = () => {
+      const range = findRanges[findAt];
+      if (range) scrollToTop(range.getBoundingClientRect().top - scroller.clientHeight / 3);
+      paintFind();
+    };
+    const runFind = (query, from) => {
+      findQuery = query;
+      const nodes = [];
+      const walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT, {
+        acceptNode: (node) => node.parentElement?.closest("svg, style, script") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+      });
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      findRanges = findMatches(
+        nodes.map((n) => n.data),
+        query
+      ).map((m) => {
+        const range = document.createRange();
+        range.setStart(nodes[m.index], m.start);
+        range.setEnd(nodes[m.index], m.end);
+        return range;
+      });
+      const viewTop = scroller.getBoundingClientRect().top;
+      const inView = findRanges.findIndex((r) => r.getBoundingClientRect().top >= viewTop);
+      findAt = findRanges.length ? from === "view" && inView >= 0 ? inView : 0 : -1;
+      showMatch();
+    };
+    const clearFind = () => {
+      findQuery = "";
+      findRanges = [];
+      findAt = -1;
+      paintFind();
+    };
+    const openFind = () => {
+      findBox.hidden = false;
+      findInput.value = findQuery;
+      findInput.focus();
+      findInput.select();
+      paintStatus();
+    };
+    const closeFind = (keep) => {
+      findBox.hidden = true;
+      findInput.blur();
+      if (!keep || !findRanges.length) clearFind();
+      else paintStatus();
+    };
+    findInput.addEventListener("input", () => runFind(findInput.value, "view"));
+    findInput.addEventListener("keydown", (event) => {
+      event.stopPropagation();
+      if (event.key === "Enter") closeFind(true);
+      else if (event.key === "Escape") closeFind(false);
+      else return;
+      event.preventDefault();
+    });
     const showMissing = (path) => {
       current = null;
+      clearFind();
       outline.replaceChildren();
       const notice = el("div", "missing");
       notice.append(
@@ -21640,6 +21772,7 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       notice.append(el("p", "missing-hint", "Press esc to go back to the list."));
       article.replaceChildren(notice);
       layout();
+      paintStatus();
     };
     const render = async (path, keepScroll, anchor) => {
       const doc = await window.mdb.render(path);
@@ -21654,21 +21787,16 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       paintOutline(doc.outline);
       layout();
       watchHeadings();
-      if (keepScroll !== null) window.scrollTo({ top: keepScroll });
-      else if (!(anchor && scrollToId(anchor))) window.scrollTo({ top: 0 });
-      if (pendingFind) findText(pendingFind);
+      if (keepScroll !== null) scroller.scrollTo({ top: keepScroll });
+      else if (!(anchor && scrollToId(anchor))) scroller.scrollTo({ top: 0 });
+      if (pendingFind) runFind(pendingFind, "top");
+      else if (keepScroll !== null && findQuery) {
+        const at2 = findAt;
+        runFind(findQuery, "top");
+        findAt = Math.min(at2, findRanges.length - 1);
+        paintFind();
+      } else clearFind();
       pendingFind = null;
-    };
-    const findText = (text) => {
-      window.getSelection()?.removeAllRanges();
-      const finder = window;
-      if (finder.find?.(text)) {
-        const range = window.getSelection()?.getRangeAt(0);
-        if (range) {
-          const top = range.getBoundingClientRect().top + window.scrollY - window.innerHeight / 3;
-          window.scrollTo({ top: Math.max(0, top) });
-        }
-      }
     };
     const open = async (path, anchor = null, scrollY = null) => {
       window.mdb.watch(path);
@@ -21676,13 +21804,13 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
     };
     const navigate = async (path, anchor) => {
       const here = history.current;
-      if (here) history.replace({ path: here.path, scrollY: window.scrollY });
+      if (here) history.replace({ path: here.path, scrollY: scroller.scrollTop });
       history.push({ path, scrollY: 0 });
       await open(path, anchor);
     };
     const step = async (direction) => {
       const here = history.current;
-      if (here) history.replace({ path: here.path, scrollY: window.scrollY });
+      if (here) history.replace({ path: here.path, scrollY: scroller.scrollTop });
       const entry = direction === "back" ? history.back() : history.forward();
       if (entry) await open(entry.path, null, entry.scrollY);
     };
@@ -21707,34 +21835,54 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
     });
     const unsubscribe = window.mdb.onChanged(async (path) => {
       if (root.hidden || history.current?.path !== path) return;
-      await render(path, window.scrollY, null);
+      await render(path, scroller.scrollTop, null);
     });
+    const showMatchStep = (by2) => {
+      if (!findRanges.length) return;
+      findAt = stepMatch(findAt, findRanges.length, by2);
+      showMatch();
+    };
     const onKey = (event) => {
-      if (root.hidden) return;
+      if (root.hidden || event.target === findInput) return;
       const plain = !event.metaKey && !event.ctrlKey && !event.altKey;
-      const page = window.innerHeight * 0.9;
-      if (event.key === "Escape") opts.onExit();
+      const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
+      const page = scroller.clientHeight * 0.9;
+      if (event.key === "Escape" && findRanges.length) clearFind();
+      else if (event.key === "Escape") opts.onExit();
+      else if (plain && event.key === "/" && current) openFind();
+      else if (!event.metaKey && !event.ctrlKey && !event.altKey && event.key === "n")
+        showMatchStep(1);
+      else if (!event.metaKey && !event.ctrlKey && !event.altKey && event.key === "N")
+        showMatchStep(-1);
       else if ((event.metaKey || event.ctrlKey) && event.key === "[") void step("back");
       else if ((event.metaKey || event.ctrlKey) && event.key === "]") void step("forward");
       else if (event.ctrlKey && event.key === "b") {
         outlineToggled = !outlineVisible();
         layout();
-      } else if (plain && (event.key === "j" || event.key === "ArrowDown"))
-        window.scrollBy({ top: 60 });
-      else if (plain && (event.key === "k" || event.key === "ArrowUp")) window.scrollBy({ top: -60 });
+      } else if ((plain || ctrl) && (event.key === "j" || event.key === "ArrowDown"))
+        scroller.scrollBy({ top: 60 });
+      else if ((plain || ctrl) && (event.key === "k" || event.key === "ArrowUp"))
+        scroller.scrollBy({ top: -60 });
       else if (plain && (event.key === " " || event.key === "PageDown") && !event.shiftKey)
-        window.scrollBy({ top: page });
+        scroller.scrollBy({ top: page });
       else if ((plain || event.shiftKey) && (event.key === " " && event.shiftKey || event.key === "PageUp"))
-        window.scrollBy({ top: -page });
-      else if (plain && (event.key === "g" || event.key === "Home")) window.scrollTo({ top: 0 });
+        scroller.scrollBy({ top: -page });
+      else if (plain && (event.key === "g" || event.key === "Home")) scroller.scrollTo({ top: 0 });
       else if (event.key === "G" && !event.metaKey && !event.ctrlKey || plain && event.key === "End")
-        window.scrollTo({ top: document.documentElement.scrollHeight });
+        scroller.scrollTo({ top: scroller.scrollHeight });
       else return;
       event.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("resize", layout);
-    window.addEventListener("scroll", () => !root.hidden && markActive(), { passive: true });
+    scroller.addEventListener(
+      "scroll",
+      () => {
+        markActive();
+        paintStatus();
+      },
+      { passive: true }
+    );
     return {
       async open(path, find) {
         pendingFind = find?.trim() || null;
@@ -21746,6 +21894,7 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       },
       hide() {
         root.hidden = true;
+        closeFind(false);
         window.mdb.watch(null);
       },
       destroy() {
@@ -21792,7 +21941,7 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       document.title = "mdb";
       finder.show();
     };
-    const reader = mountReader(app, { onExit: () => void showFinder() });
+    const reader = mountReader(app, { root: start.root, onExit: () => void showFinder() });
     reader.hide();
     if (start.openPath) await reader.open(start.openPath);
     else await showFinder();

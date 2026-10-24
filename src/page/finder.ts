@@ -173,8 +173,10 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
   input.addEventListener("input", () => (mode === "filter" ? refilter() : research()));
   input.addEventListener("keydown", (event) => {
     const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
-    if (event.key === "ArrowDown" || (ctrl && event.key === "n")) select(selected + 1);
-    else if (event.key === "ArrowUp" || (ctrl && event.key === "p")) select(selected - 1);
+    if (event.key === "ArrowDown" || (ctrl && (event.key === "n" || event.key === "j")))
+      select(selected + 1);
+    else if (event.key === "ArrowUp" || (ctrl && (event.key === "p" || event.key === "k")))
+      select(selected - 1);
     else if (event.key === "PageDown") select(selected + 10);
     else if (event.key === "PageUp") select(selected - 10);
     else if (event.key === "Enter") open(selected);

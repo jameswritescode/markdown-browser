@@ -1,0 +1,117 @@
+{
+  "args": ["../test/fixtures/docs/README.md"],
+  "out": "../build/tophat/find",
+  "width": 1100,
+  "height": 600,
+  "steps": [
+    {
+      "wait": 600
+    },
+    {
+      "eval": "document.querySelector('.reader .status')?.textContent"
+    },
+    {
+      "shot": "1-bar"
+    },
+    {
+      "key": "j",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "j",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "document.querySelector('.reader-scroll').scrollTop"
+    },
+    {
+      "eval": "document.querySelector('.where')?.textContent"
+    },
+    {
+      "key": "k",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "document.querySelector('.reader-scroll').scrollTop"
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "the"
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[document.querySelector('.find-count')?.textContent, document.querySelector('.hints')?.textContent]"
+    },
+    {
+      "shot": "2-typing"
+    },
+    {
+      "key": "j"
+    },
+    {
+      "eval": "document.querySelector('.find-query').value"
+    },
+    {
+      "key": "Backspace"
+    },
+    {
+      "key": "Return"
+    },
+    {
+      "eval": "[document.activeElement?.className, document.querySelector('.where')?.textContent]"
+    },
+    {
+      "key": "n"
+    },
+    {
+      "key": "n"
+    },
+    {
+      "eval": "document.querySelector('.where')?.textContent"
+    },
+    {
+      "key": "N",
+      "modifiers": ["shift"]
+    },
+    {
+      "eval": "document.querySelector('.where')?.textContent"
+    },
+    {
+      "shot": "3-matches"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "eval": "[CSS.highlights.get('mdb-find')?.size ?? 0, document.querySelector('.where')?.textContent, !!document.querySelector('.reader:not([hidden])')]"
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "zzzz"
+    },
+    {
+      "eval": "document.querySelector('.find-count')?.textContent"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "eval": "[document.querySelector('.find').hidden, !!document.querySelector('.reader:not([hidden])')]"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "!!document.querySelector('.finder:not([hidden])')"
+    }
+  ]
+}

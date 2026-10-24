@@ -177,26 +177,75 @@ mark.hit {
 /* Reader */
 
 .reader {
-  display: block;
-  padding: 32px 32px 96px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
-.reader.with-outline {
+.reader-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.reader-content {
+  display: block;
+  padding: 32px 32px 64px;
+}
+
+.reader-content.with-outline {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 40px;
+}
+
+.reader .status {
+  margin: 0 24px;
+}
+
+.where,
+.hints {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.find {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.find-query {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: none;
+  color: var(--fg);
+  font: inherit;
+  caret-color: var(--fg);
+}
+
+::highlight(mdb-find) {
+  background-color: color-mix(in srgb, var(--warning) 25%, transparent);
+}
+
+::highlight(mdb-find-current) {
+  background-color: color-mix(in srgb, var(--warning) 80%, transparent);
 }
 
 .outline {
   display: none;
 }
 
-.reader.with-outline .outline {
+.reader-content.with-outline .outline {
   display: block;
   position: sticky;
   top: 32px;
   align-self: start;
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - 110px);
   overflow-y: auto;
   font-size: 13px;
 }

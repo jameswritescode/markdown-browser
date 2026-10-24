@@ -51,7 +51,7 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 | -------------------------- | ------------------------------------------------------------------------ |
 | Type text                  | Filter the list by file name and title.                                  |
 | `/`                        | Search the text in the documents. Use this key when the filter is empty. |
-| `↓` `↑`, `ctrl+n` `ctrl+p` | Move the selection.                                                      |
+| `↓` `↑`, `ctrl+j` `ctrl+k` | Move the selection. You can also use `ctrl+n` and `ctrl+p`.              |
 | `pagedown` `pageup`        | Move the selection 10 rows.                                              |
 | `enter`                    | Open the selected document.                                              |
 | `esc`                      | Clear the filter. In text search, go back to the filter.                 |
@@ -63,6 +63,9 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 | ---------------------- | ------------------------------------------- |
 | `esc`                  | Go back to the file list.                   |
 | `j` `k`, `↓` `↑`       | Scroll down or up.                          |
+| `ctrl+j` `ctrl+k`      | Scroll down or up.                          |
+| `/`                    | Find text in the document.                  |
+| `n`, `N`               | Go to the next or the previous match.       |
 | `space`, `shift+space` | Scroll one page down or up.                 |
 | `g`, `G`               | Go to the top or the bottom.                |
 | `cmd+[`, `cmd+]`       | Go back or forward after you follow a link. |

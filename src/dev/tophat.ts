@@ -134,7 +134,9 @@ async function run(): Promise<void> {
         await sleep(250);
       }
     } else if ("scroll" in step) {
-      await contents.executeJavaScript(`window.scrollBy(0, ${step.scroll})`);
+      await contents.executeJavaScript(
+        `(document.querySelector(".reader:not([hidden]) .reader-scroll") ?? document.scrollingElement).scrollBy(0, ${step.scroll})`,
+      );
       await sleep(250);
     } else if ("eval" in step) {
       const value = await contents.executeJavaScript(step.eval);

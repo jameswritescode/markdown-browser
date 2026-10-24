@@ -4,21 +4,74 @@
   "width": 1000,
   "height": 420,
   "steps": [
-    { "wait": 400 },
-    { "shot": "1-list" },
-    { "type": "gst" },
-    { "shot": "2-filter-gst" },
-    { "key": "Escape" },
-    { "key": "/" },
-    { "type": "kitty" },
-    { "wait": 400 },
-    { "shot": "3-search-kitty" },
-    { "key": "Escape" },
-    { "key": "Escape" },
-    { "shot": "4-back-to-list" },
-    { "key": "Down" },
-    { "key": "Return" },
-    { "wait": 400 },
-    { "eval": "document.title" }
+    {
+      "wait": 400
+    },
+    {
+      "shot": "1-list"
+    },
+    {
+      "type": "gst"
+    },
+    {
+      "shot": "2-filter-gst"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "kitty"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "shot": "3-search-kitty"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "shot": "4-back-to-list"
+    },
+    {
+      "key": "j",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "j",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+    },
+    {
+      "key": "k",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+    },
+    {
+      "eval": "document.querySelector('.query').value"
+    },
+    {
+      "key": "Down"
+    },
+    {
+      "key": "Return"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "eval": "document.title"
+    }
   ]
 }

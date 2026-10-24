@@ -41,7 +41,7 @@ async function main(): Promise<void> {
     finder.show();
   };
 
-  const reader = mountReader(app, { onExit: () => void showFinder() });
+  const reader = mountReader(app, { root: start.root, onExit: () => void showFinder() });
   reader.hide();
 
   if (start.openPath) await reader.open(start.openPath);
