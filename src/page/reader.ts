@@ -80,7 +80,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     else if (findRanges.length) {
       where.textContent = `/${findQuery} · ${findAt + 1} of ${findRanges.length}`;
       hints.textContent = "n next · N previous · esc clear";
-    } else if (current) hints.textContent = "/ find · esc files · ctrl+b outline · cmd+[ back";
+    } else if (current) hints.textContent = "/ find · esc files · ctrl+b outline · ctrl+[ back";
     else hints.textContent = "esc files";
   };
 

@@ -75,13 +75,13 @@ If the terminal is narrow, mdb hides the outline. Press `ctrl+b` to show or hide
 
 ### Links
 
-| Link                                          | Result                                        |
-| --------------------------------------------- | --------------------------------------------- |
-| A link to a heading (`#name`)                 | mdb goes to the heading.                      |
-| A link to a markdown file                     | mdb opens the file. Press `cmd+[` to go back. |
-| A link to a markdown file that does not exist | mdb shows "Not found" next to the link.       |
-| A link to a different local file              | Finder shows the file. mdb does not open it.  |
-| A web link                                    | Your default browser opens the link.          |
+| Link                                          | Result                                         |
+| --------------------------------------------- | ---------------------------------------------- |
+| A link to a heading (`#name`)                 | mdb goes to the heading.                       |
+| A link to a markdown file                     | mdb opens the file. Press `ctrl+[` to go back. |
+| A link to a markdown file that does not exist | mdb shows "Not found" next to the link.        |
+| A link to a different local file              | Finder shows the file. mdb does not open it.   |
+| A web link                                    | Your default browser opens the link.           |
 
 ### Changes to the file
 
@@ -94,6 +94,12 @@ If you delete the file, mdb shows "This file no longer exists". Press `esc` to g
 mdb uses Pele to draw Mermaid diagrams. Pele uses the colors of your terminal. Pele ignores `%%{init}%%` theme settings in a diagram.
 
 If a diagram has an error, mdb shows the diagram text and the error message.
+
+### Go back and forward
+
+Press `ctrl+[` to go back to the previous document. Press `ctrl+]` to go forward. `cmd+[` and `cmd+]` also work if your terminal sends them to mdb.
+
+mdb can only see `ctrl+[` if your terminal uses the kitty keyboard protocol. Ghostty, kitty, and cmux use it. In a different terminal, `ctrl+[` is the same as `esc`, and mdb goes back to the file list.
 
 ## Copy text
 

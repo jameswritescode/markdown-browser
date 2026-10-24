@@ -68,7 +68,7 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 | `n`, `N`               | Go to the next or the previous match.       |
 | `space`, `shift+space` | Scroll one page down or up.                 |
 | `g`, `G`               | Go to the top or the bottom.                |
-| `cmd+[`, `cmd+]`       | Go back or forward after you follow a link. |
+| `ctrl+[`, `ctrl+]`     | Go back or forward after you follow a link. |
 | `ctrl+b`               | Show or hide the outline.                   |
 | `cmd+c`                | Copy the selected text.                     |
 | Right-click            | Open the copy menu.                         |

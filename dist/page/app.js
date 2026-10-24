@@ -21633,7 +21633,7 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       else if (findRanges.length) {
         where.textContent = `/${findQuery} \xB7 ${findAt + 1} of ${findRanges.length}`;
         hints.textContent = "n next \xB7 N previous \xB7 esc clear";
-      } else if (current) hints.textContent = "/ find \xB7 esc files \xB7 ctrl+b outline \xB7 cmd+[ back";
+      } else if (current) hints.textContent = "/ find \xB7 esc files \xB7 ctrl+b outline \xB7 ctrl+[ back";
       else hints.textContent = "esc files";
     };
     const paintOutline = (items) => {
