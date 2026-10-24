@@ -11,9 +11,11 @@ mdb uses [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel)
 - macOS.
 - A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, or cmux.
 - Node.js 24 and pnpm. This repository uses [mise](https://mise.jdx.dev) to set the versions.
-- SSH access to this GitHub repository.
+- Read access to this GitHub repository.
 
 ## Install
+
+mdb is a private package in GitHub Packages.
 
 1. Make sure that the pnpm global bin folder is in your `PATH`. If it is not, run this command one time:
 
@@ -21,15 +23,37 @@ mdb uses [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel)
    pnpm setup
    ```
 
-2. Install mdb:
+2. Give pnpm access to GitHub Packages. Do this one time on each computer:
 
    ```sh
-   pnpm add -g --config.side-effects-cache=false --allow-build=@zenbu-labs/pixel git+ssh://git@github.com/jameswritescode/markdown-browser.git
+   gh auth refresh -s read:packages
+   echo "@jameswritescode:registry=https://npm.pkg.github.com" >> ~/.npmrc
+   echo "//npm.pkg.github.com/:_authToken=$(gh auth token)" >> ~/.npmrc
    ```
+
+3. Install mdb:
+
+   ```sh
+   pnpm add -g --config.side-effects-cache=false --allow-build=@zenbu-labs/pixel @jameswritescode/mdb
+   ```
+
+To update mdb, do step 3 again.
 
 The `--allow-build` option lets pixel download its Electron runtime during the install.
 
 The `--config.side-effects-cache=false` option is necessary. If you do not use it, pnpm can copy Electron from its cache without the correct links. Then macOS shows the message "Electron is damaged" and does not start mdb.
+
+### Install from a local copy
+
+To use the code in a local copy of this repository, run these commands in the repository:
+
+```sh
+pnpm install
+pnpm build
+pnpm add -g "$PWD"
+```
+
+The installed `mdb` uses the local copy. After you change the code, run `pnpm build` again.
 
 ## Start mdb
 
@@ -84,7 +108,7 @@ mdb docs/showcase.md
 ## Uninstall
 
 ```sh
-pnpm rm -g mdb
+pnpm rm -g @jameswritescode/mdb
 ```
 
 ## Development
@@ -112,7 +136,35 @@ pnpm rm -g mdb
    node bin/mdb.js test/fixtures/docs
    ```
 
-The `dist/` folder is in git. A git install does not build the source, so you must commit `dist/` after each change. Run `pnpm check:dist` to make sure that `dist/` agrees with the source.
+The `dist/` folder is not in git. `pnpm build` makes it.
+
+### Publish a release
+
+Publish only from `main`.
+
+1. Change the version and make a tag:
+
+   ```sh
+   pnpm version patch
+   ```
+
+   Use `minor` or `major` for larger changes.
+
+2. Push the commit and the tag:
+
+   ```sh
+   git push --follow-tags
+   ```
+
+   The "Publish" workflow runs the checks and publishes the package. It stops if the tag is not on `main`, or if the tag does not agree with the version in `package.json`.
+
+You can also publish from your computer. Your token must have the `write:packages` scope. Run `gh auth refresh -s write:packages`, then put the new `gh auth token` in `~/.npmrc`. On `main`, run:
+
+```sh
+pnpm publish
+```
+
+`pnpm publish` builds `dist/` before it publishes. It stops if you are not on `main`, or if you have changes that are not committed.
 
 ### Test tools
 

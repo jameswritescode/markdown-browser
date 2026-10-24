@@ -3,3 +3,4 @@ docs/superpowers/
 .DS_Store
 .superpowers/
 build/
+dist/

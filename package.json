@@ -1,8 +1,11 @@
 {
-  "name": "mdb",
+  "name": "@jameswritescode/mdb",
   "version": "0.1.0",
-  "private": true,
   "description": "A markdown browser for the terminal, drawn with real pixels.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jameswritescode/markdown-browser.git"
+  },
   "bin": {
     "mdb": "bin/mdb.js"
   },
@@ -12,6 +15,9 @@
     "README.md"
   ],
   "main": "dist/main/main.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
@@ -19,7 +25,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "build": "node scripts/build.mjs",
-    "check:dist": "pnpm build && git diff --exit-code -- dist",
+    "prepack": "pnpm build",
     "tophat": "pnpm build && node scripts/tophat.mjs",
     "smoke": "pnpm build && node scripts/smoke.mjs"
   },
