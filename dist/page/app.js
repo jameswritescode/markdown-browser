@@ -280,8 +280,11 @@
       }
     };
     input.addEventListener("input", () => mode === "filter" ? refilter() : research());
-    input.addEventListener("keydown", (event) => {
+    const onKey = (event) => {
+      if (root.hidden || event.defaultPrevented) return;
       const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
+      const plain = !event.ctrlKey && !event.metaKey && !event.altKey;
+      if (document.activeElement !== input && plain && event.key.length === 1) input.focus();
       if (event.key === "ArrowDown" || ctrl && (event.key === "n" || event.key === "j"))
         select(selected + 1);
       else if (event.key === "ArrowUp" || ctrl && (event.key === "p" || event.key === "k"))
@@ -299,7 +302,8 @@
       } else if (event.key === "/" && mode === "filter" && !input.value) setMode("search");
       else return;
       event.preventDefault();
-    });
+    };
+    window.addEventListener("keydown", onKey);
     refilter();
     return {
       focus: () => input.focus(),
@@ -310,7 +314,10 @@
       hide: () => {
         root.hidden = true;
       },
-      destroy: () => root.remove()
+      destroy: () => {
+        window.removeEventListener("keydown", onKey);
+        root.remove();
+      }
     };
   }
 
