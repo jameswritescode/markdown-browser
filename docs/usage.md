@@ -6,7 +6,7 @@ When you start `mdb` or `mdb <folder>`, mdb shows a list of the markdown files i
 
 Each row shows:
 
-- The document title. This is the first level-1 heading. If the document has no level-1 heading, mdb uses the file name.
+- The document title. This is the `title` value in the frontmatter. If there is no `title` value, mdb uses the first level-1 heading. If the document has no level-1 heading, mdb uses the file name.
 - The path from the folder.
 - The time of the last change.
 
@@ -46,8 +46,26 @@ mdb shows these items:
 - Code blocks with syntax colors.
 - Images. mdb finds a relative image path from the folder of the document.
 - Mermaid diagrams in ` ```mermaid ` code blocks.
+- YAML frontmatter. Refer to [Frontmatter](#frontmatter).
 
 mdb does not run scripts in documents.
+
+### Frontmatter
+
+Frontmatter is YAML at the start of a document, between two `---` lines:
+
+```markdown
+---
+title: Release notes
+tags: [markdown, terminal]
+---
+```
+
+mdb shows the frontmatter as a list of properties at the top of the document. A list value, for example `tags`, shows as a set of labels. The frontmatter is not in the outline.
+
+If the YAML has an error, mdb shows the frontmatter text as a code block.
+
+mdb supports only YAML frontmatter. It does not support TOML frontmatter (`+++`).
 
 ### Status line
 

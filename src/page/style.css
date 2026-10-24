@@ -636,3 +636,38 @@ mark.hit {
 .hljs-strong {
   font-weight: 600;
 }
+
+.markdown-body .frontmatter {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 24px;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.markdown-body .fm-row {
+  display: contents;
+}
+
+.markdown-body .fm-key,
+.markdown-body .fm-value {
+  padding: 3px 0;
+}
+
+.markdown-body .fm-key {
+  color: var(--muted);
+}
+
+.markdown-body .fm-item {
+  display: inline-block;
+  margin: 0 6px 2px 0;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  font-size: 12px;
+}
+
+.markdown-body .frontmatter-raw {
+  border-left: 3px solid var(--warning);
+}

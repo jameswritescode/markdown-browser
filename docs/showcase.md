@@ -1,3 +1,10 @@
+---
+title: Markdown showcase
+description: Each markdown item that mdb can show.
+tags: [markdown, showcase, demo]
+draft: false
+---
+
 # Markdown showcase
 
 This document shows each markdown item that mdb can show. Open it with this command:
@@ -7,6 +14,10 @@ mdb docs/showcase.md
 ```
 
 Press `ctrl+b` to see the outline. Press `/` to find text.
+
+## Frontmatter
+
+The properties at the top of this page come from the YAML frontmatter at the start of the file. The file list uses the `title` value as the document title.
 
 ## Headings
 

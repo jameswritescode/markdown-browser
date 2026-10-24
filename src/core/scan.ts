@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { basename, extname, join, relative, sep } from "node:path";
 import ignore, { type Ignore } from "ignore";
 import type { DocEntry, ScanResult } from "../shared/types.ts";
+import { splitFrontmatter } from "./frontmatter.ts";
 import { SCAN_LIMIT } from "./scan-limit.ts";
 
 export { SCAN_LIMIT };
@@ -16,7 +17,13 @@ export function isMarkdownPath(p: string): boolean {
 }
 
 export function titleOf(markdown: string, fileName: string): string {
-  const lines = markdown.split(/\r?\n/);
+  const { frontmatter, body } = splitFrontmatter(markdown);
+  if (frontmatter && "data" in frontmatter) {
+    const title = frontmatter.data.title;
+    if ((typeof title === "string" && title.trim()) || typeof title === "number")
+      return String(title).trim();
+  }
+  const lines = body.split(/\r?\n/);
   let fence: string | null = null;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;

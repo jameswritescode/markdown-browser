@@ -1,0 +1,60 @@
+{
+  "args": ["../build/fm"],
+  "out": "../build/tophat/frontmatter",
+  "width": 900,
+  "height": 520,
+  "files": {
+    "../build/fm/sample.md": "---\ntitle: Release notes for mdb 0.2\ndate: 2026-10-24\nauthor: James\ntags: [markdown, terminal, release]\ndraft: false\n---\n\n# Release notes\n\nmdb 0.2 adds frontmatter support. The block above comes from the YAML at the top of this file.\n\n## What changed\n\n- Frontmatter shows at the top of the page.\n- The file list uses the `title` value.\n",
+    "../build/fm/broken.md": "---\ntitle: [unclosed\n---\n\n# Broken frontmatter\n\nThe YAML above does not parse.\n"
+  },
+  "steps": [
+    {
+      "wait": 800
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].map((r) => r.textContent)"
+    },
+    {
+      "shot": "finder"
+    },
+    {
+      "type": "sample"
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "document.querySelectorAll('.frontmatter .fm-row').length"
+    },
+    {
+      "eval": "[...document.querySelectorAll('.outline a')].map((a) => a.textContent)"
+    },
+    {
+      "shot": "reader"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "type": "broken"
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "shot": "broken"
+    }
+  ]
+}

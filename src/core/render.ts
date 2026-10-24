@@ -8,6 +8,7 @@ import footnote from "markdown-it-footnote";
 import taskLists from "markdown-it-task-lists";
 import sanitizeHtml from "sanitize-html";
 import type { MissingDoc, OutlineItem, RenderedDoc } from "../shared/types.ts";
+import { type Frontmatter, splitFrontmatter } from "./frontmatter.ts";
 import { safeDecode } from "./links.ts";
 import { titleOf } from "./scan.ts";
 
@@ -146,10 +147,32 @@ function outlineOf(tokens: Token[]): OutlineItem[] {
   return outline;
 }
 
+function frontmatterValue(value: unknown): string {
+  if (Array.isArray(value))
+    return value.map((item) => `<span class="fm-item">${frontmatterValue(item)}</span>`).join("");
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object")
+    return `<code>${markdown.utils.escapeHtml(JSON.stringify(value))}</code>`;
+  return markdown.utils.escapeHtml(String(value));
+}
+
+function frontmatterHtml(frontmatter: Frontmatter | null): string {
+  if (!frontmatter) return "";
+  if ("raw" in frontmatter)
+    return `<pre class="frontmatter-raw"><code>${markdown.utils.escapeHtml(frontmatter.raw)}</code></pre>\n`;
+  const rows = Object.entries(frontmatter.data).map(
+    ([key, value]) =>
+      `<div class="fm-row"><span class="fm-key">${markdown.utils.escapeHtml(key)}</span><span class="fm-value">${frontmatterValue(value)}</span></div>`,
+  );
+  return `<div class="frontmatter">${rows.join("")}</div>\n`;
+}
+
 export function renderMarkdown(source: string, docPath: string): RenderedDoc {
+  const { frontmatter, body } = splitFrontmatter(source);
   const env = {};
-  const tokens = markdown.parse(source, env);
-  const html = markdown.renderer.render(tokens, markdown.options, env);
+  const tokens = markdown.parse(body, env);
+  const html =
+    frontmatterHtml(frontmatter) + markdown.renderer.render(tokens, markdown.options, env);
   return {
     path: docPath,
     title: titleOf(source, basename(docPath)),
