@@ -1,0 +1,45 @@
+{
+  "args": ["../docs/showcase.md"],
+  "out": "../build/tophat/showcase",
+  "width": 1100,
+  "height": 900,
+  "steps": [
+    { "wait": 2500 },
+    {
+      "eval": "[...document.querySelectorAll('.diagram')].map((d) => (d.classList.contains('failed') ? 'FAILED: ' + d.previousElementSibling?.textContent + ' / ' + d.querySelector('.diagram-error')?.textContent.slice(0, 80) : 'ok'))"
+    },
+    {
+      "eval": "[...document.querySelectorAll('.markdown-body img')].map((i) => [i.getAttribute('src').slice(-40), i.complete && i.naturalWidth > 0])"
+    },
+    { "eval": "document.querySelectorAll('.markdown-alert, [class*=alert]').length" },
+    { "eval": "!!document.querySelector('script')?.closest('.markdown-body')" },
+    { "eval": "document.querySelectorAll('pre code.hljs, pre code [class^=hljs-]').length" },
+    { "shot": "01" },
+    { "scroll": 850 },
+    { "shot": "02" },
+    { "scroll": 850 },
+    { "shot": "03" },
+    { "scroll": 850 },
+    { "shot": "04" },
+    { "scroll": 850 },
+    { "shot": "05" },
+    { "scroll": 850 },
+    { "shot": "06" },
+    { "scroll": 850 },
+    { "shot": "07" },
+    { "scroll": 850 },
+    { "shot": "08" },
+    { "scroll": 850 },
+    { "shot": "09" },
+    { "scroll": 850 },
+    { "shot": "10" },
+    { "scroll": 850 },
+    { "shot": "11" },
+    { "scroll": 850 },
+    { "shot": "12" },
+    { "scroll": 850 },
+    { "shot": "13" },
+    { "scroll": 850 },
+    { "shot": "14" }
+  ]
+}

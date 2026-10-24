@@ -76,6 +76,12 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 
 For more information, read the [usage guide](docs/usage.md).
 
+To see each markdown item that mdb can show, open the [showcase](docs/showcase.md):
+
+```sh
+mdb docs/showcase.md
+```
+
 ## Uninstall
 
 ```sh
