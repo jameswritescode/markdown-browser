@@ -10,10 +10,19 @@ mdb uses [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel)
 
 - macOS.
 - A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, or cmux.
-- Node.js 24 and pnpm. This repository uses [mise](https://mise.jdx.dev) to set the versions.
+- Node.js 24 and pnpm.
 - Read access to this GitHub repository.
 
 ## Install
+
+You can install mdb in two ways:
+
+- [From GitHub Packages](#from-github-packages). Use this to use mdb.
+- [From a local copy](#from-a-local-copy). Use this to change mdb and use your changes.
+
+The two installs have the same name. When you install one, it replaces the other.
+
+### From GitHub Packages
 
 mdb is a private package in GitHub Packages.
 
@@ -31,29 +40,47 @@ mdb is a private package in GitHub Packages.
    echo "//npm.pkg.github.com/:_authToken=$(gh auth token)" >> ~/.npmrc
    ```
 
+   If pnpm shows an error 401, make a classic personal access token with the `read:packages` scope on GitHub. Put that token in `~/.npmrc` in place of the `gh` token.
+
 3. Install mdb:
 
    ```sh
    pnpm add -g --config.side-effects-cache=false --allow-build=@zenbu-labs/pixel @jameswritescode/mdb
    ```
 
-To update mdb, do step 3 again.
+To update mdb, do step 3 again. You get the most recent release.
 
 The `--allow-build` option lets pixel download its Electron runtime during the install.
 
 The `--config.side-effects-cache=false` option is necessary. If you do not use it, pnpm can copy Electron from its cache without the correct links. Then macOS shows the message "Electron is damaged" and does not start mdb.
 
-### Install from a local copy
+### From a local copy
 
-To use the code in a local copy of this repository, run these commands in the repository:
+This install uses the code in your copy of the repository. The `mdb` command runs that code directly.
 
-```sh
-pnpm install
-pnpm build
-pnpm add -g "$PWD"
-```
+1. Make sure that the pnpm global bin folder is in your `PATH`. If it is not, run this command one time:
 
-The installed `mdb` uses the local copy. After you change the code, run `pnpm build` again.
+   ```sh
+   pnpm setup
+   ```
+
+2. Get the repository and install the tools and the dependencies:
+
+   ```sh
+   git clone git@github.com:jameswritescode/markdown-browser.git
+   cd markdown-browser
+   mise install
+   pnpm install
+   ```
+
+3. Build mdb and install the local copy:
+
+   ```sh
+   pnpm build
+   pnpm add -g "$PWD"
+   ```
+
+After you change the code or get new commits, run `pnpm build` again. You do not need to install again. If the dependencies change, run `pnpm install` before `pnpm build`.
 
 ## Start mdb
 
@@ -107,11 +134,15 @@ mdb docs/showcase.md
 
 ## Uninstall
 
+This command removes both types of install:
+
 ```sh
 pnpm rm -g @jameswritescode/mdb
 ```
 
 ## Development
+
+To use your changes as the `mdb` command, install mdb [from a local copy](#from-a-local-copy).
 
 1. Install the tools and the dependencies:
 
