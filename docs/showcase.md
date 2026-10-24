@@ -40,8 +40,8 @@ The line above is a horizontal rule.
 | Link                        | Example                                                                            |
 | --------------------------- | ---------------------------------------------------------------------------------- |
 | A heading in this document  | [Go to Tables](#tables)                                                            |
-| A different document        | [Linked page](showcase/linked.md)                                                  |
-| A heading in a document     | [A section in the linked page](showcase/linked.md#a-section-to-link-to)            |
+| A different document        | [Usage guide](usage.md)                                                            |
+| A heading in a document     | [Outline, in the usage guide](usage.md#outline)                                    |
 | A document that is missing  | [Missing page](showcase/missing.md)                                                |
 | A file that is not markdown | [package.json](../package.json)                                                    |
 | A web page                  | [The mdb pull request](https://github.com/jameswritescode/markdown-browser/pull/1) |
