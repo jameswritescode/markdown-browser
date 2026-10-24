@@ -3,9 +3,13 @@ import { themeVariables } from "../src/core/theme.ts";
 
 const t = { background: [30, 30, 30], foreground: [220, 220, 220], ansi: [] };
 
-test("transparent mode leaves the background clear", () => {
+test("transparent mode leaves the page background clear", () => {
   expect(themeVariables(t, "transparent")["--bg"]).toBe("transparent");
-  expect(themeVariables(t, "transparent")["--pele-bg"]).toBe("transparent");
+});
+
+test("diagrams use the terminal background in both modes", () => {
+  // Pele paints label patches, dot rings and text on coloured boxes with this colour.
+  expect(themeVariables(t, "transparent")["--pele-bg"]).toBe("rgb(30 30 30)");
 });
 
 test("solid mode paints the terminal background", () => {

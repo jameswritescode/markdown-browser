@@ -71060,9 +71060,9 @@ function highlight(md, code2, lang) {
   if (lang === "mermaid")
     return `<pre class="mermaid">${md.utils.escapeHtml(code2.trimEnd())}</pre>`;
   const known = lang && es_default.getLanguage(lang);
-  const result = known ? es_default.highlight(code2, { language: lang, ignoreIllegals: true }) : es_default.highlightAuto(code2);
+  const body = known ? es_default.highlight(code2, { language: lang, ignoreIllegals: true }).value : md.utils.escapeHtml(code2);
   const langClass = known ? ` language-${md.utils.escapeHtml(lang)}` : "";
-  return `<pre><code class="hljs${langClass}">${result.value}</code></pre>`;
+  return `<pre><code class="hljs${langClass}">${body}</code></pre>`;
 }
 function alertRule(md) {
   md.core.ruler.after("block", "github_alerts", (state) => {

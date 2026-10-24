@@ -26,6 +26,11 @@ test("highlights code and leaves mermaid source for Pele", () => {
   expect(doc.html).toMatch(/<pre class="mermaid">flowchart LR\n {2}A\[Markdown\] --&gt; B\[Pele\]/);
 });
 
+test("leaves code blocks with no language uncoloured", () => {
+  const r = renderMarkdown("```\nplain text\n  keeps its spaces\n```\n", FIX("README.md"));
+  expect(r.html).toContain('<pre><code class="hljs">plain text\n  keeps its spaces\n</code></pre>');
+});
+
 test("resolves relative images and keeps remote ones", () => {
   expect(doc.html).toContain(`src="${pathToFileURL(FIX("image.png")).href}"`);
   expect(doc.html).toContain('src="https://example.com/a.png"');

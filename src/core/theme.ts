@@ -50,7 +50,7 @@ export function themeVariables(
     "--syntax-title": rgb(ansi(4)),
     "--syntax-type": rgb(ansi(6)),
     "--syntax-deletion": rgb(ansi(1)),
-    "--pele-bg": page,
+    "--pele-bg": rgb(bg),
     "--pele-fg": rgb(fg),
     "--pele-muted": rgb(fg, 0.65),
     "--pele-line": rgb(fg, 0.7),

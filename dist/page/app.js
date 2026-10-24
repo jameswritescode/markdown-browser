@@ -42,7 +42,7 @@
       "--syntax-title": rgb(ansi(4)),
       "--syntax-type": rgb(ansi(6)),
       "--syntax-deletion": rgb(ansi(1)),
-      "--pele-bg": page,
+      "--pele-bg": rgb(bg2),
       "--pele-fg": rgb(fg2),
       "--pele-muted": rgb(fg2, 0.65),
       "--pele-line": rgb(fg2, 0.7),

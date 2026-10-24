@@ -27,11 +27,11 @@ function highlight(md: MarkdownIt, code: string, lang: string): string {
   if (lang === "mermaid")
     return `<pre class="mermaid">${md.utils.escapeHtml(code.trimEnd())}</pre>`;
   const known = lang && hljs.getLanguage(lang);
-  const result = known
-    ? hljs.highlight(code, { language: lang, ignoreIllegals: true })
-    : hljs.highlightAuto(code);
+  const body = known
+    ? hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
+    : md.utils.escapeHtml(code);
   const langClass = known ? ` language-${md.utils.escapeHtml(lang)}` : "";
-  return `<pre><code class="hljs${langClass}">${result.value}</code></pre>`;
+  return `<pre><code class="hljs${langClass}">${body}</code></pre>`;
 }
 
 function alertRule(md: MarkdownIt) {
