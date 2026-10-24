@@ -1,0 +1,47 @@
+{
+  "args": ["../test/fixtures/docs"],
+  "out": "../build/tophat/finder-hover",
+  "width": 1000,
+  "height": 420,
+  "steps": [
+    {
+      "wait": 400
+    },
+    {
+      "hover": ".row:nth-child(2)"
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+    },
+    {
+      "key": "Down"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "hover": ".row:nth-child(2)"
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+    },
+    {
+      "key": "Up"
+    },
+    {
+      "key": "Up"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+    },
+    {
+      "hover": ".row:nth-child(3)"
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+    }
+  ]
+}

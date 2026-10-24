@@ -218,9 +218,6 @@
             li2.setAttribute("aria-selected", "true");
           }
           li2.addEventListener("click", () => open(i));
-          li2.addEventListener("mousemove", () => {
-            if (selected !== i) select(i);
-          });
           return li2;
         })
       );
@@ -279,6 +276,14 @@
         paint();
       }
     };
+    let pointer = { x: -1, y: -1 };
+    list.addEventListener("mousemove", (event) => {
+      if (event.clientX === pointer.x && event.clientY === pointer.y) return;
+      pointer = { x: event.clientX, y: event.clientY };
+      const row = event.target.closest(".row");
+      const i = row ? [...list.children].indexOf(row) : -1;
+      if (i >= 0 && i !== selected) select(i);
+    });
     input.addEventListener("input", () => mode === "filter" ? refilter() : research());
     const onKey = (event) => {
       if (root.hidden || event.defaultPrevented) return;

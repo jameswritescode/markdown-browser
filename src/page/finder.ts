@@ -90,9 +90,6 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
           li.setAttribute("aria-selected", "true");
         }
         li.addEventListener("click", () => open(i));
-        li.addEventListener("mousemove", () => {
-          if (selected !== i) select(i);
-        });
         return li;
       }),
     );
@@ -169,6 +166,17 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
       paint();
     }
   };
+
+  // Chromium sends a mousemove at the same position when the rows change under a
+  // still pointer. Only a real move selects a row, so keyboard moves stay put.
+  let pointer = { x: -1, y: -1 };
+  list.addEventListener("mousemove", (event) => {
+    if (event.clientX === pointer.x && event.clientY === pointer.y) return;
+    pointer = { x: event.clientX, y: event.clientY };
+    const row = (event.target as Element).closest(".row");
+    const i = row ? [...list.children].indexOf(row) : -1;
+    if (i >= 0 && i !== selected) select(i);
+  });
 
   input.addEventListener("input", () => (mode === "filter" ? refilter() : research()));
   const onKey = (event: KeyboardEvent) => {

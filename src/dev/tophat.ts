@@ -13,6 +13,7 @@ type Step =
   | { shot: string }
   | { eval: string }
   | { click: string }
+  | { hover: string }
   | { scroll: number }
   | { write: string; text: string }
   | { remove: string };
@@ -95,6 +96,12 @@ async function run(): Promise<void> {
     record(`renderer gone: ${details.reason}`),
   );
   const clipboard: string[] = [];
+  const centerOf = async (selector: string) => {
+    const box = (await contents.executeJavaScript(
+      `(() => { const e = document.querySelector(${JSON.stringify(selector)}); if (!e) return null; e.scrollIntoView({ block: "center" }); const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 } })()`,
+    )) as { x: number; y: number } | null;
+    return box && { x: Math.round(box.x), y: Math.round(box.y) };
+  };
   registerIpc(
     options as Exclude<typeof options, { error: string }>,
     (text) => clipboard.push(text),
@@ -122,13 +129,17 @@ async function run(): Promise<void> {
         contents.sendInputEvent({ type: "keyUp", keyCode: ch });
       }
       await sleep(250);
-    } else if ("click" in step) {
-      const box = (await contents.executeJavaScript(
-        `(() => { const e = document.querySelector(${JSON.stringify(step.click)}); if (!e) return null; e.scrollIntoView({ block: "center" }); const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 } })()`,
-      )) as { x: number; y: number } | null;
-      if (!box) record(`click: no element for ${step.click}`);
+    } else if ("hover" in step) {
+      const at = await centerOf(step.hover);
+      if (!at) record(`hover: no element for ${step.hover}`);
       else {
-        const at = { x: Math.round(box.x), y: Math.round(box.y) };
+        contents.sendInputEvent({ type: "mouseMove", ...at });
+        await sleep(250);
+      }
+    } else if ("click" in step) {
+      const at = await centerOf(step.click);
+      if (!at) record(`click: no element for ${step.click}`);
+      else {
         contents.sendInputEvent({ type: "mouseDown", button: "left", clickCount: 1, ...at });
         contents.sendInputEvent({ type: "mouseUp", button: "left", clickCount: 1, ...at });
         await sleep(250);
