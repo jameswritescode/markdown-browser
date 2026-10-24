@@ -108,6 +108,18 @@ mdb can only see `ctrl+[` if your terminal uses the kitty keyboard protocol. Gho
 
 To copy a link address, right-click the link and click **Copy link address**.
 
+### Ghostty and cmd+c
+
+By default, Ghostty uses `cmd+c` for its own copy command. Ghostty does not send the key to mdb, so `cmd+c` does nothing in mdb. The right-click menu continues to work.
+
+To send `cmd+c` to mdb, add this line to `~/.config/ghostty/config`:
+
+```
+keybind = performable:super+c=copy_to_clipboard
+```
+
+With this line, Ghostty copies only when it has its own selection. When it has no selection, Ghostty sends `cmd+c` to mdb. Restart Ghostty or reload its configuration after you change the file.
+
 ## Background
 
 By default, the page is transparent. Your terminal background shows behind the page.

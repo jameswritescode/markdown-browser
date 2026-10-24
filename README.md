@@ -59,19 +59,19 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 
 ### Document
 
-| Key                    | Action                                      |
-| ---------------------- | ------------------------------------------- |
-| `esc`                  | Go back to the file list.                   |
-| `j` `k`, `↓` `↑`       | Scroll down or up.                          |
-| `/`                    | Find text in the document.                  |
-| `n`, `N`               | Go to the next or the previous match.       |
-| `space`, `shift+space` | Scroll one page down or up.                 |
-| `g`, `G`               | Go to the top or the bottom.                |
-| `ctrl+[`, `ctrl+]`     | Go back or forward after you follow a link. |
-| `ctrl+b`               | Show or hide the outline.                   |
-| `cmd+c`                | Copy the selected text.                     |
-| Right-click            | Open the copy menu.                         |
-| `ctrl+c`, `ctrl+q`     | Quit.                                       |
+| Key                    | Action                                                                                        |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| `esc`                  | Go back to the file list.                                                                     |
+| `j` `k`, `↓` `↑`       | Scroll down or up.                                                                            |
+| `/`                    | Find text in the document.                                                                    |
+| `n`, `N`               | Go to the next or the previous match.                                                         |
+| `space`, `shift+space` | Scroll one page down or up.                                                                   |
+| `g`, `G`               | Go to the top or the bottom.                                                                  |
+| `ctrl+[`, `ctrl+]`     | Go back or forward after you follow a link.                                                   |
+| `ctrl+b`               | Show or hide the outline.                                                                     |
+| `cmd+c`                | Copy the selected text. In Ghostty, read [Ghostty and cmd+c](docs/usage.md#ghostty-and-cmdc). |
+| Right-click            | Open the copy menu.                                                                           |
+| `ctrl+c`, `ctrl+q`     | Quit.                                                                                         |
 
 For more information, read the [usage guide](docs/usage.md).
 
