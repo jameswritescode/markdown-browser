@@ -14,7 +14,6 @@ export interface ReaderOptions {
   onExit(): void;
 }
 
-const NARROW_WIDTH = 760;
 const OUTLINE_MAX_LEVEL = 3;
 const FIND_HIGHLIGHT = "mdb-find";
 const FIND_CURRENT_HIGHLIGHT = "mdb-find-current";
@@ -45,7 +44,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
 
   const history = new History<ReaderEntry>();
   let current: RenderedDoc | null = null;
-  let outlineToggled: boolean | null = null;
+  let outlineShown = false;
   let observer: IntersectionObserver | null = null;
   let headings: HTMLElement[] = [];
   let pendingFind: string | null = null;
@@ -53,12 +52,8 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   let findRanges: Range[] = [];
   let findAt = -1;
 
-  const outlineVisible = () => outlineToggled ?? window.innerWidth >= NARROW_WIDTH;
   const layout = () => {
-    content.classList.toggle(
-      "with-outline",
-      outlineVisible() && (current?.outline.length ?? 0) > 0,
-    );
+    content.classList.toggle("with-outline", outlineShown && (current?.outline.length ?? 0) > 0);
   };
 
   const relPath = (path: string) =>
@@ -341,7 +336,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     else if ((event.metaKey || event.ctrlKey) && event.key === "[") void step("back");
     else if ((event.metaKey || event.ctrlKey) && event.key === "]") void step("forward");
     else if (event.ctrlKey && event.key === "b") {
-      outlineToggled = !outlineVisible();
+      outlineShown = !outlineShown;
       layout();
     } else if ((plain || ctrl) && (event.key === "j" || event.key === "ArrowDown"))
       scroller.scrollBy({ top: 60 });
@@ -364,7 +359,6 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     event.preventDefault();
   };
   window.addEventListener("keydown", onKey);
-  window.addEventListener("resize", layout);
   scroller.addEventListener(
     "scroll",
     () => {

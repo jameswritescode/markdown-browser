@@ -8,6 +8,16 @@
       "wait": 600
     },
     {
+      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')"
+    },
+    {
+      "key": "b",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')"
+    },
+    {
       "shot": "1-top"
     },
     {

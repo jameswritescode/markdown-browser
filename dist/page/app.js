@@ -21575,7 +21575,6 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
   };
 
   // src/page/reader.ts
-  var NARROW_WIDTH = 760;
   var OUTLINE_MAX_LEVEL = 3;
   var FIND_HIGHLIGHT = "mdb-find";
   var FIND_CURRENT_HIGHLIGHT = "mdb-find-current";
@@ -21604,19 +21603,15 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
     host.append(root);
     const history = new History();
     let current = null;
-    let outlineToggled = null;
+    let outlineShown = false;
     let observer = null;
     let headings = [];
     let pendingFind = null;
     let findQuery = "";
     let findRanges = [];
     let findAt = -1;
-    const outlineVisible = () => outlineToggled ?? window.innerWidth >= NARROW_WIDTH;
     const layout = () => {
-      content.classList.toggle(
-        "with-outline",
-        outlineVisible() && (current?.outline.length ?? 0) > 0
-      );
+      content.classList.toggle("with-outline", outlineShown && (current?.outline.length ?? 0) > 0);
     };
     const relPath = (path) => path.startsWith(`${opts.root}/`) ? path.slice(opts.root.length + 1) : path;
     const paintStatus = () => {
@@ -21864,7 +21859,7 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       else if ((event.metaKey || event.ctrlKey) && event.key === "[") void step("back");
       else if ((event.metaKey || event.ctrlKey) && event.key === "]") void step("forward");
       else if (event.ctrlKey && event.key === "b") {
-        outlineToggled = !outlineVisible();
+        outlineShown = !outlineShown;
         layout();
       } else if ((plain || ctrl) && (event.key === "j" || event.key === "ArrowDown"))
         scroller.scrollBy({ top: 60 });
@@ -21881,7 +21876,6 @@ but found: '${Jt(Ge)}'`); (sr[tt[Ge]] & Ap) !== 0; ) Ge++;
       event.preventDefault();
     };
     window.addEventListener("keydown", onKey);
-    window.addEventListener("resize", layout);
     scroller.addEventListener(
       "scroll",
       () => {

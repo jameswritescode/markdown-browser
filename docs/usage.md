@@ -69,9 +69,9 @@ When you open a document from a text search in the file list, mdb highlights the
 
 ### Outline
 
-The outline is on the left side. It shows the level-1, level-2, and level-3 headings. The outline highlights the section that you read. Click a heading in the outline to go to that section.
+The outline is hidden when mdb starts. Press `ctrl+b` to show or hide the outline. mdb keeps your choice when you open a different document.
 
-If the terminal is narrow, mdb hides the outline. Press `ctrl+b` to show or hide the outline.
+The outline is on the left side. It shows the level-1, level-2, and level-3 headings. The outline highlights the section that you read. Click a heading in the outline to go to that section.
 
 ### Links
 
