@@ -30,10 +30,11 @@ await Promise.all([
   }),
   build({
     ...shared,
-    entryPoints: [join(root, "src/core/args.ts")],
-    outfile: join(dist, "core/args.js"),
+    entryPoints: [join(root, "src/cli/main.ts")],
+    outfile: join(dist, "cli/main.js"),
     platform: "node",
     format: "cjs",
+    external: ["@zenbu-labs/pixel", "@zenbu-labs/pixel/*"],
   }),
   build({
     ...shared,

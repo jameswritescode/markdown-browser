@@ -52,6 +52,17 @@ export interface StartOptions {
   root: string;
   openPath: string | null;
   background: Background;
+  heading: string | null;
+  tab: string | null;
+}
+
+export type Direction = "right" | "left" | "down" | "up";
+
+export interface Launch {
+  start: StartOptions;
+  split: Direction | null;
+  size: number | null;
+  fresh: boolean;
 }
 
 export interface MdbBridge {
@@ -65,4 +76,5 @@ export interface MdbBridge {
   openExternal(url: string): void;
   reveal(path: string): void;
   copy(text: string): void;
+  ready(): void;
 }

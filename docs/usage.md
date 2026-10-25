@@ -119,6 +119,56 @@ Press `ctrl+[` to go back to the previous document. Press `ctrl+]` to go forward
 
 mdb can only see `ctrl+[` if your terminal uses the kitty keyboard protocol. Ghostty, kitty, and cmux use it. In a different terminal, `ctrl+[` is the same as `esc`, and mdb goes back to the file list.
 
+## Panes and coding agents
+
+mdb can open in a new pane beside your current pane. Use `--split` with a direction:
+
+```sh
+mdb docs/plan.md --split right
+```
+
+Use `--size` to set the size of the new pane, for example `--size 0.4`. Some terminals, for example cmux, do not use the size.
+
+When the output of mdb is not a terminal, mdb acts as if you gave `--split right`. This occurs when a coding agent runs mdb in its shell. Thus, the agent does not take your current pane.
+
+### Use the pane again
+
+With `--split`, mdb first looks for an mdb in the same terminal tab. If it finds one, it shows the document in that pane and does not open a new pane. Press `ctrl+[` in that pane to go back to the previous document.
+
+This works only for a file. For a folder, mdb always opens a new pane.
+
+To always open a new pane, add `--new`.
+
+mdb can find an mdb that it opened in a pane. In cmux, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
+
+### Go to a heading
+
+Add `--heading` to go to a heading:
+
+```sh
+mdb docs/plan.md --heading "Open questions"
+```
+
+mdb compares the text to the heading text. Upper case and lower case are the same. You can also use a heading id, for example `open-questions`. If no heading matches, mdb shows the top of the document. The status line shows "no heading matches" for 5 seconds. When mdb uses an mdb pane that is already open, the command also shows a warning.
+
+### Terminals
+
+| Terminal             | Panes                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| cmux                 | Yes.                                                                                                                                        |
+| Ghostty 1.3 or later | Yes. The first time, macOS asks if your terminal or agent can control Ghostty. Click **Allow**.                                             |
+| kitty                | Yes, when remote control is on. Add `allow_remote_control socket-only` and `listen_on unix:/tmp/kitty` to `kitty.conf`, then restart kitty. |
+| tmux                 | Yes.                                                                                                                                        |
+| WezTerm              | Yes.                                                                                                                                        |
+
+mdb uses pixel to open panes. If your terminal cannot open panes, mdb shows a message and stops.
+
+### The agent skill
+
+Run `mdb skill install` to install the skill for Claude Code and Codex. The skill tells the agent when to use mdb and how to use it. If a skill file is already there and mdb did not write it, mdb does not change it.
+
+In Codex, the agent must run mdb with escalated permissions. The Codex sandbox stops the commands that mdb uses to find the terminal pane.
+
 ## Copy text
 
 1. Select text with the mouse.

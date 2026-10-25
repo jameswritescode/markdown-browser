@@ -48,7 +48,7 @@ mdb is a private package in GitHub Packages.
    pnpm add -g --config.side-effects-cache=false --allow-build=@zenbu-labs/pixel @jameswritescode/mdb
    ```
 
-To update mdb, do step 3 again. You get the most recent release.
+To update mdb, do step 3 again. You get the most recent release. If you use the [agent skill](#use-mdb-with-coding-agents), also run `mdb skill install` again.
 
 The `--allow-build` option lets pixel download its Electron runtime during the install.
 
@@ -93,6 +93,31 @@ After you change the code or get new commits, run `pnpm build` again. You do not
 | `mdb --help`    | Shows the usage text.                                                |
 
 You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
+
+### More options
+
+| Option                | Result                                                           |
+| --------------------- | ---------------------------------------------------------------- |
+| `--heading <text>`    | Goes to the first heading that matches `<text>`.                 |
+| `--split <direction>` | Opens mdb in a new pane: `right`, `left`, `down`, or `up`.       |
+| `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.             |
+| `--new`               | Opens a new pane, also when this terminal tab already shows mdb. |
+
+For more information about panes, read [Panes and coding agents](docs/usage.md#panes-and-coding-agents).
+
+## Use mdb with coding agents
+
+mdb has a skill for Claude Code and Codex. With the skill, an agent can show you a document in a pane next to the conversation. For example, an agent can show you a plan that it wrote, at the section that it is talking about.
+
+To install the skill, run this command:
+
+```sh
+mdb skill install
+```
+
+The command writes `~/.claude/skills/mdb/SKILL.md` and `~/.codex/skills/mdb/SKILL.md`. After you update mdb, run the command again.
+
+Panes work in cmux, Ghostty 1.3 or later, kitty, tmux, and WezTerm.
 
 ## Keys
 
@@ -140,6 +165,8 @@ This command removes both types of install:
 ```sh
 pnpm rm -g @jameswritescode/mdb
 ```
+
+If you installed the agent skill, also remove `~/.claude/skills/mdb` and `~/.codex/skills/mdb`.
 
 ## Development
 

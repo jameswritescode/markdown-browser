@@ -57,11 +57,12 @@ for (const [file, text] of Object.entries(script.files ?? {})) {
   writeFileSync(resolve(base, file), text);
 }
 
-const options = parseArgs(script.args, cwd, process.env);
-if ("error" in options) {
-  process.stderr.write(`${options.error}\n`);
+const parsed = parseArgs(script.args, cwd, process.env);
+if ("error" in parsed) {
+  process.stderr.write(`${parsed.error}\n`);
   process.exit(1);
 }
+const options = parsed.start;
 
 const log: string[] = [];
 const record = (line: string) => {
@@ -103,7 +104,7 @@ async function run(): Promise<void> {
     return box && { x: Math.round(box.x), y: Math.round(box.y) };
   };
   registerIpc(
-    options as Exclude<typeof options, { error: string }>,
+    options,
     (text) => clipboard.push(text),
     () => contents,
   );

@@ -12,6 +12,7 @@
   "files": [
     "bin",
     "dist",
+    "skill",
     "README.md"
   ],
   "main": "dist/main/main.js",

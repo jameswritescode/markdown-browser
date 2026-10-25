@@ -33,7 +33,7 @@ async function main(): Promise<void> {
         scan,
         onOpen: (path, find) => {
           finder?.hide();
-          void reader.open(path, find);
+          void reader.open(path, { find });
         },
       });
     }
@@ -44,7 +44,15 @@ async function main(): Promise<void> {
   const reader = mountReader(app, { root: start.root, onExit: () => void showFinder() });
   reader.hide();
 
-  if (start.openPath) await reader.open(start.openPath);
+  window.mdbRemote = {
+    open: (path, heading) => {
+      finder?.hide();
+      return reader.open(path, { heading });
+    },
+  };
+  window.mdb.ready();
+
+  if (start.openPath) await reader.open(start.openPath, { heading: start.heading });
   else await showFinder();
 }
 

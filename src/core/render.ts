@@ -9,20 +9,13 @@ import taskLists from "markdown-it-task-lists";
 import sanitizeHtml from "sanitize-html";
 import type { MissingDoc, OutlineItem, RenderedDoc } from "../shared/types.ts";
 import { type Frontmatter, splitFrontmatter } from "./frontmatter.ts";
+import { slugify } from "./heading.ts";
 import { safeDecode } from "./links.ts";
 import { titleOf } from "./scan.ts";
 
 const ALERT_TYPES = ["NOTE", "TIP", "IMPORTANT", "WARNING", "CAUTION"] as const;
 const ALERT_MARKER = new RegExp(`^\\[!(${ALERT_TYPES.join("|")})\\][ \\t]*(?:\\n|$)`, "i");
 const SCHEME = /^[a-z][a-z0-9+.-]*:/i;
-
-export function slugify(text: string): string {
-  return text
-    .trim()
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s_-]/gu, "")
-    .replace(/\s/g, "-");
-}
 
 function highlight(md: MarkdownIt, code: string, lang: string): string {
   if (lang === "mermaid")

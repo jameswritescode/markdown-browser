@@ -1,4 +1,5 @@
 import { mount, parse } from "pele";
+import { findHeading } from "../core/heading.ts";
 import type { OutlineItem, RenderedDoc } from "../shared/types.ts";
 import { el } from "./dom.ts";
 import { findMatches, stepMatch } from "./find.ts";
@@ -48,6 +49,9 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   let observer: IntersectionObserver | null = null;
   let headings: HTMLElement[] = [];
   let pendingFind: string | null = null;
+  let renderSeq = 0;
+  let notice = "";
+  let noticeTimer: ReturnType<typeof setTimeout> | undefined;
   let findQuery = "";
   let findRanges: Range[] = [];
   let findAt = -1;
@@ -64,6 +68,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     const range = scroller.scrollHeight - scroller.clientHeight;
     const percent = range > 0 ? Math.round((scroller.scrollTop / range) * 100) : 100;
     where.textContent = path ? `${relPath(path)} · ${current ? `${percent}%` : "missing"}` : "";
+    if (notice) where.textContent += ` · ${notice}`;
     const finding = !findBox.hidden;
     where.hidden = finding;
     if (findQuery) {
@@ -77,6 +82,16 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       hints.textContent = "n next · N previous · esc clear";
     } else if (current) hints.textContent = "/ find · esc files · ctrl+b outline · ctrl+[ back";
     else hints.textContent = "esc files";
+  };
+
+  const showNotice = (text: string) => {
+    notice = text;
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => {
+      notice = "";
+      paintStatus();
+    }, 5000);
+    paintStatus();
   };
 
   const paintOutline = (items: OutlineItem[]) => {
@@ -241,14 +256,28 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     paintStatus();
   };
 
-  const render = async (path: string, keepScroll: number | null, anchor: string | null) => {
+  const render = async (
+    path: string,
+    keepScroll: number | null,
+    anchor: string | null,
+    heading: string | null = null,
+  ): Promise<boolean | null> => {
+    const seq = ++renderSeq;
     const doc = await window.mdb.render(path);
+    if (seq !== renderSeq) return null;
     if ("missing" in doc) {
       showMissing(path);
-      return;
+      return null;
     }
     current = doc;
     document.title = doc.title;
+    let headingFound: boolean | null = null;
+    if (heading) {
+      const id = findHeading(doc.outline, heading);
+      headingFound = id !== null;
+      if (id) anchor = id;
+      else showNotice(`no heading matches "${heading}"`);
+    }
     article.innerHTML = doc.html;
     renderDiagrams();
     paintOutline(doc.outline);
@@ -264,22 +293,24 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       paintFind();
     } else clearFind();
     pendingFind = null;
+    return headingFound;
   };
 
   const open = async (
     path: string,
     anchor: string | null = null,
     scrollY: number | null = null,
+    heading: string | null = null,
   ) => {
     window.mdb.watch(path);
-    await render(path, scrollY, anchor);
+    return render(path, scrollY, anchor, heading);
   };
 
-  const navigate = async (path: string, anchor: string | null) => {
+  const navigate = async (path: string, anchor: string | null, heading: string | null = null) => {
     const here = history.current;
     if (here) history.replace({ path: here.path, scrollY: scroller.scrollTop });
     history.push({ path, scrollY: 0 });
-    await open(path, anchor);
+    return open(path, anchor, null, heading);
   };
 
   const step = async (direction: "back" | "forward") => {
@@ -289,7 +320,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     if (entry) await open(entry.path, null, entry.scrollY);
   };
 
-  const showNotice = (anchorEl: HTMLElement, text: string) => {
+  const showLinkNotice = (anchorEl: HTMLElement, text: string) => {
     anchorEl.parentElement?.querySelector(".link-notice")?.remove();
     const notice = el("span", "link-notice", text);
     anchorEl.after(notice);
@@ -305,7 +336,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     const target = await window.mdb.classifyLink(href, current.path);
     if (target.kind === "anchor") scrollToId(target.id);
     else if (target.kind === "doc" && target.exists) await navigate(target.path, target.anchor);
-    else if (target.kind === "doc") showNotice(link, `Not found: ${href}`);
+    else if (target.kind === "doc") showLinkNotice(link, `Not found: ${href}`);
     else if (target.kind === "file") window.mdb.reveal(target.path);
     else window.mdb.openExternal(target.url);
   });
@@ -370,10 +401,10 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   );
 
   return {
-    async open(path: string, find?: string) {
+    async open(path: string, { find, heading }: { find?: string; heading?: string | null } = {}) {
       pendingFind = find?.trim() || null;
       root.hidden = false;
-      await navigate(path, null);
+      return { heading: await navigate(path, null, heading?.trim() || null) };
     },
     show() {
       root.hidden = false;

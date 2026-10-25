@@ -7,7 +7,10 @@ import {
   WebView,
   type WebViewHandle,
 } from "@zenbu-labs/pixel";
+import { ipcMain } from "@zenbu-labs/pixel/electron";
 import { useState } from "react";
+import { serveControl } from "../core/control.ts";
+import { instanceSocket, registerInstance } from "../core/registry.ts";
 import type { StartOptions } from "../shared/types.ts";
 import { ContextMenu, type MenuItem } from "./context-menu.tsx";
 import { registerIpc } from "./ipc.ts";
@@ -51,6 +54,26 @@ registerIpc(
   (text) => root.setClipboard(text),
   () => view?.webContents ?? null,
 );
+
+// Register only when the page can take a message, so a caller never finds an mdb
+// that cannot open a document yet.
+ipcMain.once("mdb:ready", () => {
+  serveControl(instanceSocket(), async (message) => {
+    if (message.cmd !== "open") return { error: `unknown command ${String(message.cmd)}` };
+    const contents = view?.webContents;
+    if (!contents) return { error: "mdb has no page" };
+    const result = (await contents.executeJavaScript(
+      `window.mdbRemote.open(${JSON.stringify(message.path)}, ${JSON.stringify(message.heading)})`,
+    )) as { heading: boolean | null };
+    return { ok: true, ...result };
+  }).then(
+    () => {
+      const instance = registerInstance({ tab: options.tab });
+      process.on("exit", () => instance.withdraw());
+    },
+    (error: unknown) => process.stderr.write(`mdb: control socket: ${String(error)}\n`),
+  );
+});
 
 interface PageMenu {
   x: number;

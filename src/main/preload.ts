@@ -16,6 +16,7 @@ const bridge: MdbBridge = {
   openExternal: (url) => ipcRenderer.send("mdb:open-external", url),
   reveal: (path) => ipcRenderer.send("mdb:reveal", path),
   copy: (text) => ipcRenderer.send("mdb:copy", text),
+  ready: () => ipcRenderer.send("mdb:ready"),
 };
 
 contextBridge.exposeInMainWorld("mdb", bridge);

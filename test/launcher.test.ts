@@ -24,5 +24,6 @@ test("a non-markdown file exits 1", () => {
 test("--help prints usage and exits 0", () => {
   const r = spawnSync("node", [BIN, "--help"], { encoding: "utf8" });
   expect(r.status).toBe(0);
-  expect(r.stdout).toContain("usage: mdb [file.md | folder] [--solid]");
+  expect(r.stdout).toContain("usage: mdb [file.md | folder] [options]");
+  expect(r.stdout).toContain("--split <direction>");
 });
