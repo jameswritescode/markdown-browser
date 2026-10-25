@@ -71,6 +71,13 @@ mark.hit {
   gap: 12px;
 }
 
+.prompt,
+.empty {
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
+}
+
 .prompt {
   display: flex;
   align-items: center;
@@ -100,6 +107,7 @@ mark.hit {
   list-style: none;
   margin: 0;
   padding: 0;
+  padding-inline: max(0px, calc((100% - 880px) / 2));
   overflow-y: auto;
   flex: 1;
   min-height: 0;
@@ -156,8 +164,10 @@ mark.hit {
 }
 
 .empty {
+  box-sizing: border-box;
+  padding: 0 12px;
+  margin-block: 4px;
   color: var(--muted);
-  margin: 4px 12px;
 }
 
 .status {
@@ -195,7 +205,8 @@ mark.hit {
 
 .reader-content.with-outline {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 880px);
+  justify-content: center;
   gap: 40px;
 }
 
@@ -333,6 +344,7 @@ mark.hit {
 .markdown-body {
   max-width: 880px;
   min-width: 0;
+  margin: 0 auto;
   font-size: 16px;
   line-height: 1.6;
   overflow-wrap: break-word;
