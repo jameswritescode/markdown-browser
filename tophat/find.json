@@ -39,6 +39,18 @@
       "eval": "document.querySelector('.reader-scroll').scrollTop"
     },
     {
+      "key": "d"
+    },
+    {
+      "eval": "[document.querySelector('.reader-scroll').scrollTop, document.querySelector('.reader-scroll').clientHeight]"
+    },
+    {
+      "key": "u"
+    },
+    {
+      "eval": "[document.querySelector('.reader-scroll').scrollTop, document.querySelector('.reader-scroll').clientHeight]"
+    },
+    {
       "key": "/"
     },
     {

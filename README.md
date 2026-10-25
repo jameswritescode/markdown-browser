@@ -116,6 +116,7 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 | `j` `k`, `↓` `↑`       | Scroll down or up.                                                                            |
 | `/`                    | Find text in the document.                                                                    |
 | `n`, `N`               | Go to the next or the previous match.                                                         |
+| `d`, `u`               | Scroll half a page down or up.                                                                |
 | `space`, `shift+space` | Scroll one page down or up.                                                                   |
 | `g`, `G`               | Go to the top or the bottom.                                                                  |
 | `ctrl+[`, `ctrl+]`     | Go back or forward after you follow a link.                                                   |

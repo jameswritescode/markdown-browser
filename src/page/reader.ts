@@ -341,6 +341,8 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       scroller.scrollBy({ top: 60 });
     else if (plain && (event.key === "k" || event.key === "ArrowUp"))
       scroller.scrollBy({ top: -60 });
+    else if (plain && event.key === "d") scroller.scrollBy({ top: scroller.clientHeight / 2 });
+    else if (plain && event.key === "u") scroller.scrollBy({ top: -scroller.clientHeight / 2 });
     else if (plain && (event.key === " " || event.key === "PageDown") && !event.shiftKey)
       scroller.scrollBy({ top: page });
     else if (
