@@ -10,3 +10,10 @@ export function lockNavigation(contents: WebContents, pageUrl: string): void {
     if (event.url !== pageUrl) event.preventDefault();
   });
 }
+
+// Pixel scales the page zoom when the terminal's font size changes, and Chromium saves
+// that zoom for the page URL. Every mdb loads the same page, so one font change would
+// shrink or grow every mdb after it. Start each load at the default zoom instead.
+export function resetZoomOnLoad(contents: WebContents): void {
+  contents.on("did-finish-load", () => contents.setZoomFactor(1));
+}

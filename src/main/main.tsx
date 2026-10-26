@@ -14,7 +14,7 @@ import { instanceSocket, registerInstance } from "../core/registry.ts";
 import type { StartOptions } from "../shared/types.ts";
 import { ContextMenu, type MenuItem } from "./context-menu.tsx";
 import { registerIpc } from "./ipc.ts";
-import { lockNavigation } from "./navigation.ts";
+import { lockNavigation, resetZoomOnLoad } from "./navigation.ts";
 
 const options = JSON.parse(process.argv[2] ?? "null") as StartOptions | null;
 if (!options) throw new Error("mdb: start options missing; run mdb through bin/mdb.js");
@@ -108,7 +108,10 @@ function App() {
     <>
       <WebView
         ref={(handle: WebViewHandle | null) => {
-          if (handle && handle !== view) lockNavigation(handle.webContents, PAGE_URL);
+          if (handle && handle !== view) {
+            lockNavigation(handle.webContents, PAGE_URL);
+            resetZoomOnLoad(handle.webContents);
+          }
           view = handle;
         }}
         src={PAGE_URL}
