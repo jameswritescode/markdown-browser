@@ -8,7 +8,7 @@ import {
   type WebViewHandle,
 } from "@zenbu-labs/pixel";
 import { ipcMain } from "@zenbu-labs/pixel/electron";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { serveControl } from "../core/control.ts";
 import { instanceSocket, registerInstance } from "../core/registry.ts";
 import type { StartOptions } from "../shared/types.ts";
@@ -24,6 +24,7 @@ const PRELOAD = join(__dirname, "preload.js");
 const COPY_SHORTCUT = process.platform === "darwin" ? "cmd+c" : "ctrl+shift+c";
 
 let view: WebViewHandle | null = null;
+let closeMenu: (() => void) | null = null;
 
 async function copySelection(): Promise<void> {
   const text = (await view?.webContents.executeJavaScript("getSelection().toString()")) as
@@ -36,6 +37,10 @@ const root = createRoot({
   name: "mdb",
   onKey(event) {
     if (event.kind !== "press") return false;
+    if (closeMenu) {
+      closeMenu();
+      if (event.key === "escape") return true;
+    }
     if (event.mods.ctrl && (event.key === "c" || event.key === "q")) {
       root.stop();
       return true;
@@ -95,6 +100,10 @@ function App() {
   const [menu, setMenu] = useState<PageMenu | null>(null);
   const theme = makeTheme(useTerminalColors());
   const items = menu ? menuItems(menu) : [];
+  const menuOpen = items.length > 0;
+  useEffect(() => {
+    closeMenu = menuOpen ? () => setMenu(null) : null;
+  }, [menuOpen]);
   return (
     <>
       <WebView
@@ -117,7 +126,7 @@ function App() {
           })
         }
       />
-      {menu && items.length > 0 && (
+      {menu && menuOpen && (
         <ContextMenu
           x={menu.x}
           y={menu.y}

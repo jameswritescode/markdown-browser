@@ -40,32 +40,42 @@ export function ContextMenu({
   const left = Math.max(2, Math.min(x, bounds.width - width - 4));
   const top = Math.max(2, Math.min(y, bounds.height - height - 4));
   return (
-    <Box
-      style={{
-        position: "absolute",
-        inset: { top, left },
-        width,
-        flexDirection: "column",
-        background: theme.field,
-        cornerRadius: rem * 0.45,
-        border: { width: 1, color: theme.fieldBorder },
-        overflow: "hidden",
-      }}
-      onClickOutside={onClose}
-    >
-      {items.map((item, i) => (
-        <MenuRow
-          key={item.id}
-          item={item}
-          rowH={rowH}
-          rem={rem}
-          theme={theme}
-          onAction={onAction}
-          first={i === 0}
-          last={i === items.length - 1}
-        />
-      ))}
-    </Box>
+    <>
+      <Box
+        style={{
+          position: "absolute",
+          inset: { top: 0, left: 0 },
+          width: bounds.width,
+          height: bounds.height,
+        }}
+        onClick={onClose}
+      />
+      <Box
+        style={{
+          position: "absolute",
+          inset: { top, left },
+          width,
+          flexDirection: "column",
+          background: theme.field,
+          cornerRadius: rem * 0.45,
+          border: { width: 1, color: theme.fieldBorder },
+          overflow: "hidden",
+        }}
+      >
+        {items.map((item, i) => (
+          <MenuRow
+            key={item.id}
+            item={item}
+            rowH={rowH}
+            rem={rem}
+            theme={theme}
+            onAction={onAction}
+            first={i === 0}
+            last={i === items.length - 1}
+          />
+        ))}
+      </Box>
+    </>
   );
 }
 
