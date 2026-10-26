@@ -1,6 +1,7 @@
 import { mount, parse } from "pele";
 import { findHeading } from "../core/heading.ts";
 import type { OutlineItem, RenderedDoc } from "../shared/types.ts";
+import { addCopyButtons } from "./copy-code.ts";
 import { el } from "./dom.ts";
 import { findMatches, stepMatch } from "./find.ts";
 import { History } from "./history.ts";
@@ -280,6 +281,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     }
     article.innerHTML = doc.html;
     renderDiagrams();
+    addCopyButtons(article);
     paintOutline(doc.outline);
     layout();
     watchHeadings();

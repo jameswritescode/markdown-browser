@@ -176,6 +176,8 @@ In Codex, the agent must run mdb with escalated permissions. The Codex sandbox s
 
 To copy a link address, right-click the link and click **Copy link address**.
 
+To copy all of a code block, move the pointer over the block and click the copy button in its top-right corner. The button shows a check mark when the text is on the clipboard.
+
 ### Ghostty and cmd+c
 
 By default, Ghostty uses `cmd+c` for its own copy command. Ghostty does not send the key to mdb, so `cmd+c` does nothing in mdb. The right-click menu continues to work.

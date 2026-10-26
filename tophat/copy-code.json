@@ -1,0 +1,41 @@
+{
+  "args": ["../docs/showcase.md"],
+  "out": "../build/tophat/copy-code",
+  "width": 1200,
+  "height": 700,
+  "steps": [
+    {
+      "wait": 800
+    },
+    {
+      "eval": "[document.querySelectorAll('.markdown-body pre > code').length, document.querySelectorAll('.copy-code').length, document.querySelectorAll('.frontmatter-raw .copy-code').length]"
+    },
+    {
+      "hover": ".code-block"
+    },
+    {
+      "wait": 200
+    },
+    {
+      "shot": "1-hover"
+    },
+    {
+      "click": ".code-block .copy-code"
+    },
+    {
+      "wait": 100
+    },
+    {
+      "eval": "document.querySelector('.code-block .copy-code')?.classList.contains('copied')"
+    },
+    {
+      "shot": "2-copied"
+    },
+    {
+      "wait": 2200
+    },
+    {
+      "eval": "document.querySelector('.code-block .copy-code')?.classList.contains('copied')"
+    }
+  ]
+}

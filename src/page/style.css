@@ -492,6 +492,53 @@ mark.hit {
   background: var(--surface);
 }
 
+.markdown-body .code-block {
+  position: relative;
+  margin: 0 0 16px;
+}
+
+.markdown-body .code-block > pre {
+  margin: 0;
+}
+
+.markdown-body .copy-code {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--surface-strong);
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.markdown-body .copy-code svg {
+  fill: currentColor;
+}
+
+.markdown-body .code-block:hover .copy-code,
+.markdown-body .copy-code:focus-visible,
+.markdown-body .copy-code.copied {
+  opacity: 1;
+}
+
+.markdown-body .copy-code:hover {
+  color: var(--fg);
+}
+
+.markdown-body .copy-code.copied {
+  color: var(--tip);
+}
+
 .markdown-body pre code {
   font-size: 100%;
   background: none;
