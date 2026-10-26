@@ -192,22 +192,33 @@ mark.hit {
   height: 100vh;
 }
 
-.reader-scroll {
+.reader-content {
+  display: flex;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
 }
 
-.reader-content {
-  display: block;
+.reader-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
   padding: 32px 32px 64px;
 }
 
+/* The outline and the document stay centered as a pair; only the document scrolls. */
 .reader-content.with-outline {
   display: grid;
-  grid-template-columns: 220px minmax(0, 880px);
-  justify-content: center;
-  gap: 40px;
+  grid-template-columns: max(32px, (100% - 1140px) / 2) 220px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.reader-content.with-outline .reader-scroll {
+  grid-column: 3;
+  padding-left: 40px;
+}
+
+.reader-content.with-outline .markdown-body {
+  margin-left: 0;
 }
 
 .reader .status {
@@ -253,11 +264,10 @@ mark.hit {
 
 .reader-content.with-outline .outline {
   display: block;
-  position: sticky;
-  top: 32px;
-  align-self: start;
-  max-height: calc(100vh - 110px);
+  grid-column: 2;
+  min-height: 0;
   overflow-y: auto;
+  padding: 32px 0 16px;
   font-size: 13px;
 }
 

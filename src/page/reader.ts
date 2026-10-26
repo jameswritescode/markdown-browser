@@ -27,8 +27,8 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   const article = el("article", "markdown-body");
   const scroller = el("div", "reader-scroll");
   const content = el("div", "reader-content");
-  content.append(outline, article);
-  scroller.append(content);
+  scroller.append(article);
+  content.append(outline, scroller);
   const status = el("div", "status");
   const where = el("span", "where");
   const findBox = el("label", "find");
@@ -41,7 +41,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   findBox.hidden = true;
   const hints = el("span", "hints");
   status.append(where, findBox, hints);
-  root.append(scroller, status);
+  root.append(content, status);
   host.append(root);
 
   const history = new History<ReaderEntry>();
