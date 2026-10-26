@@ -66,6 +66,15 @@ test("sending to a missing socket rejects", async () => {
   ).rejects.toThrow();
 });
 
+test("serving creates the socket's folder when it is missing", async () => {
+  const socket = join(instancesDir(env), "c.sock");
+  const server = await serveControl(socket, async () => ({ ok: true }));
+  expect(await sendControl(socket, { cmd: "open", path: "/a.md", heading: null })).toEqual({
+    ok: true,
+  });
+  server.close();
+});
+
 test("serving replaces a stale socket file", async () => {
   const socket = join(state, "c.sock");
   writeFileSync(socket, "");

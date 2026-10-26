@@ -1,5 +1,6 @@
-import { rmSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
 import { createConnection, createServer, type Server } from "node:net";
+import { dirname } from "node:path";
 
 export interface OpenMessage {
   cmd: "open";
@@ -15,6 +16,7 @@ export function serveControl(
   handle: (message: ControlMessage) => Promise<ControlReply>,
   idleMs = 5000,
 ): Promise<Server> {
+  mkdirSync(dirname(socket), { recursive: true });
   rmSync(socket, { force: true });
   const server = createServer((connection) => {
     let buffer = "";
