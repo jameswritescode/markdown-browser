@@ -21,7 +21,9 @@ export function renderSkill(template: string, note: string | null): string {
     throw new Error("skill template has no frontmatter");
   const head = template.slice(0, end + 5);
   const body = template.slice(end + 5).replace(/^\n+/, "");
-  return `${head}\n${SKILL_MARKER}\n\n${note ? `${note}\n` : ""}${body}`;
+  // A comment at the top of the note is for whoever edits it, not for the agent.
+  const text = note?.replace(/^<!--[\s\S]*?-->\s*/, "");
+  return `${head}\n${SKILL_MARKER}\n\n${text ? `${text}\n` : ""}${body}`;
 }
 
 export function installSkill(home: string, template: string, codexNote: string): SkillResult[] {

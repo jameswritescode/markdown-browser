@@ -22,6 +22,11 @@ test("renders the marker after the frontmatter, and the Codex note for Codex", (
   );
 });
 
+test("leaves out the comment at the top of the Codex note", () => {
+  const note = `<!-- For maintainers: this note goes into the Codex copy. -->\n\n${CODEX}`;
+  expect(renderSkill(TEMPLATE, note)).toBe(renderSkill(TEMPLATE, CODEX));
+});
+
 test("installs the skill for Claude Code and Codex", () => {
   const results = installSkill(home, TEMPLATE, CODEX);
   expect(results).toEqual([

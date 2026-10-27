@@ -168,7 +168,7 @@ async function openSplit(
 function skillCommand(args: string[]): number {
   if (args[0] !== "install" || args.length > 1) return fail("usage: mdb skill install");
   const read = (name: string) => readFileSync(join(PACKAGE_ROOT, "skill", name), "utf8");
-  for (const result of installSkill(homedir(), read("SKILL.md"), read("codex.md"))) {
+  for (const result of installSkill(homedir(), read("SKILL.md"), read("codex-note.md"))) {
     if (result.status === "skipped")
       say(
         `${result.agent}: skipped ${result.path}. mdb did not write this file, so it is left as it is.`,
