@@ -70,7 +70,6 @@ Run `pnpm smoke` too when you change the main process, the CLI, or the build.
 
 - Write the subject as a short sentence in the imperative, with a capital letter and no period, for example `Keep the file list up to date when docs are added or removed`. Do not use prefixes such as `feat:`.
 - In the body, tell what changed for the user, and why.
-- The maintainer signs commits with 1Password. If signing fails because 1Password is locked, tell the user. Do not turn off signing unless the user allows it.
 - Work on a branch. The maintainer squash-merges pull requests into `main`.
 
 ## Releases
