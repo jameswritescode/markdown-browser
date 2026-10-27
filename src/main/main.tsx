@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   createRoot,
@@ -58,6 +58,7 @@ registerIpc(
   options,
   (text) => root.setClipboard(text),
   () => view?.webContents ?? null,
+  () => root.stop(),
 );
 
 // Register only when the page can take a message, so a caller never finds an mdb
@@ -67,9 +68,15 @@ ipcMain.once("mdb:ready", () => {
     if (message.cmd !== "open") return { error: `unknown command ${String(message.cmd)}` };
     const contents = view?.webContents;
     if (!contents) return { error: "mdb has no page" };
+    const request = {
+      path: message.path,
+      root: message.root ?? dirname(message.path),
+      heading: message.heading,
+      mode: message.mode ?? "tab",
+    };
     const result = (await contents.executeJavaScript(
-      `window.mdbRemote.open(${JSON.stringify(message.path)}, ${JSON.stringify(message.heading)})`,
-    )) as { heading: boolean | null };
+      `window.mdbRemote.open(${JSON.stringify(request)})`,
+    )) as { heading: boolean | null; result: string };
     return { ok: true, ...result };
   }).then(
     () => {

@@ -1,0 +1,320 @@
+{
+  "args": ["../docs/showcase.md"],
+  "out": "../build/tophat/tabs",
+  "width": 1200,
+  "height": 700,
+  "steps": [
+    {
+      "write": "../build/tophat/tabs-live.md",
+      "text": "# Live\n\nFirst version.\n\nParagraph 0 of the live document, long enough to scroll.\n\nParagraph 1 of the live document, long enough to scroll.\n\nParagraph 2 of the live document, long enough to scroll.\n\nParagraph 3 of the live document, long enough to scroll.\n\nParagraph 4 of the live document, long enough to scroll.\n\nParagraph 5 of the live document, long enough to scroll.\n\nParagraph 6 of the live document, long enough to scroll.\n\nParagraph 7 of the live document, long enough to scroll.\n\nParagraph 8 of the live document, long enough to scroll.\n\nParagraph 9 of the live document, long enough to scroll.\n\nParagraph 10 of the live document, long enough to scroll.\n\nParagraph 11 of the live document, long enough to scroll.\n\nParagraph 12 of the live document, long enough to scroll.\n\nParagraph 13 of the live document, long enough to scroll.\n\nParagraph 14 of the live document, long enough to scroll.\n\nParagraph 15 of the live document, long enough to scroll.\n\nParagraph 16 of the live document, long enough to scroll.\n\nParagraph 17 of the live document, long enough to scroll.\n\nParagraph 18 of the live document, long enough to scroll.\n\nParagraph 19 of the live document, long enough to scroll.\n\nParagraph 20 of the live document, long enough to scroll.\n\nParagraph 21 of the live document, long enough to scroll.\n\nParagraph 22 of the live document, long enough to scroll.\n\nParagraph 23 of the live document, long enough to scroll.\n\nParagraph 24 of the live document, long enough to scroll.\n\nParagraph 25 of the live document, long enough to scroll.\n\nParagraph 26 of the live document, long enough to scroll.\n\nParagraph 27 of the live document, long enough to scroll.\n\nParagraph 28 of the live document, long enough to scroll.\n\nParagraph 29 of the live document, long enough to scroll.\n\nParagraph 30 of the live document, long enough to scroll.\n\nParagraph 31 of the live document, long enough to scroll.\n\nParagraph 32 of the live document, long enough to scroll.\n\nParagraph 33 of the live document, long enough to scroll.\n\nParagraph 34 of the live document, long enough to scroll.\n\nParagraph 35 of the live document, long enough to scroll.\n\nParagraph 36 of the live document, long enough to scroll.\n\nParagraph 37 of the live document, long enough to scroll.\n\nParagraph 38 of the live document, long enough to scroll.\n\nParagraph 39 of the live document, long enough to scroll.\n\nParagraph 40 of the live document, long enough to scroll.\n\nParagraph 41 of the live document, long enough to scroll.\n\nParagraph 42 of the live document, long enough to scroll.\n\nParagraph 43 of the live document, long enough to scroll.\n\nParagraph 44 of the live document, long enough to scroll.\n\nParagraph 45 of the live document, long enough to scroll.\n\nParagraph 46 of the live document, long enough to scroll.\n\nParagraph 47 of the live document, long enough to scroll.\n\nParagraph 48 of the live document, long enough to scroll.\n\nParagraph 49 of the live document, long enough to scroll.\n\nParagraph 50 of the live document, long enough to scroll.\n\nParagraph 51 of the live document, long enough to scroll.\n\nParagraph 52 of the live document, long enough to scroll.\n\nParagraph 53 of the live document, long enough to scroll.\n\nParagraph 54 of the live document, long enough to scroll.\n\nParagraph 55 of the live document, long enough to scroll.\n\nParagraph 56 of the live document, long enough to scroll.\n\nParagraph 57 of the live document, long enough to scroll.\n\nParagraph 58 of the live document, long enough to scroll.\n\nParagraph 59 of the live document, long enough to scroll.\n\nParagraph 60 of the live document, long enough to scroll.\n\nParagraph 61 of the live document, long enough to scroll.\n\nParagraph 62 of the live document, long enough to scroll.\n\nParagraph 63 of the live document, long enough to scroll.\n\nParagraph 64 of the live document, long enough to scroll.\n\nParagraph 65 of the live document, long enough to scroll.\n\nParagraph 66 of the live document, long enough to scroll.\n\nParagraph 67 of the live document, long enough to scroll.\n\nParagraph 68 of the live document, long enough to scroll.\n\nParagraph 69 of the live document, long enough to scroll.\n\nParagraph 70 of the live document, long enough to scroll.\n\nParagraph 71 of the live document, long enough to scroll.\n\nParagraph 72 of the live document, long enough to scroll.\n\nParagraph 73 of the live document, long enough to scroll.\n\nParagraph 74 of the live document, long enough to scroll.\n\nParagraph 75 of the live document, long enough to scroll.\n\nParagraph 76 of the live document, long enough to scroll.\n\nParagraph 77 of the live document, long enough to scroll.\n\nParagraph 78 of the live document, long enough to scroll.\n\nParagraph 79 of the live document, long enough to scroll.\n\nParagraph 80 of the live document, long enough to scroll.\n\nParagraph 81 of the live document, long enough to scroll.\n\nParagraph 82 of the live document, long enough to scroll.\n\nParagraph 83 of the live document, long enough to scroll.\n\nParagraph 84 of the live document, long enough to scroll.\n\nParagraph 85 of the live document, long enough to scroll.\n\nParagraph 86 of the live document, long enough to scroll.\n\nParagraph 87 of the live document, long enough to scroll.\n\nParagraph 88 of the live document, long enough to scroll.\n\nParagraph 89 of the live document, long enough to scroll.\n\nParagraph 90 of the live document, long enough to scroll.\n\nParagraph 91 of the live document, long enough to scroll.\n\nParagraph 92 of the live document, long enough to scroll.\n\nParagraph 93 of the live document, long enough to scroll.\n\nParagraph 94 of the live document, long enough to scroll.\n\nParagraph 95 of the live document, long enough to scroll.\n\nParagraph 96 of the live document, long enough to scroll.\n\nParagraph 97 of the live document, long enough to scroll.\n\nParagraph 98 of the live document, long enough to scroll.\n\nParagraph 99 of the live document, long enough to scroll.\n\nParagraph 100 of the live document, long enough to scroll.\n\nParagraph 101 of the live document, long enough to scroll.\n\nParagraph 102 of the live document, long enough to scroll.\n\nParagraph 103 of the live document, long enough to scroll.\n\nParagraph 104 of the live document, long enough to scroll.\n\nParagraph 105 of the live document, long enough to scroll.\n\nParagraph 106 of the live document, long enough to scroll.\n\nParagraph 107 of the live document, long enough to scroll.\n\nParagraph 108 of the live document, long enough to scroll.\n\nParagraph 109 of the live document, long enough to scroll.\n\nParagraph 110 of the live document, long enough to scroll.\n\nParagraph 111 of the live document, long enough to scroll.\n\nParagraph 112 of the live document, long enough to scroll.\n\nParagraph 113 of the live document, long enough to scroll.\n\nParagraph 114 of the live document, long enough to scroll.\n\nParagraph 115 of the live document, long enough to scroll.\n\nParagraph 116 of the live document, long enough to scroll.\n\nParagraph 117 of the live document, long enough to scroll.\n\nParagraph 118 of the live document, long enough to scroll.\n\nParagraph 119 of the live document, long enough to scroll.\n\n"
+    },
+    {
+      "write": "../build/tophat/tabs-long/a-very-long-design-document-name-one.md",
+      "text": "# One\n"
+    },
+    {
+      "write": "../build/tophat/tabs-long/a-very-long-design-document-name-two.md",
+      "text": "# Two\n"
+    },
+    {
+      "write": "../build/tophat/tabs-long/a-very-long-design-document-name-three.md",
+      "text": "# Three\n"
+    },
+    {
+      "write": "../build/tophat/tabs-long/a-very-long-design-document-name-four.md",
+      "text": "# Four\n"
+    },
+    {
+      "write": "../build/tophat/tabs-long/a-very-long-design-document-name-five.md",
+      "text": "# Five\n"
+    },
+    {
+      "write": "../build/tophat/tabs-long/a-very-long-design-document-name-six.md",
+      "text": "# Six\n"
+    },
+    {
+      "wait": 1000
+    },
+    {
+      "eval": "(window.T = { repo: location.pathname.replace(/dist\\/page\\/index.html$/, ''), at: (r) => T.repo + r, dir: (p) => p.slice(0, p.lastIndexOf('/')), open: (r, mode = 'tab', heading = null) => window.mdbRemote.open({ path: T.at(r), root: T.dir(T.at(r)), heading, mode }).then((x) => x.result), labels: () => [...document.querySelectorAll('.tab .tab-label')].map((t) => t.textContent), active: () => [...document.querySelectorAll('.tab')].findIndex((t) => t.classList.contains('active')), state: () => ({ labels: T.labels(), active: T.active(), title: document.title }) }) && [document.querySelector('.tabbar').hidden, document.querySelectorAll('.tab-pane').length]"
+    },
+    {
+      "eval": "T.open('docs/usage.md')"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "[document.querySelector('.tabbar').hidden, T.state()]"
+    },
+    {
+      "shot": "two-tabs"
+    },
+    {
+      "eval": "T.open('docs/showcase.md', 'tab', 'tables')"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "eval": "[T.state(), Math.round(document.querySelector('.tab-pane:not(.background) #tables').getBoundingClientRect().top)]"
+    },
+    {
+      "key": "l",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "T.active()"
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "T.active()"
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "mdb"
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]"
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]"
+    },
+    {
+      "key": "l",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]"
+    },
+    {
+      "key": "t",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "[T.state(), document.activeElement?.classList.contains('query'), document.querySelector('.tab-pane:not(.background) .reader:not([hidden]) .where')?.textContent ?? document.querySelector('.tab-pane:not(.background) .finder .hints')?.textContent]"
+    },
+    {
+      "shot": "finder-tab"
+    },
+    {
+      "type": "ab"
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[T.active(), document.querySelectorAll('.tab-pane')[2].querySelector('.query').value]"
+    },
+    {
+      "key": "l",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "T.open('docs/usage.md')"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "T.state()"
+    },
+    {
+      "key": "t",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "T.open('test/fixtures/docs/README.md')"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "T.state()"
+    },
+    {
+      "eval": "T.open('docs/showcase.md', 'replace')"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "T.state()"
+    },
+    {
+      "eval": "document.querySelector('.tab-pane:not(.background) .where').textContent + ' | ' + document.querySelector('.tab-pane:not(.background) .reader .hints').textContent"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-live.md')"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop = 400"
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop"
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "write": "../build/tophat/tabs-live.md",
+      "text": "# Live\n\nSecond version.\n\nParagraph 0 of the live document, long enough to scroll.\n\nParagraph 1 of the live document, long enough to scroll.\n\nParagraph 2 of the live document, long enough to scroll.\n\nParagraph 3 of the live document, long enough to scroll.\n\nParagraph 4 of the live document, long enough to scroll.\n\nParagraph 5 of the live document, long enough to scroll.\n\nParagraph 6 of the live document, long enough to scroll.\n\nParagraph 7 of the live document, long enough to scroll.\n\nParagraph 8 of the live document, long enough to scroll.\n\nParagraph 9 of the live document, long enough to scroll.\n\nParagraph 10 of the live document, long enough to scroll.\n\nParagraph 11 of the live document, long enough to scroll.\n\nParagraph 12 of the live document, long enough to scroll.\n\nParagraph 13 of the live document, long enough to scroll.\n\nParagraph 14 of the live document, long enough to scroll.\n\nParagraph 15 of the live document, long enough to scroll.\n\nParagraph 16 of the live document, long enough to scroll.\n\nParagraph 17 of the live document, long enough to scroll.\n\nParagraph 18 of the live document, long enough to scroll.\n\nParagraph 19 of the live document, long enough to scroll.\n\nParagraph 20 of the live document, long enough to scroll.\n\nParagraph 21 of the live document, long enough to scroll.\n\nParagraph 22 of the live document, long enough to scroll.\n\nParagraph 23 of the live document, long enough to scroll.\n\nParagraph 24 of the live document, long enough to scroll.\n\nParagraph 25 of the live document, long enough to scroll.\n\nParagraph 26 of the live document, long enough to scroll.\n\nParagraph 27 of the live document, long enough to scroll.\n\nParagraph 28 of the live document, long enough to scroll.\n\nParagraph 29 of the live document, long enough to scroll.\n\nParagraph 30 of the live document, long enough to scroll.\n\nParagraph 31 of the live document, long enough to scroll.\n\nParagraph 32 of the live document, long enough to scroll.\n\nParagraph 33 of the live document, long enough to scroll.\n\nParagraph 34 of the live document, long enough to scroll.\n\nParagraph 35 of the live document, long enough to scroll.\n\nParagraph 36 of the live document, long enough to scroll.\n\nParagraph 37 of the live document, long enough to scroll.\n\nParagraph 38 of the live document, long enough to scroll.\n\nParagraph 39 of the live document, long enough to scroll.\n\nParagraph 40 of the live document, long enough to scroll.\n\nParagraph 41 of the live document, long enough to scroll.\n\nParagraph 42 of the live document, long enough to scroll.\n\nParagraph 43 of the live document, long enough to scroll.\n\nParagraph 44 of the live document, long enough to scroll.\n\nParagraph 45 of the live document, long enough to scroll.\n\nParagraph 46 of the live document, long enough to scroll.\n\nParagraph 47 of the live document, long enough to scroll.\n\nParagraph 48 of the live document, long enough to scroll.\n\nParagraph 49 of the live document, long enough to scroll.\n\nParagraph 50 of the live document, long enough to scroll.\n\nParagraph 51 of the live document, long enough to scroll.\n\nParagraph 52 of the live document, long enough to scroll.\n\nParagraph 53 of the live document, long enough to scroll.\n\nParagraph 54 of the live document, long enough to scroll.\n\nParagraph 55 of the live document, long enough to scroll.\n\nParagraph 56 of the live document, long enough to scroll.\n\nParagraph 57 of the live document, long enough to scroll.\n\nParagraph 58 of the live document, long enough to scroll.\n\nParagraph 59 of the live document, long enough to scroll.\n\nParagraph 60 of the live document, long enough to scroll.\n\nParagraph 61 of the live document, long enough to scroll.\n\nParagraph 62 of the live document, long enough to scroll.\n\nParagraph 63 of the live document, long enough to scroll.\n\nParagraph 64 of the live document, long enough to scroll.\n\nParagraph 65 of the live document, long enough to scroll.\n\nParagraph 66 of the live document, long enough to scroll.\n\nParagraph 67 of the live document, long enough to scroll.\n\nParagraph 68 of the live document, long enough to scroll.\n\nParagraph 69 of the live document, long enough to scroll.\n\nParagraph 70 of the live document, long enough to scroll.\n\nParagraph 71 of the live document, long enough to scroll.\n\nParagraph 72 of the live document, long enough to scroll.\n\nParagraph 73 of the live document, long enough to scroll.\n\nParagraph 74 of the live document, long enough to scroll.\n\nParagraph 75 of the live document, long enough to scroll.\n\nParagraph 76 of the live document, long enough to scroll.\n\nParagraph 77 of the live document, long enough to scroll.\n\nParagraph 78 of the live document, long enough to scroll.\n\nParagraph 79 of the live document, long enough to scroll.\n\nParagraph 80 of the live document, long enough to scroll.\n\nParagraph 81 of the live document, long enough to scroll.\n\nParagraph 82 of the live document, long enough to scroll.\n\nParagraph 83 of the live document, long enough to scroll.\n\nParagraph 84 of the live document, long enough to scroll.\n\nParagraph 85 of the live document, long enough to scroll.\n\nParagraph 86 of the live document, long enough to scroll.\n\nParagraph 87 of the live document, long enough to scroll.\n\nParagraph 88 of the live document, long enough to scroll.\n\nParagraph 89 of the live document, long enough to scroll.\n\nParagraph 90 of the live document, long enough to scroll.\n\nParagraph 91 of the live document, long enough to scroll.\n\nParagraph 92 of the live document, long enough to scroll.\n\nParagraph 93 of the live document, long enough to scroll.\n\nParagraph 94 of the live document, long enough to scroll.\n\nParagraph 95 of the live document, long enough to scroll.\n\nParagraph 96 of the live document, long enough to scroll.\n\nParagraph 97 of the live document, long enough to scroll.\n\nParagraph 98 of the live document, long enough to scroll.\n\nParagraph 99 of the live document, long enough to scroll.\n\nParagraph 100 of the live document, long enough to scroll.\n\nParagraph 101 of the live document, long enough to scroll.\n\nParagraph 102 of the live document, long enough to scroll.\n\nParagraph 103 of the live document, long enough to scroll.\n\nParagraph 104 of the live document, long enough to scroll.\n\nParagraph 105 of the live document, long enough to scroll.\n\nParagraph 106 of the live document, long enough to scroll.\n\nParagraph 107 of the live document, long enough to scroll.\n\nParagraph 108 of the live document, long enough to scroll.\n\nParagraph 109 of the live document, long enough to scroll.\n\nParagraph 110 of the live document, long enough to scroll.\n\nParagraph 111 of the live document, long enough to scroll.\n\nParagraph 112 of the live document, long enough to scroll.\n\nParagraph 113 of the live document, long enough to scroll.\n\nParagraph 114 of the live document, long enough to scroll.\n\nParagraph 115 of the live document, long enough to scroll.\n\nParagraph 116 of the live document, long enough to scroll.\n\nParagraph 117 of the live document, long enough to scroll.\n\nParagraph 118 of the live document, long enough to scroll.\n\nParagraph 119 of the live document, long enough to scroll.\n\n"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "[...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed'))"
+    },
+    {
+      "key": "l",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed')).concat([document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent])"
+    },
+    {
+      "click": ".tab:nth-child(1)"
+    },
+    {
+      "eval": "T.active()"
+    },
+    {
+      "click": ".tab-new"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "T.state()"
+    },
+    {
+      "click": ".tab.active .tab-close"
+    },
+    {
+      "eval": "[T.state(), document.querySelectorAll('.tab-pane').length]"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-one.md')"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-two.md')"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-three.md')"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-four.md')"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-five.md')"
+    },
+    {
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-six.md')"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "(() => { const bar = document.querySelector('.tabbar').getBoundingClientRect(); const a = document.querySelector('.tab.active').getBoundingClientRect(); return [document.querySelectorAll('.tab').length, Math.round(a.left) >= Math.round(bar.left), Math.round(a.right) <= Math.round(bar.right), Math.round(document.querySelector('.tab').getBoundingClientRect().width)] })()"
+    },
+    {
+      "shot": "long-labels"
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[T.state(), document.querySelectorAll('.tab-pane').length]"
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[document.querySelector('.tabbar').hidden, document.querySelectorAll('.tab-pane').length]"
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 200
+    }
+  ]
+}

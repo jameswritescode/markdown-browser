@@ -10,14 +10,14 @@
     },
     { "shot": "start-heading" },
     {
-      "eval": "window.mdbRemote.open(document.querySelector('.reader-scroll') && location.pathname.replace(/dist\\/page\\/index.html$/, 'docs/usage.md'), 'Outline')"
+      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'docs/usage.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Outline', mode: 'replace' }) })()"
     },
     { "wait": 500 },
     {
       "eval": "[document.title, Math.round(document.getElementById('outline').getBoundingClientRect().top)]"
     },
     {
-      "eval": "window.mdbRemote.open(location.pathname.replace(/dist\\/page\\/index.html$/, 'docs/showcase.md'), 'Nothing like this')"
+      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'docs/showcase.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Nothing like this', mode: 'replace' }) })()"
     },
     { "wait": 300 },
     {

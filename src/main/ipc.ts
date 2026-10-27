@@ -10,6 +10,7 @@ export function registerIpc(
   options: StartOptions,
   copy: (text: string) => void,
   contents: () => WebContents | null,
+  quit: () => void,
 ): void {
   const scans = new Map<string, Promise<ScanResult>>();
   const scan = (dir: string) => {
@@ -40,4 +41,5 @@ export function registerIpc(
   });
   ipcMain.on("mdb:reveal", (_event, path: string) => shell.showItemInFolder(path));
   ipcMain.on("mdb:copy", (_event, text: string) => copy(text));
+  ipcMain.on("mdb:quit", () => quit());
 }

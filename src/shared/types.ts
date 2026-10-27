@@ -77,4 +77,5 @@ export interface MdbBridge {
   reveal(path: string): void;
   copy(text: string): void;
   ready(): void;
+  quit(): void;
 }

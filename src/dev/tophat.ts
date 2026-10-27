@@ -107,6 +107,7 @@ async function run(): Promise<void> {
     options,
     (text) => clipboard.push(text),
     () => contents,
+    () => record("quit"),
   );
   const pageUrl = pathToFileURL(join(__dirname, "..", "..", "dist", "page", "index.html")).href;
   lockNavigation(contents, pageUrl);
@@ -151,9 +152,16 @@ async function run(): Promise<void> {
       );
       await sleep(250);
     } else if ("eval" in step) {
-      const value = await contents.executeJavaScript(step.eval);
-      record(`eval ${step.eval} => ${JSON.stringify(value)}`);
+      try {
+        const value = await contents.executeJavaScript(step.eval);
+        record(`eval ${step.eval} => ${JSON.stringify(value)}`);
+      } catch (error) {
+        record(
+          `eval ${step.eval} => error: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     } else if ("write" in step) {
+      mkdirSync(dirname(resolve(base, step.write)), { recursive: true });
       writeFileSync(resolve(base, step.write), step.text);
       await sleep(500);
     } else if ("remove" in step) {
