@@ -11,11 +11,20 @@ import type { InstanceInfo } from "../src/core/registry.ts";
 import type { Launch } from "../src/shared/types.ts";
 
 const launch = (over: Partial<Launch> = {}, openPath: string | null = "/d/a.md"): Launch => ({
-  start: { root: "/d", openPath, background: "transparent", heading: null, tab: null },
+  start: {
+    root: "/d",
+    openPath,
+    background: "transparent",
+    heading: null,
+    tab: null,
+    waitToken: null,
+  },
   split: null,
   size: null,
   fresh: false,
   replace: false,
+  stdin: false,
+  title: null,
   ...over,
 });
 const instance = (pid: number, tab: string | null): InstanceInfo => ({

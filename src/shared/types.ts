@@ -54,6 +54,8 @@ export interface StartOptions {
   background: Background;
   heading: string | null;
   tab: string | null;
+  /** Set when a CLI starts this mdb and then sends it a stdin document over the socket. */
+  waitToken: string | null;
 }
 
 export type Direction = "right" | "left" | "down" | "up";
@@ -65,6 +67,10 @@ export interface Launch {
   fresh: boolean;
   /** Show the file in the reused pane's current tab, not a new tab. */
   replace: boolean;
+  /** Read markdown from stdin (`-`). */
+  stdin: boolean;
+  /** The stdin document's title, from `--title`. */
+  title: string | null;
 }
 
 export interface MdbBridge {

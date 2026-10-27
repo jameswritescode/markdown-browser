@@ -16,11 +16,14 @@ test("no arguments browses the working folder", () => {
       background: "transparent",
       heading: null,
       tab: null,
+      waitToken: null,
     },
     split: null,
     size: null,
     fresh: false,
     replace: false,
+    stdin: false,
+    title: null,
   });
 });
 
@@ -103,4 +106,26 @@ test("non-markdown files are an error", () => {
 
 test("unknown flags are an error", () => {
   expect(parseArgs(["--nope"], "/w", {})).toEqual({ error: "mdb: unknown option --nope" });
+});
+
+test("- reads stdin, rooted at the working folder", () => {
+  const parsed = parseArgs(["-"], "/w", {});
+  expect(parsed).toMatchObject({ stdin: true, title: null, start: { root: "/w", openPath: null } });
+});
+
+test("--title names a stdin document", () => {
+  expect(parseArgs(["-", "--title", "Work summary"], "/w", {})).toMatchObject({
+    stdin: true,
+    title: "Work summary",
+  });
+});
+
+test("--title without stdin is an error", () => {
+  const error = { error: "mdb: --title works only with stdin (-)" };
+  expect(parseArgs(["--title", "x"], "/w", {})).toEqual(error);
+  expect(parseArgs([FIX("README.md"), "--title", "x"], "/w", {})).toEqual(error);
+});
+
+test("--wait-token sets the start token", () => {
+  expect(start(["--wait-token", "abc"])).toMatchObject({ waitToken: "abc" });
 });

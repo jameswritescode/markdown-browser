@@ -4,7 +4,7 @@ import type { Background, Direction, Launch } from "../shared/types.ts";
 import { isMarkdownPath } from "./scan.ts";
 
 const DIRECTIONS: readonly string[] = ["right", "left", "down", "up"];
-const VALUE_FLAGS = new Set(["--split", "--size", "--heading", "--tab"]);
+const VALUE_FLAGS = new Set(["--split", "--size", "--heading", "--tab", "--title", "--wait-token"]);
 
 export function parseArgs(
   argv: string[],
@@ -14,6 +14,7 @@ export function parseArgs(
   let background: Background = env.MDB_BACKGROUND === "solid" ? "solid" : "transparent";
   let fresh = false;
   let replace = false;
+  let stdin = false;
   const values = new Map<string, string | undefined>();
   const paths: string[] = [];
   for (let i = 0; i < argv.length; i++) {
@@ -22,6 +23,7 @@ export function parseArgs(
     if (arg === "--solid") background = "solid";
     else if (arg === "--new") fresh = true;
     else if (arg === "--replace") replace = true;
+    else if (arg === "-") stdin = true;
     else if (VALUE_FLAGS.has(flag)) {
       const value = inline ?? argv[i + 1];
       if (inline === undefined && value !== undefined) i++;
@@ -43,19 +45,27 @@ export function parseArgs(
     if (!Number.isFinite(size) || size < 0.2 || size > 0.95)
       return { error: "mdb: --size takes a number between 0.2 and 0.95" };
   }
-  for (const flag of ["--heading", "--tab"]) {
+  for (const flag of ["--heading", "--tab", "--title", "--wait-token"]) {
     if (values.has(flag) && !values.get(flag)) return { error: `mdb: ${flag} takes a value` };
   }
   const heading = values.get("--heading") ?? null;
   const tab = values.get("--tab") ?? env.CMUX_WORKSPACE_ID ?? null;
+  const title = values.get("--title") ?? null;
+  const waitToken = values.get("--wait-token") ?? null;
   const launch = (root: string, openPath: string | null): Launch => ({
-    start: { root, openPath, background, heading, tab },
+    start: { root, openPath, background, heading, tab, waitToken },
     split,
     size,
     fresh,
     replace,
+    stdin,
+    title,
   });
 
+  if (title !== null && (!stdin || paths.length > 0))
+    return { error: "mdb: --title works only with stdin (-)" };
+  if (stdin)
+    return paths.length > 0 ? { error: "mdb: - takes no file or folder" } : launch(cwd, null);
   if (paths.length > 1) return { error: `mdb: expected one file or folder, got ${paths.length}` };
   const given = paths[0];
   if (given === undefined) return launch(cwd, null);
