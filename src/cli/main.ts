@@ -30,10 +30,12 @@ options:
   --split <direction>  open mdb in a new pane: right, left, down, or up
   --size <fraction>    the size of the new pane, from 0.2 to 0.95
   --new                open a new pane, even if this terminal tab already shows mdb
+  --replace            show the file in the mdb pane's current tab, not a new tab
 
 With no terminal on stdout (for example, in a coding agent's shell), mdb acts as if you
-gave --split right. With --split, mdb shows the document in this terminal tab's mdb pane
-if there is one, and opens a new pane if there is not.
+gave --split right. With --split, mdb opens the document in a new tab in this terminal
+tab's mdb pane if there is one, and opens a new pane if there is not. If a tab already
+shows the document, mdb goes to that tab.
 
 mdb skill install    install the mdb skill for Claude Code and Codex
 `;
@@ -114,14 +116,19 @@ async function reuse(instance: InstanceInfo, launch: Launch): Promise<number | n
     reply = await sendControl(instance.socket, {
       cmd: "open",
       path,
+      root: launch.start.root,
       heading: launch.start.heading,
+      mode: launch.replace ? "replace" : "tab",
     });
   } catch (error) {
     if (isGone(error)) return null;
     return fail(`mdb: the mdb pane in this tab did not answer: ${(error as Error).message}`);
   }
   if ("error" in reply) return fail(`mdb: ${reply.error}`);
-  say(`mdb: showing ${describe(launch)} in the mdb pane in this tab`);
+  const shown = describe(launch);
+  if (reply.result === "switched") say(`mdb: switched to ${shown} in the mdb pane`);
+  else if (reply.result === "replaced") say(`mdb: showing ${shown} in the mdb pane`);
+  else say(`mdb: opened ${shown} in a tab in the mdb pane`);
   if (launch.start.heading && reply.heading === false)
     process.stderr.write(`mdb: no heading matches "${launch.start.heading}"\n`);
   return 0;

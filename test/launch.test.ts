@@ -8,6 +8,7 @@ const launch = (over: Partial<Launch> = {}, openPath: string | null = "/d/a.md")
   split: null,
   size: null,
   fresh: false,
+  replace: false,
   ...over,
 });
 const instance = (pid: number, tab: string | null): InstanceInfo => ({
@@ -74,6 +75,14 @@ test("the split command starts this mdb with the same options and the tab", () =
     "--heading=Open questions",
   ]);
   expect(splitCommand("n", "m", launch({}, null), null)).toEqual(["n", "m", "/d"]);
+});
+
+test("the split command leaves out --replace, because a new pane has one tab", () => {
+  expect(splitCommand("n", "m", launch({ replace: true }, "/d/a.md"), null)).toEqual([
+    "n",
+    "m",
+    "/d/a.md",
+  ]);
 });
 
 test("help is a flag, not a flag value", () => {

@@ -63,6 +63,8 @@ export interface Launch {
   split: Direction | null;
   size: number | null;
   fresh: boolean;
+  /** Show the file in the reused pane's current tab, not a new tab. */
+  replace: boolean;
 }
 
 export interface MdbBridge {

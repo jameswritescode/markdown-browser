@@ -13,6 +13,7 @@ export function parseArgs(
 ): Launch | { error: string } {
   let background: Background = env.MDB_BACKGROUND === "solid" ? "solid" : "transparent";
   let fresh = false;
+  let replace = false;
   const values = new Map<string, string | undefined>();
   const paths: string[] = [];
   for (let i = 0; i < argv.length; i++) {
@@ -20,6 +21,7 @@ export function parseArgs(
     const [flag, inline] = arg.startsWith("--") ? splitFlag(arg) : [arg, undefined];
     if (arg === "--solid") background = "solid";
     else if (arg === "--new") fresh = true;
+    else if (arg === "--replace") replace = true;
     else if (VALUE_FLAGS.has(flag)) {
       const value = inline ?? argv[i + 1];
       if (inline === undefined && value !== undefined) i++;
@@ -51,6 +53,7 @@ export function parseArgs(
     split,
     size,
     fresh,
+    replace,
   });
 
   if (paths.length > 1) return { error: `mdb: expected one file or folder, got ${paths.length}` };

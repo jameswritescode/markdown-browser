@@ -6,8 +6,8 @@ export interface OpenMessage {
   cmd: "open";
   path: string;
   heading: string | null;
-  root?: string;
-  mode?: "tab" | "replace";
+  root: string;
+  mode: "tab" | "replace";
 }
 
 export type ControlMessage = OpenMessage;

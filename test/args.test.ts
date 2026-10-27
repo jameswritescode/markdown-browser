@@ -20,6 +20,7 @@ test("no arguments browses the working folder", () => {
     split: null,
     size: null,
     fresh: false,
+    replace: false,
   });
 });
 
@@ -67,6 +68,10 @@ test("--size takes a fraction between 0.2 and 0.95", () => {
 
 test("--new asks for a new pane", () => {
   expect(parseArgs(["--new"], "/w", {})).toMatchObject({ fresh: true });
+});
+
+test("--replace asks to replace the current tab", () => {
+  expect(parseArgs(["--replace"], "/w", {})).toMatchObject({ replace: true });
 });
 
 test("--heading names a heading to go to", () => {

@@ -42,10 +42,8 @@ test("records of dead processes and unreadable records are removed", () => {
 test("a control message reaches the handler and its reply comes back", async () => {
   const socket = join(state, "c.sock");
   const server = await serveControl(socket, async (message) => ({ ok: true, echo: message }));
-  expect(await sendControl(socket, { cmd: "open", path: "/a.md", heading: null })).toEqual({
-    ok: true,
-    echo: { cmd: "open", path: "/a.md", heading: null },
-  });
+  const message = { cmd: "open", path: "/a.md", root: "/", heading: null, mode: "tab" } as const;
+  expect(await sendControl(socket, message)).toEqual({ ok: true, echo: message });
   server.close();
 });
 
@@ -54,7 +52,15 @@ test("a handler error comes back as an error reply", async () => {
   const server = await serveControl(socket, async () => {
     throw new Error("boom");
   });
-  expect(await sendControl(socket, { cmd: "open", path: "/a.md", heading: null })).toEqual({
+  expect(
+    await sendControl(socket, {
+      cmd: "open",
+      path: "/a.md",
+      root: "/",
+      heading: null,
+      mode: "tab",
+    }),
+  ).toEqual({
     error: "boom",
   });
   server.close();
@@ -62,14 +68,28 @@ test("a handler error comes back as an error reply", async () => {
 
 test("sending to a missing socket rejects", async () => {
   await expect(
-    sendControl(join(state, "none.sock"), { cmd: "open", path: "/a.md", heading: null }),
+    sendControl(join(state, "none.sock"), {
+      cmd: "open",
+      path: "/a.md",
+      root: "/",
+      heading: null,
+      mode: "tab",
+    }),
   ).rejects.toThrow();
 });
 
 test("serving creates the socket's folder when it is missing", async () => {
   const socket = join(instancesDir(env), "c.sock");
   const server = await serveControl(socket, async () => ({ ok: true }));
-  expect(await sendControl(socket, { cmd: "open", path: "/a.md", heading: null })).toEqual({
+  expect(
+    await sendControl(socket, {
+      cmd: "open",
+      path: "/a.md",
+      root: "/",
+      heading: null,
+      mode: "tab",
+    }),
+  ).toEqual({
     ok: true,
   });
   server.close();
@@ -79,7 +99,15 @@ test("serving replaces a stale socket file", async () => {
   const socket = join(state, "c.sock");
   writeFileSync(socket, "");
   const server = await serveControl(socket, async () => ({ ok: true }));
-  expect(await sendControl(socket, { cmd: "open", path: "/a.md", heading: null })).toEqual({
+  expect(
+    await sendControl(socket, {
+      cmd: "open",
+      path: "/a.md",
+      root: "/",
+      heading: null,
+      mode: "tab",
+    }),
+  ).toEqual({
     ok: true,
   });
   server.close();
@@ -106,7 +134,13 @@ test("only the first message on a connection is handled", async () => {
   const reply = await new Promise<string>((done) => {
     let text = "";
     const connection = createConnection(socket, () => {
-      const line = JSON.stringify({ cmd: "open", path: "/a.md", heading: null });
+      const line = JSON.stringify({
+        cmd: "open",
+        path: "/a.md",
+        root: "/",
+        heading: null,
+        mode: "tab",
+      });
       connection.write(`${line}\n${line}\n`);
     });
     connection.on("data", (chunk) => (text += chunk));
