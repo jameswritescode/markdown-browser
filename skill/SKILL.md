@@ -13,8 +13,10 @@ mdb docs/plan.md
 ```
 
 Your shell has no terminal, so mdb opens a pane to the right of the user's pane.
-If this terminal tab already shows mdb, mdb shows the file in that pane instead of
-opening a new one. (A folder always opens a new pane.) The user can press `ctrl+[` there to go back to the previous document.
+If this terminal tab already shows mdb, mdb opens the file in a new tab in that pane
+instead of opening a new pane. If a tab there already shows the file, mdb goes to that
+tab. Other agents in the same terminal tab can use the same pane, and each document keeps
+its own tab. (A folder always opens a new pane.)
 
 Point the user at a section:
 
@@ -32,6 +34,8 @@ Other options:
 - `--split down` (or `left`, `up`) chooses where the new pane goes. The default is `right`.
 - `--size 0.4` sets the size of a new pane, as a fraction of the current pane.
 - `--new` opens a new pane even if the tab already shows mdb.
+- `--replace` shows the file in the pane's current tab, not a new tab. Use it only when
+  the new document replaces the one on screen.
 - `mdb <folder>` opens the file list for a folder, where the user can search the markdown files.
 
 mdb reloads the document when the file changes. After you edit a file that mdb shows, you do

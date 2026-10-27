@@ -96,12 +96,13 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 
 ### More options
 
-| Option                | Result                                                           |
-| --------------------- | ---------------------------------------------------------------- |
-| `--heading <text>`    | Goes to the first heading that matches `<text>`.                 |
-| `--split <direction>` | Opens mdb in a new pane: `right`, `left`, `down`, or `up`.       |
-| `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.             |
-| `--new`               | Opens a new pane, also when this terminal tab already shows mdb. |
+| Option                | Result                                                            |
+| --------------------- | ----------------------------------------------------------------- |
+| `--heading <text>`    | Goes to the first heading that matches `<text>`.                  |
+| `--split <direction>` | Opens mdb in a new pane: `right`, `left`, `down`, or `up`.        |
+| `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.              |
+| `--new`               | Opens a new pane, also when this terminal tab already shows mdb.  |
+| `--replace`           | Shows the file in the current tab of the mdb pane, not a new tab. |
 
 For more information about panes, read [Panes and coding agents](docs/usage.md#panes-and-coding-agents).
 
@@ -132,6 +133,16 @@ Panes work in cmux, Ghostty 1.3 or later, kitty, tmux, and WezTerm.
 | `enter`                    | Open the selected document.                                              |
 | `esc`                      | Clear the filter. In text search, go back to the filter.                 |
 | `ctrl+c`, `ctrl+q`         | Quit.                                                                    |
+
+### Tabs
+
+These keys work in the file list and in a document.
+
+| Key                | Action                                                 |
+| ------------------ | ------------------------------------------------------ |
+| `ctrl+t`           | Open a new tab. The new tab shows the file list.       |
+| `ctrl+w`           | Close the tab. When you close the last tab, mdb stops. |
+| `ctrl+h`, `ctrl+l` | Go to the previous or the next tab.                    |
 
 ### Document
 

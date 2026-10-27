@@ -119,6 +119,21 @@ Press `ctrl+[` to go back to the previous document. Press `ctrl+]` to go forward
 
 mdb can only see `ctrl+[` if your terminal uses the kitty keyboard protocol. Ghostty, kitty, and cmux use it. In a different terminal, `ctrl+[` is the same as `esc`, and mdb goes back to the file list.
 
+## Tabs
+
+One mdb can show many documents. Each document is in a tab. When mdb has two or more tabs, a bar at the top shows the tabs.
+
+- Press `ctrl+t` to open a new tab. The new tab shows the file list of the folder of the current tab.
+- Press `ctrl+w` to close the current tab. When you close the last tab, mdb stops.
+- Press `ctrl+h` to go to the previous tab. Press `ctrl+l` to go to the next tab.
+- Click a tab to go to it. Click ✕ on a tab to close it. Click + to open a new tab.
+
+Each tab has its own folder, back and forward history, scroll position, and find. Press `esc` in a tab to show the file list of the folder of that tab.
+
+A tab shows the file name. When two tabs show files with the same name, the tab also shows the name of the folder. The status line shows the full path and the position of the tab, for example `plan.md · 2 of 3 · 40%`.
+
+When the file of a tab that you do not see changes, mdb shows the new document in that tab and puts a dot on the tab. The dot goes away when you go to the tab.
+
 ## Panes and coding agents
 
 mdb can open in a new pane beside your current pane. Use `--split` with a direction:
@@ -133,7 +148,15 @@ When the output of mdb is not a terminal, mdb acts as if you gave `--split right
 
 ### Use the pane again
 
-With `--split`, mdb first looks for an mdb in the same terminal tab. If it finds one, it shows the document in that pane and does not open a new pane. Press `ctrl+[` in that pane to go back to the previous document.
+With `--split`, mdb first looks for an mdb in the same terminal tab. If it finds one, it shows the document in that pane and does not open a new pane:
+
+- If a tab in that pane already shows the document, mdb goes to that tab.
+- If the current tab shows the file list, mdb shows the document in that tab.
+- If not, mdb opens the document in a new tab.
+
+Thus, many agents in one terminal tab can show you documents in the same pane, and they do not replace the documents of each other.
+
+To show the document in the current tab, add `--replace`. Press `ctrl+[` in that tab to go back to the previous document.
 
 This works only for a file. For a folder, mdb always opens a new pane.
 
