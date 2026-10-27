@@ -72,7 +72,8 @@ export function createTab(host: HTMLElement, startRoot: string, hooks: TabHooks)
     root: () => root,
     /** The document this tab shows, or null when it shows its finder. */
     path: () => reader.currentPath(),
-    title: () => (reader.currentPath() ? reader.title() : "mdb"),
+    /** The document's title, or null when the tab shows its finder or has no document yet. */
+    title: () => (reader.currentPath() ? reader.title() : null),
     open,
     showFinder,
     goToHeading: (heading: string) => reader.goToHeading(heading),

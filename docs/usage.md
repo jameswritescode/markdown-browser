@@ -130,7 +130,7 @@ One mdb can show many documents. Each document is in a tab. When mdb has two or 
 
 Each tab has its own folder, back and forward history, scroll position, and find. Press `esc` in a tab to show the file list of the folder of that tab.
 
-A tab shows the file name. When two tabs show files with the same name, the tab also shows the name of the folder. The status line shows the full path and the position of the tab, for example `plan.md · 2 of 3 · 40%`.
+A tab shows the title of its document, as the file list does. If the document has no title, the tab shows the file name. When two tabs have the same title, the tab also shows the file name, or the name of the folder if the file names are also the same. The status line shows the full path and the position of the tab, for example `plan.md · 2 of 3 · 40%`.
 
 When the file of a tab that you do not see changes, mdb shows the new document in that tab and puts a dot on the tab. The dot goes away when you go to the tab.
 

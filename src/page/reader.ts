@@ -437,7 +437,8 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     },
     /** The document this reader shows, even when its file is missing; null when hidden. */
     currentPath: () => (root.hidden ? null : (history.current?.path ?? null)),
-    title: () => current?.title ?? "mdb",
+    /** The document's title, or null when it is missing or not rendered yet. */
+    title: () => current?.title ?? null,
     goToHeading(heading: string) {
       const id = current ? findHeading(current.outline, heading) : null;
       if (id) scrollToId(id);

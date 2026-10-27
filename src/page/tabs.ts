@@ -45,7 +45,9 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
 
   const paintBar = () => {
     bar.hidden = tabs.length < 2;
-    const labels = tabLabels(tabs.map((tab) => ({ path: tab.path(), root: tab.root() })));
+    const labels = tabLabels(
+      tabs.map((tab) => ({ path: tab.path(), root: tab.root(), title: tab.title() })),
+    );
     const cells = tabs.map((tab, i) => {
       const cell = el("div", "tab");
       cell.setAttribute("role", "tab");
