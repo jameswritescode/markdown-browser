@@ -12,6 +12,10 @@ interface Row {
 
 export interface FinderOptions {
   scan: ScanResult;
+  /** Only the front tab's finder handles keys. */
+  isActive(): boolean;
+  /** Extra hints for the status line, starting with " · ", or "". */
+  hints(): string;
   onOpen(path: string, find?: string): void;
 }
 
@@ -23,7 +27,6 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
   const prompt = el("label", "prompt");
   const sigil = el("span", "sigil", "›");
   const input = el("input", "query");
-  input.id = "finder-query";
   input.spellcheck = false;
   input.autocomplete = "off";
   input.setAttribute("aria-label", "Filter documents");
@@ -116,6 +119,7 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
       mode === "search"
         ? "enter open · esc back to filter"
         : "enter open · / search text · esc clear · ctrl+c quit";
+    hints.textContent += opts.hints();
     sigil.textContent = mode === "search" ? "/" : "›";
     list.querySelector(".selected")?.scrollIntoView({ block: "nearest" });
   };
@@ -180,7 +184,7 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
 
   input.addEventListener("input", () => (mode === "filter" ? refilter() : research()));
   const onKey = (event: KeyboardEvent) => {
-    if (root.hidden || event.defaultPrevented) return;
+    if (root.hidden || !opts.isActive() || event.defaultPrevented) return;
     const ctrl = event.ctrlKey && !event.metaKey && !event.altKey;
     const plain = !event.ctrlKey && !event.metaKey && !event.altKey;
     if (document.activeElement !== input && plain && event.key.length === 1) input.focus();
@@ -215,6 +219,7 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
     hide: () => {
       root.hidden = true;
     },
+    refresh: () => paint(),
     destroy: () => {
       window.removeEventListener("keydown", onKey);
       root.remove();

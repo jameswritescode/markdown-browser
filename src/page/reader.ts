@@ -12,7 +12,17 @@ interface ReaderEntry {
 }
 
 export interface ReaderOptions {
-  root: string;
+  root(): string;
+  /** Only the front tab's reader handles keys and paints find highlights. */
+  isActive(): boolean;
+  /** The tab position for the status line, such as "2 of 5", or "". */
+  tabInfo(): string;
+  /** Extra hints for the status line, starting with " · ", or "". */
+  hints(): string;
+  /** The document, its title or its path changed. */
+  onState(): void;
+  /** A live reload rendered while this reader was not the front one. */
+  onReload(path: string): void;
   onExit(): void;
 }
 
@@ -61,14 +71,18 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     content.classList.toggle("with-outline", outlineShown && (current?.outline.length ?? 0) > 0);
   };
 
-  const relPath = (path: string) =>
-    path.startsWith(`${opts.root}/`) ? path.slice(opts.root.length + 1) : path;
+  const relPath = (path: string) => {
+    const root = opts.root();
+    return path.startsWith(`${root}/`) ? path.slice(root.length + 1) : path;
+  };
 
   const paintStatus = () => {
     const path = history.current?.path;
     const range = scroller.scrollHeight - scroller.clientHeight;
     const percent = range > 0 ? Math.round((scroller.scrollTop / range) * 100) : 100;
-    where.textContent = path ? `${relPath(path)} · ${current ? `${percent}%` : "missing"}` : "";
+    const tab = opts.tabInfo();
+    const state = current ? `${percent}%` : "missing";
+    where.textContent = path ? `${relPath(path)} · ${tab ? `${tab} · ` : ""}${state}` : "";
     if (notice) where.textContent += ` · ${notice}`;
     const finding = !findBox.hidden;
     where.hidden = finding;
@@ -83,6 +97,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       hints.textContent = "n next · N previous · esc clear";
     } else if (current) hints.textContent = "/ find · esc files · ctrl+b outline · ctrl+[ back";
     else hints.textContent = "esc files";
+    if (!finding && !findRanges.length) hints.textContent += opts.hints();
   };
 
   const showNotice = (text: string) => {
@@ -173,6 +188,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   };
 
   const paintFind = () => {
+    if (!opts.isActive()) return paintStatus();
     const active = findRanges[findAt];
     CSS.highlights.set(FIND_HIGHLIGHT, new Highlight(...findRanges.filter((r) => r !== active)));
     if (active) CSS.highlights.set(FIND_CURRENT_HIGHLIGHT, new Highlight(active));
@@ -255,6 +271,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     article.replaceChildren(notice);
     layout();
     paintStatus();
+    opts.onState();
   };
 
   const render = async (
@@ -271,7 +288,6 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       return null;
     }
     current = doc;
-    document.title = doc.title;
     let headingFound: boolean | null = null;
     if (heading) {
       const id = findHeading(doc.outline, heading);
@@ -295,6 +311,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       paintFind();
     } else clearFind();
     pendingFind = null;
+    opts.onState();
     return headingFound;
   };
 
@@ -304,7 +321,6 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     scrollY: number | null = null,
     heading: string | null = null,
   ) => {
-    window.mdb.watch([path]);
     return render(path, scrollY, anchor, heading);
   };
 
@@ -346,6 +362,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   const unsubscribe = window.mdb.onChanged(async (path) => {
     if (root.hidden || history.current?.path !== path) return;
     await render(path, scroller.scrollTop, null);
+    if (!opts.isActive()) opts.onReload(path);
   });
 
   const showMatchStep = (by: 1 | -1) => {
@@ -355,7 +372,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   };
 
   const onKey = (event: KeyboardEvent) => {
-    if (root.hidden || event.target === findInput) return;
+    if (root.hidden || !opts.isActive() || event.target === findInput) return;
     const plain = !event.metaKey && !event.ctrlKey && !event.altKey;
     const page = scroller.clientHeight * 0.9;
     if (event.key === "Escape" && findRanges.length) clearFind();
@@ -414,8 +431,24 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     hide() {
       root.hidden = true;
       closeFind(false);
-      window.mdb.watch([]);
+      opts.onState();
     },
+    /** The document this reader shows, even when its file is missing; null when hidden. */
+    currentPath: () => (root.hidden ? null : (history.current?.path ?? null)),
+    title: () => current?.title ?? "mdb",
+    goToHeading(heading: string) {
+      const id = current ? findHeading(current.outline, heading) : null;
+      if (id) scrollToId(id);
+      else showNotice(`no heading matches "${heading}"`);
+      return id !== null;
+    },
+    activate() {
+      paintFind();
+    },
+    deactivate() {
+      closeFind(true);
+    },
+    refresh: () => paintStatus(),
     destroy() {
       unsubscribe();
       observer?.disconnect();

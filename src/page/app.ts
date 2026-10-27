@@ -31,6 +31,8 @@ async function main(): Promise<void> {
       loading.remove();
       finder = mountFinder(app, {
         scan,
+        isActive: () => true,
+        hints: () => "",
         onOpen: (path, find) => {
           finder?.hide();
           void reader.open(path, { find });
@@ -41,7 +43,19 @@ async function main(): Promise<void> {
     finder.show();
   };
 
-  const reader = mountReader(app, { root: start.root, onExit: () => void showFinder() });
+  const reader = mountReader(app, {
+    root: () => start.root,
+    isActive: () => true,
+    tabInfo: () => "",
+    hints: () => "",
+    onState: () => {
+      const path = reader.currentPath();
+      window.mdb.watch(path ? [path] : []);
+      if (path) document.title = reader.title();
+    },
+    onReload: () => {},
+    onExit: () => void showFinder(),
+  });
   reader.hide();
 
   window.mdbRemote = {
