@@ -48,6 +48,14 @@ export function wantsSkill(argv: string[]): boolean {
   return argv[0] === "skill" && argv[1] === "install";
 }
 
+/** The line the CLI prints after a reused mdb pane answers. */
+export function reuseLine(result: unknown, shown: string): string {
+  if (result === "tab") return `mdb: opened ${shown} in a tab in the mdb pane`;
+  if (result === "switched") return `mdb: switched to ${shown} in the mdb pane`;
+  // "replaced", or an mdb from before tabs, which replaces the document.
+  return `mdb: showing ${shown} in the mdb pane`;
+}
+
 export function isGone(error: unknown): boolean {
   const code = (error as NodeJS.ErrnoException | null)?.code;
   return code === "ENOENT" || code === "ECONNREFUSED";

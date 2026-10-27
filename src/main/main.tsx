@@ -9,7 +9,7 @@ import {
 } from "@zenbu-labs/pixel";
 import { ipcMain } from "@zenbu-labs/pixel/electron";
 import { useEffect, useState } from "react";
-import { serveControl } from "../core/control.ts";
+import { openRequest, serveControl } from "../core/control.ts";
 import { instanceSocket, registerInstance } from "../core/registry.ts";
 import type { StartOptions } from "../shared/types.ts";
 import { ContextMenu, type MenuItem } from "./context-menu.tsx";
@@ -68,8 +68,7 @@ ipcMain.once("mdb:ready", () => {
     if (message.cmd !== "open") return { error: `unknown command ${String(message.cmd)}` };
     const contents = view?.webContents;
     if (!contents) return { error: "mdb has no page" };
-    const { path, root: tabRoot, heading, mode } = message;
-    const request = { path, root: tabRoot, heading, mode };
+    const request = openRequest(message);
     const result = (await contents.executeJavaScript(
       `window.mdbRemote.open(${JSON.stringify(request)})`,
     )) as { heading: boolean | null; result: string };

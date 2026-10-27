@@ -14,7 +14,7 @@ import { parseArgs } from "../core/args.ts";
 import { sendControl } from "../core/control.ts";
 import { type InstanceInfo, listInstances } from "../core/registry.ts";
 import type { Direction, Launch } from "../shared/types.ts";
-import { chooseAction, isGone, splitCommand, wantsHelp, wantsSkill } from "./launch.ts";
+import { chooseAction, isGone, reuseLine, splitCommand, wantsHelp, wantsSkill } from "./launch.ts";
 import { installSkill } from "./skill.ts";
 
 const USAGE = `usage: mdb [file.md | folder] [options]
@@ -125,10 +125,7 @@ async function reuse(instance: InstanceInfo, launch: Launch): Promise<number | n
     return fail(`mdb: the mdb pane in this tab did not answer: ${(error as Error).message}`);
   }
   if ("error" in reply) return fail(`mdb: ${reply.error}`);
-  const shown = describe(launch);
-  if (reply.result === "switched") say(`mdb: switched to ${shown} in the mdb pane`);
-  else if (reply.result === "replaced") say(`mdb: showing ${shown} in the mdb pane`);
-  else say(`mdb: opened ${shown} in a tab in the mdb pane`);
+  say(reuseLine(reply.result, describe(launch)));
   if (launch.start.heading && reply.heading === false)
     process.stderr.write(`mdb: no heading matches "${launch.start.heading}"\n`);
   return 0;

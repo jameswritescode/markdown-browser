@@ -2,7 +2,7 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { sendControl, serveControl } from "../src/core/control.ts";
+import { openRequest, sendControl, serveControl } from "../src/core/control.ts";
 import { instancesDir, listInstances, registerInstance } from "../src/core/registry.ts";
 
 let state: string;
@@ -149,4 +149,19 @@ test("only the first message on a connection is handled", async () => {
   expect(reply).toBe('{"ok":true,"calls":1}\n');
   expect(calls).toBe(1);
   server.close();
+});
+
+test("an open message from an older mdb gets the file's folder and a new tab", () => {
+  expect(openRequest({ cmd: "open", path: "/d/a.md", heading: null })).toEqual({
+    path: "/d/a.md",
+    root: "/d",
+    heading: null,
+    mode: "tab",
+  });
+  expect(
+    openRequest({ cmd: "open", path: "/d/a.md", root: "/r", heading: "x", mode: "replace" }),
+  ).toEqual({ path: "/d/a.md", root: "/r", heading: "x", mode: "replace" });
+  expect(
+    openRequest({ cmd: "open", path: "/d/a.md", heading: null, mode: "sideways" as "tab" }).mode,
+  ).toBe("tab");
 });

@@ -6,8 +6,26 @@ export interface OpenMessage {
   cmd: "open";
   path: string;
   heading: string | null;
+  // An mdb from before tabs sends neither.
+  root?: string;
+  mode?: "tab" | "replace";
+}
+
+export interface OpenRequest {
+  path: string;
   root: string;
+  heading: string | null;
   mode: "tab" | "replace";
+}
+
+/** Fills in what an older mdb leaves out: the file's folder, and a new tab. */
+export function openRequest(message: OpenMessage): OpenRequest {
+  return {
+    path: message.path,
+    root: message.root ?? dirname(message.path),
+    heading: message.heading,
+    mode: message.mode === "replace" ? "replace" : "tab",
+  };
 }
 
 export type ControlMessage = OpenMessage;

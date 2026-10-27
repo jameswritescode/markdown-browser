@@ -1,5 +1,12 @@
 import { expect, test } from "vitest";
-import { chooseAction, isGone, splitCommand, wantsHelp, wantsSkill } from "../src/cli/launch.ts";
+import {
+  chooseAction,
+  isGone,
+  reuseLine,
+  splitCommand,
+  wantsHelp,
+  wantsSkill,
+} from "../src/cli/launch.ts";
 import type { InstanceInfo } from "../src/core/registry.ts";
 import type { Launch } from "../src/shared/types.ts";
 
@@ -103,4 +110,12 @@ test("only a missing or refusing socket counts as a gone mdb", () => {
   expect(isGone(coded("ENOENT"))).toBe(true);
   expect(isGone(coded("ECONNREFUSED"))).toBe(true);
   expect(isGone(new Error("mdb did not answer"))).toBe(false);
+});
+
+test("the reuse line says what the mdb pane did", () => {
+  expect(reuseLine("tab", "a.md")).toBe("mdb: opened a.md in a tab in the mdb pane");
+  expect(reuseLine("switched", "a.md")).toBe("mdb: switched to a.md in the mdb pane");
+  expect(reuseLine("replaced", "a.md")).toBe("mdb: showing a.md in the mdb pane");
+  // An mdb from before tabs replies without a result: it replaced the document.
+  expect(reuseLine(undefined, "a.md")).toBe("mdb: showing a.md in the mdb pane");
 });

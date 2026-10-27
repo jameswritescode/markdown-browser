@@ -309,6 +309,8 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
       runFind(findQuery, "top");
       findAt = Math.min(at, findRanges.length - 1);
       paintFind();
+      // runFind scrolled to the first match; a reload keeps the reader's place.
+      scroller.scrollTo({ top: keepScroll });
     } else clearFind();
     pendingFind = null;
     opts.onState();
