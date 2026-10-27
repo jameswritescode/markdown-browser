@@ -7,6 +7,11 @@ ipcRenderer.on("mdb:changed", (_event: unknown, path: string) => {
   for (const listener of changeListeners) listener(path);
 });
 
+const folderListeners = new Set<(root: string) => void>();
+ipcRenderer.on("mdb:folder-changed", (_event: unknown, root: string) => {
+  for (const listener of folderListeners) listener(root);
+});
+
 const bridge: MdbBridge = {
   start: () => ipcRenderer.invoke("mdb:start"),
   scan: (root) => ipcRenderer.invoke("mdb:scan", root),
@@ -14,6 +19,11 @@ const bridge: MdbBridge = {
   render: (path) => ipcRenderer.invoke("mdb:render", path),
   classifyLink: (href, docPath) => ipcRenderer.invoke("mdb:classify", href, docPath),
   watch: (paths) => ipcRenderer.send("mdb:watch", paths),
+  watchFolders: (roots) => ipcRenderer.send("mdb:watch-folders", roots),
+  onFolderChanged: (cb) => {
+    folderListeners.add(cb);
+    return () => folderListeners.delete(cb);
+  },
   onChanged: (cb) => {
     changeListeners.add(cb);
     return () => changeListeners.delete(cb);

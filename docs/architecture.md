@@ -97,7 +97,7 @@ The title comes from `titleOf` (`src/core/scan.ts`): the frontmatter `title`, el
 - `filterDocs` (`src/core/filter.ts`) gives a score to the file names and titles for the text that you type.
 - `searchDocs` (`src/core/search.ts`) searches the text in the files.
 
-The main process keeps one scan for each folder. Each tab can have a different folder.
+The main process keeps one scan for each folder. Each tab can have a different folder. While a tab shows its finder, `FolderWatchers` (`src/main/watcher.ts`) watches the folder of that tab. When a markdown file is added, renamed, or deleted, the finder scans again and keeps the query and the selection. The finder also scans again each time it comes back into view.
 
 ## Live reload
 

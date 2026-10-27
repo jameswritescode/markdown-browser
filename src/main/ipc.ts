@@ -4,7 +4,7 @@ import { loadDoc } from "../core/render.ts";
 import { scanDocs } from "../core/scan.ts";
 import { searchDocs } from "../core/search.ts";
 import type { ScanResult, StartOptions } from "../shared/types.ts";
-import { DocWatchers } from "./watcher.ts";
+import { DocWatchers, FolderWatchers } from "./watcher.ts";
 
 export function registerIpc(
   options: StartOptions,
@@ -36,6 +36,8 @@ export function registerIpc(
     classifyLink(href, docPath),
   );
   ipcMain.on("mdb:watch", (_event, paths: string[]) => watchers.set(paths));
+  const folders = new FolderWatchers((root) => contents()?.send("mdb:folder-changed", root));
+  ipcMain.on("mdb:watch-folders", (_event, roots: string[]) => folders.set(roots));
   ipcMain.on("mdb:open-external", (_event, url: string) => {
     if (isOpenableUrl(url)) void shell.openExternal(url);
   });

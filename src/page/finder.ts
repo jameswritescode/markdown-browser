@@ -22,7 +22,7 @@ export interface FinderOptions {
 const SEARCH_DEBOUNCE_MS = 150;
 
 export function mountFinder(host: HTMLElement, opts: FinderOptions) {
-  const { scan } = opts;
+  let scan = opts.scan;
   const root = el("div", "finder");
   const prompt = el("label", "prompt");
   const sigil = el("span", "sigil", "›");
@@ -220,6 +220,15 @@ export function mountFinder(host: HTMLElement, opts: FinderOptions) {
       root.hidden = true;
     },
     refresh: () => paint(),
+    /** Takes a new scan of the same folder. Keeps the query and the selected file. */
+    update(next: ScanResult) {
+      scan = next;
+      if (mode === "search") return;
+      const keep = rows[selected]?.entry.path;
+      refilter();
+      const at = rows.findIndex((row) => row.entry.path === keep);
+      if (at > 0) select(at);
+    },
     destroy: () => {
       window.removeEventListener("keydown", onKey);
       root.remove();

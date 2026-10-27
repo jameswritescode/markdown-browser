@@ -75,6 +75,9 @@ export interface MdbBridge {
   classifyLink(href: string, docPath: string): Promise<LinkTarget>;
   watch(paths: string[]): void;
   onChanged(cb: (path: string) => void): () => void;
+  /** Watches these folders for markdown files that appear or go away. */
+  watchFolders(roots: string[]): void;
+  onFolderChanged(cb: (root: string) => void): () => void;
   openExternal(url: string): void;
   reveal(path: string): void;
   copy(text: string): void;

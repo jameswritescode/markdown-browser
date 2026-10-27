@@ -4,6 +4,8 @@
 
 When you start `mdb` or `mdb <folder>`, mdb shows a list of the markdown files in the folder and its subfolders.
 
+The list stays up to date. When you add, rename, or delete a markdown file in the folder, the list changes. mdb also reads the folder again each time that you go back to the list.
+
 Each row shows:
 
 - The document title. This is the `title` value in the frontmatter. If there is no `title` value, mdb uses the first level-1 heading. If the document has no level-1 heading, mdb uses the file name.

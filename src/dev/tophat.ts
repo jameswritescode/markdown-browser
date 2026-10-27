@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { app, BrowserWindow } from "@zenbu-labs/pixel/electron";
@@ -26,7 +26,8 @@ interface Script {
   background?: string;
   theme?: { foreground: number[]; background: number[]; ansi: (number[] | null)[] };
   out: string;
-  files?: Record<string, string>;
+  /** Written before mdb starts; null removes the file. */
+  files?: Record<string, string | null>;
   steps: Step[];
 }
 
@@ -53,6 +54,10 @@ const cwd = resolve(base, script.cwd ?? ".");
 mkdirSync(out, { recursive: true });
 
 for (const [file, text] of Object.entries(script.files ?? {})) {
+  if (text === null) {
+    rmSync(resolve(base, file), { force: true });
+    continue;
+  }
   mkdirSync(dirname(resolve(base, file)), { recursive: true });
   writeFileSync(resolve(base, file), text);
 }

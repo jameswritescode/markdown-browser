@@ -77,6 +77,8 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
   const sync = () => {
     const paths = new Set(tabs.map((tab) => tab.path()).filter((path) => path !== null));
     window.mdb.watch([...paths]);
+    const roots = new Set(tabs.filter((tab) => tab.path() === null).map((tab) => tab.root()));
+    window.mdb.watchFolders([...roots]);
     document.title = tabs[active]?.title() ?? "mdb";
     paintBar();
   };

@@ -1,11 +1,11 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test } from "vitest";
-import { DocWatcher, DocWatchers } from "../src/main/watcher.ts";
+import { DocWatcher, DocWatchers, FolderWatchers } from "../src/main/watcher.ts";
 
 const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms));
-let watcher: DocWatcher | DocWatchers | null = null;
+let watcher: DocWatcher | DocWatchers | FolderWatchers | null = null;
 afterEach(() => watcher?.close());
 
 const twoFiles = () => {
@@ -69,4 +69,27 @@ test("DocWatchers stops watching a removed path", async () => {
   writeFileSync(a, "a2");
   await sleep(400);
   expect(seen).toContain(a);
+});
+
+test("FolderWatchers notifies when a markdown file appears in a watched folder", async () => {
+  const root = mkdtempSync(join(tmpdir(), "mdb-folder-"));
+  mkdirSync(join(root, "sub"));
+  const seen: string[] = [];
+  watcher = new FolderWatchers((p) => seen.push(p));
+  watcher.set([root]);
+  await sleep(100);
+  writeFileSync(join(root, "sub", "new.md"), "# New");
+  await sleep(600);
+  expect(seen).toContain(root);
+});
+
+test("FolderWatchers ignores files that are not markdown", async () => {
+  const root = mkdtempSync(join(tmpdir(), "mdb-folder-"));
+  const seen: string[] = [];
+  watcher = new FolderWatchers((p) => seen.push(p));
+  watcher.set([root]);
+  await sleep(100);
+  writeFileSync(join(root, "notes.txt"), "text");
+  await sleep(600);
+  expect(seen).toEqual([]);
 });
