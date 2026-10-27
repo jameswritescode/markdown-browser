@@ -26,7 +26,7 @@ interface Script {
   background?: string;
   theme?: { foreground: number[]; background: number[]; ansi: (number[] | null)[] };
   out: string;
-  /** Written before mdb starts; null removes the file. */
+  /** Written before mdb starts; null removes the file; a key that ends in "/" makes an empty folder. */
   files?: Record<string, string | null>;
   steps: Step[];
 }
@@ -54,6 +54,11 @@ const cwd = resolve(base, script.cwd ?? ".");
 mkdirSync(out, { recursive: true });
 
 for (const [file, text] of Object.entries(script.files ?? {})) {
+  if (file.endsWith("/")) {
+    rmSync(resolve(base, file), { recursive: true, force: true });
+    mkdirSync(resolve(base, file), { recursive: true });
+    continue;
+  }
   if (text === null) {
     rmSync(resolve(base, file), { force: true });
     continue;

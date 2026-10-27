@@ -8,7 +8,14 @@
       "wait": 400
     },
     {
+      "eval": "document.querySelector('.finder .empty')?.textContent.replace(/ in .*/, ' in \u2026')",
+      "expect": "No markdown files in \u2026"
+    },
+    {
       "shot": "empty"
     }
-  ]
+  ],
+  "files": {
+    "../build/tophat/empty-folder/": null
+  }
 }

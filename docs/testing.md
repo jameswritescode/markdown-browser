@@ -89,17 +89,17 @@ Do not expect values that change from run to run, for example relative times ("2
 
 A script is a JSON file in `tophat/`. Paths in a script are relative to the script file.
 
-| Field        | Required | Value                                                                                                |
-| ------------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| `args`       | Yes      | The `mdb` arguments, for example `["../docs/showcase.md", "--heading", "tables"]`.                   |
-| `out`        | Yes      | The output folder, for example `"../build/tophat/reader"`.                                           |
-| `steps`      | Yes      | The steps, in order.                                                                                 |
-| `files`      | No       | Files to make before mdb starts: `{ "path": "text" }`. A `null` value removes the file.              |
-| `width`      | No       | The window width in pixels. The default is 1200.                                                     |
-| `height`     | No       | The window height in pixels. The default is 800.                                                     |
-| `cwd`        | No       | The working folder for `args`. The default is the folder of the script.                              |
-| `theme`      | No       | The terminal colors: `{ "foreground": [r, g, b], "background": [r, g, b], "ansi": [[r, g, b], …] }`. |
-| `background` | No       | The window background color, for example `"#1e1e2e"`.                                                |
+| Field        | Required | Value                                                                                                                                  |
+| ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `args`       | Yes      | The `mdb` arguments, for example `["../docs/showcase.md", "--heading", "tables"]`.                                                     |
+| `out`        | Yes      | The output folder, for example `"../build/tophat/reader"`.                                                                             |
+| `steps`      | Yes      | The steps, in order.                                                                                                                   |
+| `files`      | No       | Files to make before mdb starts: `{ "path": "text" }`. A `null` value removes the file. A path that ends in `/` makes an empty folder. |
+| `width`      | No       | The window width in pixels. The default is 1200.                                                                                       |
+| `height`     | No       | The window height in pixels. The default is 800.                                                                                       |
+| `cwd`        | No       | The working folder for `args`. The default is the folder of the script.                                                                |
+| `theme`      | No       | The terminal colors: `{ "foreground": [r, g, b], "background": [r, g, b], "ansi": [[r, g, b], …] }`.                                   |
+| `background` | No       | The window background color, for example `"#1e1e2e"`.                                                                                  |
 
 tophat reads `args` before it does the steps. Thus, if mdb must start in a folder or on a file that the script makes, put that file in `files`, not in a `write` step.
 
