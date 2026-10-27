@@ -25,12 +25,14 @@ const launch = (over: Partial<Launch> = {}, openPath: string | null = "/d/a.md")
   replace: false,
   stdin: false,
   title: null,
+  pathGiven: openPath !== null,
   ...over,
 });
 const instance = (pid: number, tab: string | null): InstanceInfo => ({
   pid,
   socket: `/s/${pid}.sock`,
   tab,
+  token: null,
   startedAt: pid,
 });
 
@@ -62,14 +64,31 @@ test("reuses the first mdb in the same tab", () => {
   });
 });
 
-test("does not reuse with --new, without a document, or without a known tab", () => {
+test("does not reuse with --new or without a known tab", () => {
   const found = [instance(1, "t")];
   const split = { kind: "split", direction: "right" };
   expect(chooseAction(launch({ fresh: true }), { tty: false, tab: "t", instances: found })).toEqual(
     split,
   );
-  expect(chooseAction(launch({}, null), { tty: false, tab: "t", instances: found })).toEqual(split);
   expect(chooseAction(launch(), { tty: false, tab: null, instances: found })).toEqual(split);
+});
+
+test("reuses the mdb pane for a folder and for stdin", () => {
+  const found = [instance(1, "t")];
+  const reuse = { kind: "reuse", instance: found[0] };
+  expect(chooseAction(launch({}, null), { tty: false, tab: "t", instances: found })).toEqual(reuse);
+  expect(
+    chooseAction(launch({ stdin: true }, null), { tty: false, tab: "t", instances: found }),
+  ).toEqual(reuse);
+});
+
+test("the split command passes a wait token, with the folder as the path", () => {
+  expect(splitCommand("n", "m", launch({ stdin: true }, null), null, "t0k")).toEqual([
+    "n",
+    "m",
+    "/d",
+    "--wait-token=t0k",
+  ]);
 });
 
 test("the split command starts this mdb with the same options and the tab", () => {
@@ -125,6 +144,7 @@ test("the reuse line says what the mdb pane did", () => {
   expect(reuseLine("tab", "a.md")).toBe("mdb: opened a.md in a tab in the mdb pane");
   expect(reuseLine("switched", "a.md")).toBe("mdb: switched to a.md in the mdb pane");
   expect(reuseLine("replaced", "a.md")).toBe("mdb: showing a.md in the mdb pane");
+  expect(reuseLine("updated", "Work summary")).toBe("mdb: updated Work summary in the mdb pane");
   // An mdb from before tabs replies without a result: it replaced the document.
   expect(reuseLine(undefined, "a.md")).toBe("mdb: showing a.md in the mdb pane");
 });

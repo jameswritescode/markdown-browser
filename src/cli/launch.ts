@@ -15,7 +15,7 @@ export interface Situation {
 export function chooseAction(launch: Launch, situation: Situation): Action {
   const direction = launch.split ?? (situation.tty ? null : "right");
   if (direction === null) return { kind: "here" };
-  if (!launch.fresh && launch.start.openPath && situation.tab !== null) {
+  if (!launch.fresh && situation.tab !== null) {
     const instance = situation.instances.find((found) => found.tab === situation.tab);
     if (instance) return { kind: "reuse", instance };
   }
@@ -27,16 +27,18 @@ export function splitCommand(
   bin: string,
   launch: Launch,
   tab: string | null,
+  waitToken: string | null = null,
 ): string[] {
   const { start } = launch;
   const command = [node, bin, start.openPath ?? start.root];
+  if (waitToken) command.push(`--wait-token=${waitToken}`);
   if (start.background === "solid") command.push("--solid");
   if (start.heading) command.push(`--heading=${start.heading}`);
   if (tab) command.push("--tab", tab);
   return command;
 }
 
-const VALUE_FLAGS = new Set(["--split", "--size", "--heading", "--tab"]);
+const VALUE_FLAGS = new Set(["--split", "--size", "--heading", "--tab", "--title", "--wait-token"]);
 
 export function wantsHelp(argv: string[]): boolean {
   return argv.some(
@@ -52,6 +54,7 @@ export function wantsSkill(argv: string[]): boolean {
 export function reuseLine(result: unknown, shown: string): string {
   if (result === "tab") return `mdb: opened ${shown} in a tab in the mdb pane`;
   if (result === "switched") return `mdb: switched to ${shown} in the mdb pane`;
+  if (result === "updated") return `mdb: updated ${shown} in the mdb pane`;
   // "replaced", or an mdb from before tabs, which replaces the document.
   return `mdb: showing ${shown} in the mdb pane`;
 }

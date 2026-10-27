@@ -24,7 +24,12 @@ test("no arguments browses the working folder", () => {
     replace: false,
     stdin: false,
     title: null,
+    pathGiven: false,
   });
+});
+
+test("a given path is marked, so a plain pipe does not read stdin", () => {
+  expect(parseArgs([FIX("guide")], "/w", {})).toMatchObject({ pathGiven: true });
 });
 
 test("a folder argument browses that folder", () => {
@@ -120,10 +125,14 @@ test("--title names a stdin document", () => {
   });
 });
 
-test("--title without stdin is an error", () => {
+test("--title with a file or folder is an error", () => {
   const error = { error: "mdb: --title works only with stdin (-)" };
-  expect(parseArgs(["--title", "x"], "/w", {})).toEqual(error);
   expect(parseArgs([FIX("README.md"), "--title", "x"], "/w", {})).toEqual(error);
+  expect(parseArgs([FIX("guide"), "--title", "x"], "/w", {})).toEqual(error);
+});
+
+test("--title alone leaves the pipe check to the CLI", () => {
+  expect(parseArgs(["--title", "x"], "/w", {})).toMatchObject({ stdin: false, title: "x" });
 });
 
 test("--wait-token sets the start token", () => {

@@ -71,6 +71,8 @@ export interface Launch {
   stdin: boolean;
   /** The stdin document's title, from `--title`. */
   title: string | null;
+  /** A file or folder was named. A plain pipe then is not read. */
+  pathGiven: boolean;
 }
 
 export interface StdinDoc {

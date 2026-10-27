@@ -19,6 +19,7 @@ export interface RemoteOpen {
 export type OpenResult = "tab" | "switched" | "replaced" | "updated";
 type Opened = { heading: boolean | null; result: OpenResult };
 
+const WAIT_FOR_OPEN_MS = 20_000;
 const TAB_HINTS = " · ctrl+t new tab · ctrl+w close";
 
 /** The tab bar and the tabs below it. */
@@ -211,7 +212,12 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
     async start() {
       const first = add(start.root);
       if (start.openPath) await first.open(start.openPath, { heading: start.heading });
-      else await first.showFinder();
+      else if (start.waitToken) {
+        // The CLI that started this mdb sends the document next; it lands in this empty tab.
+        setTimeout(() => {
+          if (tabs.includes(first) && first.path() === null) void first.showFinder();
+        }, WAIT_FOR_OPEN_MS);
+      } else await first.showFinder();
     },
     open(request: RemoteOpen): Promise<Opened> {
       const next = queue.then(() => openNow(request));

@@ -2,29 +2,41 @@ import { mkdirSync, rmSync } from "node:fs";
 import { createConnection, createServer, type Server } from "node:net";
 import { dirname } from "node:path";
 
+export interface StdinContent {
+  key: string;
+  text: string;
+  title: string | null;
+}
+
 export interface OpenMessage {
   cmd: "open";
-  path: string;
+  /** A file, a stdin key (with `content`), or null for the file list of `root`. */
+  path: string | null;
   heading: string | null;
   // An mdb from before tabs sends neither.
   root?: string;
   mode?: "tab" | "replace";
+  content?: StdinContent;
 }
 
 export interface OpenRequest {
-  path: string;
+  path: string | null;
   root: string;
   heading: string | null;
   mode: "tab" | "replace";
+  content?: StdinContent;
 }
 
 /** Fills in what an older mdb leaves out: the file's folder, and a new tab. */
 export function openRequest(message: OpenMessage): OpenRequest {
+  const root = message.root ?? (message.path === null ? null : dirname(message.path));
+  if (root === null) throw new Error("an open with no path needs a root");
   return {
     path: message.path,
-    root: message.root ?? dirname(message.path),
+    root,
     heading: message.heading,
     mode: message.mode === "replace" ? "replace" : "tab",
+    ...(message.content ? { content: message.content } : {}),
   };
 }
 

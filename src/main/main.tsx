@@ -75,7 +75,7 @@ ipcMain.once("mdb:ready", () => {
     return { ok: true, ...result };
   }).then(
     () => {
-      const instance = registerInstance({ tab: options.tab });
+      const instance = registerInstance({ tab: options.tab, token: options.waitToken });
       process.on("exit", () => instance.withdraw());
     },
     (error: unknown) => process.stderr.write(`mdb: control socket: ${String(error)}\n`),

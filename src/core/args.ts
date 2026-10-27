@@ -60,9 +60,10 @@ export function parseArgs(
     replace,
     stdin,
     title,
+    pathGiven: paths.length > 0,
   });
 
-  if (title !== null && (!stdin || paths.length > 0))
+  if (title !== null && paths.length > 0)
     return { error: "mdb: --title works only with stdin (-)" };
   if (stdin)
     return paths.length > 0 ? { error: "mdb: - takes no file or folder" } : launch(cwd, null);

@@ -6,6 +6,8 @@ export interface InstanceInfo {
   pid: number;
   socket: string;
   tab: string | null;
+  /** The wait token this mdb was started with, so the CLI that started it can find it. */
+  token: string | null;
   startedAt: number;
 }
 
@@ -23,7 +25,7 @@ export function instanceSocket(env: NodeJS.ProcessEnv = process.env): string {
 }
 
 export function registerInstance(
-  { tab }: { tab: string | null },
+  { tab, token }: { tab: string | null; token: string | null },
   env: NodeJS.ProcessEnv = process.env,
 ): InstanceInfo & { withdraw(): void } {
   const dir = instancesDir(env);
@@ -33,6 +35,7 @@ export function registerInstance(
     pid: process.pid,
     socket: instanceSocket(env),
     tab,
+    token,
     startedAt: Date.now(),
   };
   writeFileSync(file, JSON.stringify(info));

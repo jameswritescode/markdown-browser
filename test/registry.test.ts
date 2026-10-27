@@ -19,17 +19,23 @@ test("instances live under XDG_STATE_HOME, or ~/.local/state", () => {
 });
 
 test("a registered instance is listed until it is withdrawn", () => {
-  const record = registerInstance({ tab: "w:1" }, env);
+  const record = registerInstance({ tab: "w:1", token: "t0k" }, env);
   expect(record.socket).toBe(join(instancesDir(env), `${process.pid}.sock`));
   expect(listInstances(env)).toEqual([
-    { pid: process.pid, socket: record.socket, tab: "w:1", startedAt: expect.any(Number) },
+    {
+      pid: process.pid,
+      socket: record.socket,
+      tab: "w:1",
+      token: "t0k",
+      startedAt: expect.any(Number),
+    },
   ]);
   record.withdraw();
   expect(listInstances(env)).toEqual([]);
 });
 
 test("records of dead processes and unreadable records are removed", () => {
-  registerInstance({ tab: null }, env);
+  registerInstance({ tab: null, token: null }, env);
   const dir = instancesDir(env);
   const dead = join(dir, "999999.json");
   writeFileSync(dead, JSON.stringify({ pid: 999999, socket: "x", tab: "w:1", startedAt: 1 }));

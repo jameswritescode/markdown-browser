@@ -24,6 +24,26 @@ test("a non-markdown file exits 1", () => {
 test("--help prints usage and exits 0", () => {
   const r = spawnSync("node", [BIN, "--help"], { encoding: "utf8" });
   expect(r.status).toBe(0);
-  expect(r.stdout).toContain("usage: mdb [file.md | folder] [options]");
+  expect(r.stdout).toContain("usage: mdb [file.md | folder | -] [options]");
   expect(r.stdout).toContain("--split <direction>");
+});
+
+test("mdb - with empty stdin exits 1", () => {
+  const r = spawnSync("node", [BIN, "-"], { input: "  \n", encoding: "utf8" });
+  expect(r.status).toBe(1);
+  expect(r.stderr.trim()).toBe("mdb: stdin is empty");
+});
+
+test("--title with no pipe on stdin exits 1", () => {
+  const r = spawnSync("node", [BIN, "--title", "x"], {
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf8",
+  });
+  expect(r.status).toBe(1);
+  expect(r.stderr.trim()).toBe("mdb: --title works only with stdin (-)");
+});
+
+test("--title reads a plain pipe to its end", () => {
+  const r = spawnSync("node", [BIN, "--title", "x"], { input: "", encoding: "utf8" });
+  expect(r.stderr.trim()).toBe("mdb: stdin is empty");
 });
