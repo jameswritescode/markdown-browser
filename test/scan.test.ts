@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
@@ -68,4 +68,33 @@ test("recognises markdown extensions case-insensitively", () => {
   expect(isMarkdownPath("a.MARKDOWN")).toBe(true);
   expect(isMarkdownPath("a.mdx")).toBe(true);
   expect(isMarkdownPath("a.txt")).toBe(false);
+});
+
+const repo = () => {
+  const dir = mkdtempSync(join(tmpdir(), "mdb-repo-"));
+  mkdirSync(join(dir, ".git"));
+  mkdirSync(join(dir, "docs", "local"), { recursive: true });
+  writeFileSync(join(dir, ".gitignore"), "docs/local/\n");
+  writeFileSync(join(dir, "docs", "guide.md"), "# Guide\n");
+  writeFileSync(join(dir, "docs", "local", "plan.md"), "# Plan\n");
+  return dir;
+};
+
+test("a subfolder of a repo follows the .gitignore files above it", async () => {
+  const dir = repo();
+  const { docs } = await scanDocs(join(dir, "docs"));
+  expect(docs.map((d) => d.relPath)).toEqual(["guide.md"]);
+});
+
+test("an ignored folder that you open shows its own files", async () => {
+  const dir = repo();
+  const { docs } = await scanDocs(join(dir, "docs", "local"));
+  expect(docs.map((d) => d.relPath)).toEqual(["plan.md"]);
+});
+
+test("a folder outside a repo does not read .gitignore files above it", async () => {
+  const dir = repo();
+  rmSync(join(dir, ".git"), { recursive: true });
+  const { docs } = await scanDocs(join(dir, "docs"));
+  expect(docs.map((d) => d.relPath).sort()).toEqual(["guide.md", "local/plan.md"]);
 });

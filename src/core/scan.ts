@@ -1,7 +1,7 @@
 import type { Dirent } from "node:fs";
 import { open, readFile, readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
-import { basename, extname, join, relative, sep } from "node:path";
+import { basename, dirname, extname, join, relative, sep } from "node:path";
 import ignore, { type Ignore } from "ignore";
 import type { DocEntry, ScanResult } from "../shared/types.ts";
 import { splitFrontmatter } from "./frontmatter.ts";
@@ -65,6 +65,38 @@ async function readIgnoreScope(dir: string): Promise<IgnoreScope | null> {
   }
 }
 
+/**
+ * The .gitignore rules of the folders above `root`, up to the root of its git repository.
+ * None when `root` is not in a repository, or when those rules ignore `root` itself:
+ * a folder that you open on purpose shows its files.
+ */
+async function ancestorScopes(root: string): Promise<IgnoreScope[]> {
+  const dirs: string[] = [];
+  let dir = root;
+  for (;;) {
+    const parent = dirname(dir);
+    if (await exists(join(dir, ".git"))) break;
+    if (parent === dir) return [];
+    dir = parent;
+    dirs.unshift(dir);
+  }
+  const scopes: IgnoreScope[] = [];
+  for (const above of dirs) {
+    const scope = await readIgnoreScope(above);
+    if (scope) scopes.push(scope);
+  }
+  return isIgnored(root, true, scopes) ? [] : scopes;
+}
+
+async function exists(path: string): Promise<boolean> {
+  try {
+    await stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function readHead(path: string): Promise<string> {
   const handle = await open(path, "r");
   try {
@@ -98,7 +130,9 @@ export async function scanDocs(
   const library = join(home, "Library");
   const found: string[] = [];
   let truncated = false;
-  const queue: { dir: string; scopes: IgnoreScope[] }[] = [{ dir: root, scopes: [] }];
+  const queue: { dir: string; scopes: IgnoreScope[] }[] = [
+    { dir: root, scopes: await ancestorScopes(root) },
+  ];
 
   while (queue.length > 0 && !truncated) {
     const { dir, scopes: parentScopes } = queue.shift()!;
