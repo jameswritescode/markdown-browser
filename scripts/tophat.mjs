@@ -1,12 +1,23 @@
 import { spawnSync } from "node:child_process";
-import { dirname, join, resolve } from "node:path";
+import { readdirSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const scriptFile = process.argv[2];
-if (!scriptFile) {
-  process.stderr.write("usage: pnpm tophat <script.json>\n");
+const args = process.argv.slice(2);
+const flags = args.filter((arg) => arg.startsWith("--"));
+const named = args.filter((arg) => !arg.startsWith("--"));
+const scriptFiles = flags.includes("--all")
+  ? readdirSync(join(root, "tophat"))
+      .filter((file) => file.endsWith(".json"))
+      .sort()
+      .map((file) => join(root, "tophat", file))
+  : named.map((file) => resolve(file));
+if (scriptFiles.length === 0) {
+  process.stderr.write(
+    "usage: pnpm tophat <script.json>... [--update]\n       pnpm tophat --all [--update]\n",
+  );
   process.exit(2);
 }
 
@@ -36,8 +47,21 @@ const electron = join(
 );
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
-const result = spawnSync(electron, [join(root, "build/dev/tophat.js"), resolve(scriptFile)], {
-  stdio: "inherit",
-  env,
-});
-process.exit(result.status ?? 1);
+const passthrough = flags.filter((flag) => flag === "--update");
+const failed = [];
+for (const file of scriptFiles) {
+  if (scriptFiles.length > 1) process.stdout.write(`\n== ${relative(root, file)}\n`);
+  const result = spawnSync(electron, [join(root, "build/dev/tophat.js"), file, ...passthrough], {
+    stdio: "inherit",
+    env,
+  });
+  if (result.status !== 0) failed.push(relative(root, file));
+}
+if (scriptFiles.length > 1) {
+  process.stdout.write(
+    failed.length
+      ? `\ntophat: ${failed.length} of ${scriptFiles.length} scripts failed: ${failed.join(", ")}\n`
+      : `\ntophat: all ${scriptFiles.length} scripts passed\n`,
+  );
+}
+process.exit(failed.length ? 1 : 0);

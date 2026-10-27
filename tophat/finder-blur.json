@@ -11,7 +11,8 @@
       "click": ".status"
     },
     {
-      "eval": "document.activeElement?.className"
+      "eval": "document.activeElement?.className",
+      "expect": ""
     },
     {
       "key": "Down"
@@ -21,14 +22,16 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 2
     },
     {
       "key": "k",
       "modifiers": ["control"]
     },
     {
-      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 1
     },
     {
       "click": ".status"
@@ -37,7 +40,8 @@
       "type": "gst"
     },
     {
-      "eval": "document.querySelector('.query').value"
+      "eval": "document.querySelector('.query').value",
+      "expect": "gst"
     },
     {
       "key": "Escape"
@@ -52,7 +56,8 @@
       "wait": 400
     },
     {
-      "eval": "document.title"
+      "eval": "document.title",
+      "expect": "Fixture Docs"
     },
     {
       "key": "Escape"
@@ -67,7 +72,8 @@
       "key": "Down"
     },
     {
-      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 1
     },
     {
       "type": "gst"
@@ -85,7 +91,8 @@
       "wait": 400
     },
     {
-      "eval": "[document.querySelector('.query').value, document.querySelectorAll('.row').length]"
+      "eval": "[document.querySelector('.query').value, document.querySelectorAll('.row').length]",
+      "expect": ["gst", 1]
     }
   ]
 }

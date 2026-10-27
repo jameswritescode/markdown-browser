@@ -49,17 +49,20 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 2
     },
     {
       "key": "k",
       "modifiers": ["control"]
     },
     {
-      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))"
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 1
     },
     {
-      "eval": "document.querySelector('.query').value"
+      "eval": "document.querySelector('.query').value",
+      "expect": ""
     },
     {
       "key": "Down"
@@ -71,7 +74,8 @@
       "wait": 400
     },
     {
-      "eval": "document.title"
+      "eval": "document.title",
+      "expect": "Setup Guide"
     }
   ]
 }

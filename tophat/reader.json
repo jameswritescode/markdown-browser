@@ -8,20 +8,23 @@
       "wait": 600
     },
     {
-      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')"
+      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')",
+      "expect": false
     },
     {
       "key": "b",
       "modifiers": ["control"]
     },
     {
-      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')"
+      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')",
+      "expect": true
     },
     {
       "shot": "1-top"
     },
     {
-      "eval": "document.querySelector('.outline a.active')?.textContent"
+      "eval": "document.querySelector('.outline a.active')?.textContent",
+      "expect": "Fixture Docs"
     },
     {
       "scroll": 700
@@ -30,10 +33,12 @@
       "shot": "2-middle"
     },
     {
-      "eval": "document.querySelector('.outline a.active')?.textContent"
+      "eval": "document.querySelector('.outline a.active')?.textContent",
+      "expect": "Notes"
     },
     {
-      "eval": "document.querySelector('.diagram svg') ? 'svg' : document.querySelector('.diagram')?.textContent"
+      "eval": "document.querySelector('.diagram svg') ? 'svg' : document.querySelector('.diagram')?.textContent",
+      "expect": "svg"
     },
     {
       "key": "b",
@@ -56,7 +61,8 @@
       "wait": 300
     },
     {
-      "eval": "document.title"
+      "eval": "document.title",
+      "expect": "Setup Guide"
     },
     {
       "shot": "4-linked-doc"
@@ -69,7 +75,8 @@
       "wait": 300
     },
     {
-      "eval": "document.title"
+      "eval": "document.title",
+      "expect": "Fixture Docs"
     },
     {
       "key": "]",
@@ -79,7 +86,8 @@
       "wait": 300
     },
     {
-      "eval": "document.title"
+      "eval": "document.title",
+      "expect": "Setup Guide"
     },
     {
       "key": "[",
@@ -89,13 +97,15 @@
       "wait": 300
     },
     {
-      "eval": "document.title"
+      "eval": "document.title",
+      "expect": "Fixture Docs"
     },
     {
       "click": "a[href='missing.md']"
     },
     {
-      "eval": "document.querySelector('.link-notice')?.textContent"
+      "eval": "document.querySelector('.link-notice')?.textContent",
+      "expect": "Not found: missing.md"
     },
     {
       "key": "Escape"
@@ -104,7 +114,8 @@
       "wait": 800
     },
     {
-      "eval": "document.querySelector('.finder') && !document.querySelector('.finder').hidden"
+      "eval": "document.querySelector('.finder') && !document.querySelector('.finder').hidden",
+      "expect": true
     },
     {
       "shot": "5-finder-after-esc"

@@ -11,7 +11,7 @@ type Step =
   | { key: string; modifiers?: ("meta" | "control" | "shift" | "alt")[] }
   | { type: string }
   | { shot: string }
-  | { eval: string }
+  | { eval: string; expect?: unknown }
   | { click: string }
   | { hover: string }
   | { scroll: number }
@@ -69,10 +69,20 @@ if ("error" in parsed) {
 }
 const options = parsed.start;
 
+// --update writes each eval's result into the script as its expected value.
+const update = process.argv.includes("--update");
+let checks = 0;
+let failures = 0;
+
 const log: string[] = [];
 const record = (line: string) => {
   log.push(line);
   process.stdout.write(`${line}\n`);
+};
+
+const fail = (line: string) => {
+  failures++;
+  record(`FAIL ${line}`);
 };
 
 const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms));
@@ -138,14 +148,14 @@ async function run(): Promise<void> {
       await sleep(250);
     } else if ("hover" in step) {
       const at = await centerOf(step.hover);
-      if (!at) record(`hover: no element for ${step.hover}`);
+      if (!at) fail(`hover: no element for ${step.hover}`);
       else {
         contents.sendInputEvent({ type: "mouseMove", ...at });
         await sleep(250);
       }
     } else if ("click" in step) {
       const at = await centerOf(step.click);
-      if (!at) record(`click: no element for ${step.click}`);
+      if (!at) fail(`click: no element for ${step.click}`);
       else {
         contents.sendInputEvent({ type: "mouseDown", button: "left", clickCount: 1, ...at });
         contents.sendInputEvent({ type: "mouseUp", button: "left", clickCount: 1, ...at });
@@ -157,14 +167,25 @@ async function run(): Promise<void> {
       );
       await sleep(250);
     } else if ("eval" in step) {
+      let value: unknown;
       try {
-        const value = await contents.executeJavaScript(step.eval);
-        record(`eval ${step.eval} => ${JSON.stringify(value)}`);
+        value = await contents.executeJavaScript(step.eval);
       } catch (error) {
-        record(
+        fail(
           `eval ${step.eval} => error: ${error instanceof Error ? error.message : String(error)}`,
         );
+        continue;
       }
+      const actual = JSON.stringify(value);
+      if (update) step.expect = value;
+      else if ("expect" in step) {
+        checks++;
+        if (actual !== JSON.stringify(step.expect)) {
+          fail(`eval ${step.eval} => ${actual}, expected ${JSON.stringify(step.expect)}`);
+          continue;
+        }
+      }
+      record(`eval ${step.eval} => ${actual}`);
     } else if ("write" in step) {
       mkdirSync(dirname(resolve(base, step.write)), { recursive: true });
       writeFileSync(resolve(base, step.write), step.text);
@@ -182,8 +203,12 @@ async function run(): Promise<void> {
     }
   }
   record(`clipboard: ${JSON.stringify(clipboard)}`);
+  if (update) writeFileSync(scriptPath, `${JSON.stringify(script, null, 2)}\n`);
+  record(
+    `tophat: ${checks} checks, ${failures} failed${update ? ", expected values updated" : ""}`,
+  );
   writeFileSync(join(out, "log.txt"), `${log.join("\n")}\n`);
-  app.exit(0);
+  app.exit(failures ? 1 : 0);
 }
 
 app.whenReady().then(run, (error) => {

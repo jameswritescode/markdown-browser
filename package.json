@@ -28,6 +28,7 @@
     "build": "node scripts/build.mjs",
     "prepack": "pnpm build",
     "tophat": "pnpm build && node scripts/tophat.mjs",
+    "tophat:all": "pnpm build && node scripts/tophat.mjs --all",
     "smoke": "pnpm build && node scripts/smoke.mjs"
   },
   "dependencies": {

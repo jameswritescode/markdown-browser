@@ -148,12 +148,12 @@ The build also copies `index.html` and `style.css` to `dist/page/`. `dist/` is n
 
 ## Tests and tools
 
-| Tool                                               | What it checks                                                                                                                                                           |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `pnpm test`                                        | Unit tests (vitest) in `test/`. They test `src/core`, the CLI logic, the file watchers, and the pure page modules.                                                       |
-| `pnpm tophat`                                      | Opens the real page offscreen in Electron and runs a script from `tophat/`: keys, clicks, file writes, page checks, and screenshots. The output goes to `build/tophat/`. |
-| `pnpm smoke`                                       | Starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors.                                            |
-| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | TypeScript, oxlint, and oxfmt.                                                                                                                                           |
+| Tool                                               | What it checks                                                                                                                                                                                 |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm test`                                        | Unit tests (vitest) in `test/`. They test `src/core`, the CLI logic, the file watchers, and the pure page modules.                                                                             |
+| `pnpm tophat:all`                                  | Opens the real page offscreen in Electron and runs the scripts in `tophat/`: keys, clicks, file writes, page checks with expected values, and screenshots. The output goes to `build/tophat/`. |
+| `pnpm smoke`                                       | Starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors.                                                                  |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | TypeScript, oxlint, and oxfmt.                                                                                                                                                                 |
 
 For how to use these tools, read [Testing mdb](testing.md).
 

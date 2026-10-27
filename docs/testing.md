@@ -5,7 +5,7 @@ This document tells you how to test a change to mdb. It is for people and for co
 | Test        | Command                     | What it tests                                                                |
 | ----------- | --------------------------- | ---------------------------------------------------------------------------- |
 | Unit tests  | `pnpm test`                 | The logic in `src/core`, the CLI logic, the watchers, and pure page modules. |
-| tophat      | `pnpm tophat <script>`      | The real page and the real IPC, in an offscreen Electron window.             |
+| tophat      | `pnpm tophat:all`           | The real page and the real IPC, in an offscreen Electron window.             |
 | Smoke test  | `pnpm smoke [file\|folder]` | The real app in a pseudo-terminal: it starts, draws, and writes no errors.   |
 | Live checks | `node bin/mdb.js …`         | The parts that need a real terminal: panes, terminal keys, and the drawing.  |
 
@@ -16,6 +16,7 @@ pnpm test
 pnpm typecheck
 pnpm lint
 pnpm format:check
+pnpm tophat:all
 ```
 
 ## Unit tests
@@ -28,7 +29,7 @@ Write a unit test when the code does not need the DOM or Electron. If page code 
 
 tophat runs the mdb page in an offscreen Electron window, and does the steps in a JSON script. A step can push a key, type text, click, write a file, run JavaScript in the page, or save a screenshot. Use tophat to see a change in the page, and to prove that the page does the correct thing.
 
-tophat is not a test framework. It does not compare results, and it does not fail when a result is wrong. It writes each result to a log. You must read the log and the screenshots, and compare them with what you expect.
+An `eval` step can have an `expect` value. tophat compares the result with the value. If they are not the same, tophat writes a `FAIL` line, and the script fails. A `click` or `hover` that finds no element also fails, and so does an `eval` that throws an error. tophat cannot check how a screenshot looks. Look at the screenshots yourself.
 
 ### How tophat works
 
@@ -40,25 +41,49 @@ tophat is not a test framework. It does not compare results, and it does not fai
 - When the page calls `window.mdb.copy`, tophat records the text. The log ends with `clipboard: […]`.
 - When the page calls `window.mdb.quit`, tophat writes `quit` in the log.
 
-### Run a script
+### Run the scripts
+
+To run all the scripts:
 
 ```sh
-pnpm tophat tophat/reader.json
+pnpm tophat:all
 ```
 
-`pnpm tophat` builds mdb first. If you already built mdb, you can run the script without a build:
+The last line tells you if all scripts passed, or which scripts failed. If a script fails, the command exits with code 1.
+
+To run one or more scripts:
+
+```sh
+pnpm tophat tophat/reader.json tophat/tabs.json
+```
+
+`pnpm tophat` and `pnpm tophat:all` build mdb first. If you already built mdb, you can run the scripts without a build:
 
 ```sh
 node scripts/tophat.mjs tophat/reader.json
+node scripts/tophat.mjs --all
 ```
 
-tophat writes each step result to stdout and to `log.txt` in the output folder. Screenshots go to the same folder.
+tophat writes each step result to stdout and to `log.txt` in the output folder. Screenshots go to the same folder. Each script ends with a line such as `tophat: 12 checks, 0 failed`.
 
 Electron writes some lines that are not tophat output, for example `sandbox_extension … failed` and `GPU process exited`. Ignore these lines. To see only the results, filter the output:
 
 ```sh
-node scripts/tophat.mjs tophat/tabs.json 2>&1 | grep -E "^(eval|shot|click|hover|clipboard|quit|console)"
+node scripts/tophat.mjs tophat/tabs.json 2>&1 | grep -E "^(FAIL|eval|shot|clipboard|quit|console|tophat)"
 ```
+
+### Set the expected values
+
+Add `--update` to write the result of each `eval` into the script as its `expect` value:
+
+```sh
+node scripts/tophat.mjs tophat/tabs.json --update
+pnpm exec oxfmt tophat
+```
+
+Use `--update` when you add a script, or when you change the behavior on purpose. After `--update`, read the `git diff` of the script, and make sure that each value is correct. `--update` writes what the page does now, and that can be wrong.
+
+Do not expect values that change from run to run, for example relative times ("2d ago"), absolute paths, or images from the web. Change the `eval` so that it returns only the stable part. For example, `tophat/showcase.json` checks only the local images, and `tophat/frontmatter.json` checks the row text without the time.
 
 ### Script format
 
@@ -90,11 +115,12 @@ tophat reads `args` before it does the steps. Thus, if mdb must start in a folde
 | `{ "hover": ".row:nth-child(2)" }`            | Moves the mouse to the center of the element.                                                        |
 | `{ "scroll": 700 }`                           | Scrolls the reader (or the page) down by the number of pixels.                                       |
 | `{ "eval": "document.title" }`                | Runs JavaScript in the page and writes the result as JSON. If the result is a promise, tophat waits. |
+| `{ "eval": "document.title", "expect": "X" }` | Also fails the script if the result is not the same as `expect` (compared as JSON).                  |
 | `{ "write": "../build/x.md", "text": "# X" }` | Writes a file, and makes its folders. Then waits 500 ms.                                             |
 | `{ "remove": "../build/x.md" }`               | Removes a file. Then waits 500 ms.                                                                   |
 | `{ "shot": "top" }`                           | Saves `top.png` (a screenshot) and `top.txt` (the text of the page) in the output folder.            |
 
-`click` and `hover` write `no element for <selector>` if the selector finds nothing. `eval` writes `error: <message>` if the JavaScript throws an error. The script then continues.
+`click` and `hover` write `FAIL … no element for <selector>` if the selector finds nothing. `eval` writes `FAIL … error: <message>` if the JavaScript throws an error. In both cases, the script continues, but it fails at the end.
 
 ### Write a good script
 
@@ -105,11 +131,11 @@ tophat reads `args` before it does the steps. Thus, if mdb must start in a folde
 - **Make helpers once.** An `eval` can make an object on `window`, and later steps can use it. `tophat/tabs.json` makes `window.T` with helpers in its first `eval`.
 - **Send a document from "outside".** `window.mdbRemote.open({ path, root, heading, mode })` does the same thing as an `mdb` command that uses an open mdb. It returns `{ heading, result }`. Build absolute paths from `location.pathname`. For an example, read `tophat/remote.json`.
 - **Write test files in `build/`.** Do not change the files in `docs/` or `test/fixtures/`. Use `files` to make a clean start, for example `"../build/tophat/fresh/old.md": null`.
-- **Prove the test first.** Run the new script before you change the code, and make sure that the results show the problem. Then change the code, and run the script again.
+- **Prove the test first.** Write the script with the `expect` values that you want. Run it before you change the code, and make sure that it fails for the correct reason. Then change the code, and run it again.
 
 ### Compare with a baseline
 
-If a change must not change the behavior, save the results of all scripts before the change, and compare them after the change:
+The `expect` values catch most changes. A baseline also catches changes in results that have no `expect` value. If a change must not change the behavior, save the results of all scripts before the change, and compare them after the change:
 
 ```sh
 mkdir -p build/baseline

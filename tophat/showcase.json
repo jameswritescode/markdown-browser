@@ -4,42 +4,127 @@
   "width": 1100,
   "height": 900,
   "steps": [
-    { "wait": 2500 },
     {
-      "eval": "[...document.querySelectorAll('.diagram')].map((d) => (d.classList.contains('failed') ? 'FAILED: ' + d.previousElementSibling?.textContent + ' / ' + d.querySelector('.diagram-error')?.textContent.slice(0, 80) : 'ok'))"
+      "wait": 2500
     },
     {
-      "eval": "[...document.querySelectorAll('.markdown-body img')].map((i) => [i.getAttribute('src').slice(-40), i.complete && i.naturalWidth > 0])"
+      "eval": "[...document.querySelectorAll('.diagram')].map((d) => (d.classList.contains('failed') ? 'FAILED: ' + d.previousElementSibling?.textContent + ' / ' + d.querySelector('.diagram-error')?.textContent.slice(0, 80) : 'ok'))",
+      "expect": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "FAILED: mdb shows the diagram text and the error message: / Diagram error: Parse error on line 3:\n\n^\nExpecting 'NODE_STRING', got 'EOF'"
+      ]
     },
-    { "eval": "document.querySelectorAll('.markdown-alert, [class*=alert]').length" },
-    { "eval": "!!document.querySelector('script')?.closest('.markdown-body')" },
-    { "eval": "document.querySelectorAll('pre code.hljs, pre code [class^=hljs-]').length" },
-    { "shot": "01" },
-    { "scroll": 850 },
-    { "shot": "02" },
-    { "scroll": 850 },
-    { "shot": "03" },
-    { "scroll": 850 },
-    { "shot": "04" },
-    { "scroll": 850 },
-    { "shot": "05" },
-    { "scroll": 850 },
-    { "shot": "06" },
-    { "scroll": 850 },
-    { "shot": "07" },
-    { "scroll": 850 },
-    { "shot": "08" },
-    { "scroll": 850 },
-    { "shot": "09" },
-    { "scroll": 850 },
-    { "shot": "10" },
-    { "scroll": 850 },
-    { "shot": "11" },
-    { "scroll": 850 },
-    { "shot": "12" },
-    { "scroll": 850 },
-    { "shot": "13" },
-    { "scroll": 850 },
-    { "shot": "14" }
+    {
+      "eval": "[...document.querySelectorAll('.markdown-body img')].filter((i) => !/^https?:/.test(i.getAttribute('src'))).map((i) => [i.getAttribute('src').split('/').pop(), i.complete && i.naturalWidth > 0])",
+      "expect": [
+        ["sample.svg", true],
+        ["missing.png", false]
+      ]
+    },
+    {
+      "eval": "document.querySelectorAll('.markdown-alert, [class*=alert]').length",
+      "expect": 10
+    },
+    {
+      "eval": "!!document.querySelector('script')?.closest('.markdown-body')",
+      "expect": false
+    },
+    {
+      "eval": "document.querySelectorAll('pre code.hljs, pre code [class^=hljs-]').length",
+      "expect": 63
+    },
+    {
+      "shot": "01"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "02"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "03"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "04"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "05"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "06"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "07"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "08"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "09"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "10"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "11"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "12"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "13"
+    },
+    {
+      "scroll": 850
+    },
+    {
+      "shot": "14"
+    }
   ]
 }

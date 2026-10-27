@@ -4,9 +4,19 @@
   "width": 800,
   "height": 400,
   "steps": [
-    { "wait": 500 },
-    { "eval": "location.href = 'file:///etc/hosts'; 'sent'" },
-    { "wait": 800 },
-    { "eval": "[location.pathname.endsWith('/dist/page/index.html'), typeof window.mdb]" }
+    {
+      "wait": 500
+    },
+    {
+      "eval": "location.href = 'file:///etc/hosts'; 'sent'",
+      "expect": "sent"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "[location.pathname.endsWith('/dist/page/index.html'), typeof window.mdb]",
+      "expect": [true, "object"]
+    }
   ]
 }

@@ -12,7 +12,8 @@
       "wait": 800
     },
     {
-      "eval": "[...document.querySelectorAll('.row')].map((r) => r.textContent)"
+      "eval": "[...document.querySelectorAll('.row')].map((r) => r.querySelector('.row-main').textContent)",
+      "expect": ["Broken frontmatterbroken.md", "Release notes for mdb 0.2sample.md"]
     },
     {
       "shot": "finder"
@@ -27,10 +28,12 @@
       "wait": 800
     },
     {
-      "eval": "document.querySelectorAll('.frontmatter .fm-row').length"
+      "eval": "document.querySelectorAll('.frontmatter .fm-row').length",
+      "expect": 5
     },
     {
-      "eval": "[...document.querySelectorAll('.outline a')].map((a) => a.textContent)"
+      "eval": "[...document.querySelectorAll('.outline a')].map((a) => a.textContent)",
+      "expect": ["Release notes", "What changed"]
     },
     {
       "shot": "reader"

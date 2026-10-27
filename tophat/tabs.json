@@ -36,35 +36,55 @@
       "wait": 1000
     },
     {
-      "eval": "(window.T = { repo: location.pathname.replace(/dist\\/page\\/index.html$/, ''), at: (r) => T.repo + r, dir: (p) => p.slice(0, p.lastIndexOf('/')), open: (r, mode = 'tab', heading = null) => window.mdbRemote.open({ path: T.at(r), root: T.dir(T.at(r)), heading, mode }).then((x) => x.result), labels: () => [...document.querySelectorAll('.tab .tab-label')].map((t) => t.textContent), active: () => [...document.querySelectorAll('.tab')].findIndex((t) => t.classList.contains('active')), state: () => ({ labels: T.labels(), active: T.active(), title: document.title }) }) && [document.querySelector('.tabbar').hidden, document.querySelectorAll('.tab-pane').length]"
+      "eval": "(window.T = { repo: location.pathname.replace(/dist\\/page\\/index.html$/, ''), at: (r) => T.repo + r, dir: (p) => p.slice(0, p.lastIndexOf('/')), open: (r, mode = 'tab', heading = null) => window.mdbRemote.open({ path: T.at(r), root: T.dir(T.at(r)), heading, mode }).then((x) => x.result), labels: () => [...document.querySelectorAll('.tab .tab-label')].map((t) => t.textContent), active: () => [...document.querySelectorAll('.tab')].findIndex((t) => t.classList.contains('active')), state: () => ({ labels: T.labels(), active: T.active(), title: document.title }) }) && [document.querySelector('.tabbar').hidden, document.querySelectorAll('.tab-pane').length]",
+      "expect": [true, 1]
     },
     {
-      "eval": "T.open('docs/usage.md')"
+      "eval": "T.open('docs/usage.md')",
+      "expect": "tab"
     },
     {
       "wait": 500
     },
     {
-      "eval": "[document.querySelector('.tabbar').hidden, T.state()]"
+      "eval": "[document.querySelector('.tabbar').hidden, T.state()]",
+      "expect": [
+        false,
+        {
+          "labels": ["Markdown showcase", "mdb usage guide"],
+          "active": 1,
+          "title": "mdb usage guide"
+        }
+      ]
     },
     {
       "shot": "two-tabs"
     },
     {
-      "eval": "T.open('docs/showcase.md', 'tab', 'tables')"
+      "eval": "T.open('docs/showcase.md', 'tab', 'tables')",
+      "expect": "switched"
     },
     {
       "wait": 400
     },
     {
-      "eval": "[T.state(), Math.round(document.querySelector('.tab-pane:not(.background) #tables').getBoundingClientRect().top)]"
+      "eval": "[T.state(), Math.round(document.querySelector('.tab-pane:not(.background) #tables').getBoundingClientRect().top)]",
+      "expect": [
+        {
+          "labels": ["Markdown showcase", "mdb usage guide"],
+          "active": 0,
+          "title": "Markdown showcase"
+        },
+        48
+      ]
     },
     {
       "key": "l",
       "modifiers": ["control"]
     },
     {
-      "eval": "T.active()"
+      "eval": "T.active()",
+      "expect": 1
     },
     {
       "key": "h",
@@ -75,7 +95,8 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "T.active()"
+      "eval": "T.active()",
+      "expect": 1
     },
     {
       "key": "/"
@@ -90,7 +111,8 @@
       "wait": 200
     },
     {
-      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]"
+      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
+      "expect": [1, 87]
     },
     {
       "key": "h",
@@ -100,7 +122,8 @@
       "wait": 200
     },
     {
-      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]"
+      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
+      "expect": [0, 0]
     },
     {
       "key": "l",
@@ -110,7 +133,8 @@
       "wait": 200
     },
     {
-      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]"
+      "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
+      "expect": [1, 87]
     },
     {
       "key": "t",
@@ -120,7 +144,16 @@
       "wait": 800
     },
     {
-      "eval": "[T.state(), document.activeElement?.classList.contains('query'), document.querySelector('.tab-pane:not(.background) .reader:not([hidden]) .where')?.textContent ?? document.querySelector('.tab-pane:not(.background) .finder .hints')?.textContent]"
+      "eval": "[T.state(), document.activeElement?.classList.contains('query'), document.querySelector('.tab-pane:not(.background) .reader:not([hidden]) .where')?.textContent ?? document.querySelector('.tab-pane:not(.background) .finder .hints')?.textContent]",
+      "expect": [
+        {
+          "labels": ["Markdown showcase", "mdb usage guide", "Files · docs"],
+          "active": 2,
+          "title": "mdb"
+        },
+        true,
+        "enter open · / search text · esc clear · ctrl+c quit · ctrl+t new tab · ctrl+w close"
+      ]
     },
     {
       "shot": "finder-tab"
@@ -133,20 +166,27 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "[T.active(), document.querySelectorAll('.tab-pane')[2].querySelector('.query').value]"
+      "eval": "[T.active(), document.querySelectorAll('.tab-pane')[2].querySelector('.query').value]",
+      "expect": [1, "ab"]
     },
     {
       "key": "l",
       "modifiers": ["control"]
     },
     {
-      "eval": "T.open('docs/usage.md')"
+      "eval": "T.open('docs/usage.md')",
+      "expect": "switched"
     },
     {
       "wait": 300
     },
     {
-      "eval": "T.state()"
+      "eval": "T.state()",
+      "expect": {
+        "labels": ["Markdown showcase", "mdb usage guide", "Files · docs"],
+        "active": 1,
+        "title": "mdb usage guide"
+      }
     },
     {
       "key": "t",
@@ -156,40 +196,56 @@
       "wait": 800
     },
     {
-      "eval": "T.open('test/fixtures/docs/README.md')"
+      "eval": "T.open('test/fixtures/docs/README.md')",
+      "expect": "tab"
     },
     {
       "wait": 500
     },
     {
-      "eval": "T.state()"
+      "eval": "T.state()",
+      "expect": {
+        "labels": ["Markdown showcase", "mdb usage guide", "Files · docs", "Fixture Docs"],
+        "active": 3,
+        "title": "Fixture Docs"
+      }
     },
     {
-      "eval": "T.open('docs/showcase.md', 'replace')"
+      "eval": "T.open('docs/showcase.md', 'replace')",
+      "expect": "switched"
     },
     {
       "wait": 300
     },
     {
-      "eval": "T.state()"
+      "eval": "T.state()",
+      "expect": {
+        "labels": ["Markdown showcase", "mdb usage guide", "Files · docs", "Fixture Docs"],
+        "active": 0,
+        "title": "Markdown showcase"
+      }
     },
     {
-      "eval": "document.querySelector('.tab-pane:not(.background) .where').textContent + ' | ' + document.querySelector('.tab-pane:not(.background) .reader .hints').textContent"
+      "eval": "document.querySelector('.tab-pane:not(.background) .where').textContent + ' | ' + document.querySelector('.tab-pane:not(.background) .reader .hints').textContent",
+      "expect": "showcase.md · 1 of 4 · 41% | / find · esc files · ctrl+b outline · ctrl+[ back · ctrl+t new tab · ctrl+w close"
     },
     {
-      "eval": "T.open('build/tophat/tabs-live.md')"
+      "eval": "T.open('build/tophat/tabs-live.md')",
+      "expect": "tab"
     },
     {
       "wait": 500
     },
     {
-      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop = 400"
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop = 400",
+      "expect": 400
     },
     {
       "wait": 200
     },
     {
-      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop"
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop",
+      "expect": 400
     },
     {
       "key": "h",
@@ -203,7 +259,8 @@
       "wait": 800
     },
     {
-      "eval": "[...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed'))"
+      "eval": "[...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed'))",
+      "expect": [false, false, false, false, true]
     },
     {
       "key": "l",
@@ -213,7 +270,8 @@
       "wait": 200
     },
     {
-      "eval": "[...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed')).concat([document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent])"
+      "eval": "[...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed')).concat([document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent])",
+      "expect": [false, false, false, false, false, 400, "Second version."]
     },
     {
       "key": "/"
@@ -228,13 +286,15 @@
       "wait": 200
     },
     {
-      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop = 2000"
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop = 2000",
+      "expect": 2000
     },
     {
       "wait": 200
     },
     {
-      "eval": "[document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, CSS.highlights.get('mdb-find')?.size ?? 0]"
+      "eval": "[document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, CSS.highlights.get('mdb-find')?.size ?? 0]",
+      "expect": [2000, 119]
     },
     {
       "key": "h",
@@ -255,13 +315,15 @@
       "wait": 200
     },
     {
-      "eval": "[document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent]"
+      "eval": "[document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop, document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent]",
+      "expect": [2000, "Third version."]
     },
     {
       "click": ".tab:nth-child(1)"
     },
     {
-      "eval": "T.active()"
+      "eval": "T.active()",
+      "expect": 0
     },
     {
       "click": ".tab-new"
@@ -270,37 +332,70 @@
       "wait": 800
     },
     {
-      "eval": "T.state()"
+      "eval": "T.state()",
+      "expect": {
+        "labels": [
+          "Markdown showcase",
+          "mdb usage guide",
+          "Files · docs",
+          "Fixture Docs",
+          "Live",
+          "Files · docs"
+        ],
+        "active": 5,
+        "title": "mdb"
+      }
     },
     {
       "click": ".tab.active .tab-close"
     },
     {
-      "eval": "[T.state(), document.querySelectorAll('.tab-pane').length]"
+      "eval": "[T.state(), document.querySelectorAll('.tab-pane').length]",
+      "expect": [
+        {
+          "labels": [
+            "Markdown showcase",
+            "mdb usage guide",
+            "Files · docs",
+            "Fixture Docs",
+            "Live"
+          ],
+          "active": 4,
+          "title": "Live"
+        },
+        5
+      ]
     },
     {
-      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-one.md')"
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-one.md')",
+      "expect": "tab"
     },
     {
-      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-two.md')"
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-two.md')",
+      "expect": "tab"
     },
     {
-      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-three.md')"
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-three.md')",
+      "expect": "tab"
     },
     {
-      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-four.md')"
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-four.md')",
+      "expect": "tab"
     },
     {
-      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-five.md')"
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-five.md')",
+      "expect": "tab"
     },
     {
-      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-six.md')"
+      "eval": "T.open('build/tophat/tabs-long/a-very-long-design-document-name-six.md')",
+      "expect": "tab"
     },
     {
       "wait": 600
     },
     {
-      "eval": "(() => { const bar = document.querySelector('.tabbar').getBoundingClientRect(); const a = document.querySelector('.tab.active').getBoundingClientRect(); return [document.querySelectorAll('.tab').length, Math.round(a.left) >= Math.round(bar.left), Math.round(a.right) <= Math.round(bar.right), Math.round(document.querySelector('.tab').getBoundingClientRect().width)] })()"
+      "eval": "(() => { const bar = document.querySelector('.tabbar').getBoundingClientRect(); const a = document.querySelector('.tab.active').getBoundingClientRect(); return [document.querySelectorAll('.tab').length, Math.round(a.left) >= Math.round(bar.left), Math.round(a.right) <= Math.round(bar.right), Math.round(document.querySelector('.tab').getBoundingClientRect().width)] })()",
+      "expect": [11, true, true, 106]
     },
     {
       "shot": "long-labels"
@@ -310,7 +405,26 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "[T.state(), document.querySelectorAll('.tab-pane').length]"
+      "eval": "[T.state(), document.querySelectorAll('.tab-pane').length]",
+      "expect": [
+        {
+          "labels": [
+            "Markdown showcase",
+            "mdb usage guide",
+            "Files · docs",
+            "Fixture Docs",
+            "Live",
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five"
+          ],
+          "active": 9,
+          "title": "Five"
+        },
+        10
+      ]
     },
     {
       "key": "w",
@@ -349,7 +463,8 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "[document.querySelector('.tabbar').hidden, document.querySelectorAll('.tab-pane').length]"
+      "eval": "[document.querySelector('.tabbar').hidden, document.querySelectorAll('.tab-pane').length]",
+      "expect": [true, 1]
     },
     {
       "key": "w",

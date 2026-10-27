@@ -201,6 +201,7 @@ To learn how mdb works, read [mdb architecture](docs/architecture.md).
    pnpm typecheck
    pnpm lint
    pnpm format:check
+   pnpm tophat:all
    ```
 
 3. Build and start mdb from the repository:
@@ -244,5 +245,5 @@ pnpm publish
 
 For the full guide, read [Testing mdb](docs/testing.md).
 
-- `pnpm tophat <script.json>` opens the mdb page in an offscreen window. It sends the keys in the script and saves screenshots and page text. The scripts are in `tophat/`. The output goes to `build/tophat/`.
+- `pnpm tophat:all` runs all the scripts in `tophat/` and fails if a check fails. `pnpm tophat <script.json>` runs one script. tophat opens the mdb page in an offscreen window. It sends the keys in the script and saves screenshots and page text. The scripts are in `tophat/`. The output goes to `build/tophat/`.
 - `pnpm smoke [file or folder]` starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors to its log.
