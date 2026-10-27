@@ -179,6 +179,11 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
         return { heading: null, result: "updated" };
       }
       activate(route.index);
+      // The tab may show another document or its file list now; bring the stdin document back.
+      if (tab.path() !== path) {
+        const opened = await tab.open(path!, { heading });
+        return { heading: opened.heading, result: "updated" };
+      }
       await tab.reload();
       return { heading: tab.goToHeading(heading), result: "updated" };
     }

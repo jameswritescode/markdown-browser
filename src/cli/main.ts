@@ -1,4 +1,4 @@
-import { type ChildProcess, spawn } from "node:child_process";
+import { type ChildProcess, execFileSync, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { openSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -18,7 +18,7 @@ import { stdinKey } from "../core/stdin.ts";
 import type { Direction, Launch } from "../shared/types.ts";
 import { chooseAction, isGone, reuseLine, splitCommand, wantsHelp, wantsSkill } from "./launch.ts";
 import { installSkill } from "./skill.ts";
-import { readStdin, stdinHasInput } from "./stdin.ts";
+import { keyDevice, readStdin, stdinHasInput } from "./stdin.ts";
 
 const USAGE = `usage: mdb [file.md | folder | -] [options]
        mdb skill install
@@ -116,13 +116,14 @@ async function runHere(launch: Launch, content: StdinContent | null): Promise<nu
   let keys: "inherit" | number = "inherit";
   const env = { ...process.env };
   if (!process.stdin.isTTY) {
-    const device = callerTty().path ?? "/dev/tty";
+    const device = keyDevice(callerTty().path) ?? keyDevice(stdoutTty());
     try {
+      if (!device) throw new Error("no device");
       keys = openSync(device, "r");
     } catch {
       return fail("mdb: no terminal to read keys from");
     }
-    if (device !== "/dev/tty") env.PIXEL_TTY = device;
+    env.PIXEL_TTY = device;
   }
   const token = content ? randomUUID() : null;
   const start = content ? { ...launch.start, openPath: null, waitToken: token } : launch.start;
@@ -142,6 +143,15 @@ async function runHere(launch: Launch, content: StdinContent | null): Promise<nu
   if (problem) child.kill("SIGTERM");
   const code = await exited;
   return problem ? fail(problem) : code;
+}
+
+/** The name of the terminal on stdout, from `tty`. */
+function stdoutTty(): string | null {
+  try {
+    return execFileSync("tty", { stdio: [1, "pipe", "ignore"], encoding: "utf8" }).trim();
+  } catch {
+    return null;
+  }
 }
 
 /** Waits for the mdb with this token to register, then sends it the stdin document. */

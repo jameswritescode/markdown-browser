@@ -45,3 +45,11 @@ export function stdinHasInput(fd = 0): boolean {
     return false;
   }
 }
+
+/**
+ * The terminal device that pixel can read keys from. pixel finds its pane by this name, so
+ * /dev/tty, which names no pane, does not work.
+ */
+export function keyDevice(name: string | null): string | null {
+  return name && name.startsWith("/dev/") && name !== "/dev/tty" ? name : null;
+}

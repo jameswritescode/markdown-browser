@@ -104,11 +104,22 @@
       "expect": [false, true, false, false]
     },
     {
+      "eval": "window.mdbRemote.open({ path: 'stdin:title:Work summary', root: T.repo + 'docs', heading: 'Next steps', mode: 'tab', content: { key: 'stdin:title:Work summary', text: '# Draft\\n\\nStep four.\\n\\n## Next steps\\n\\nMore.', title: 'Work summary' } }).then((x) => [x.result, x.heading])",
+      "expect": ["updated", true]
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "[T.active(), document.querySelector('.tab-pane:not(.background) .where').textContent.startsWith('Work summary'), document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent]",
+      "expect": [1, true, "Step four."]
+    },
+    {
       "key": "w",
       "modifiers": ["control"]
     },
     {
-      "eval": "(document.querySelectorAll('.tab')[1].click(), true)",
+      "eval": "(document.querySelectorAll('.tab')[2].click(), true)",
       "expect": true
     },
     {
