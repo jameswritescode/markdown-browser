@@ -304,7 +304,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     scrollY: number | null = null,
     heading: string | null = null,
   ) => {
-    window.mdb.watch(path);
+    window.mdb.watch([path]);
     return render(path, scrollY, anchor, heading);
   };
 
@@ -414,7 +414,7 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     hide() {
       root.hidden = true;
       closeFind(false);
-      window.mdb.watch(null);
+      window.mdb.watch([]);
     },
     destroy() {
       unsubscribe();

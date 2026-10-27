@@ -51,3 +51,30 @@ export class DocWatcher {
     this.retry = null;
   }
 }
+
+/** Watches a set of documents, one DocWatcher per path. */
+export class DocWatchers {
+  private readonly watchers = new Map<string, DocWatcher>();
+
+  constructor(private readonly notify: (path: string) => void) {}
+
+  set(paths: string[]): void {
+    const wanted = new Set(paths);
+    for (const [path, watcher] of this.watchers) {
+      if (wanted.has(path)) continue;
+      watcher.close();
+      this.watchers.delete(path);
+    }
+    for (const path of wanted) {
+      if (this.watchers.has(path)) continue;
+      const watcher = new DocWatcher(this.notify);
+      watcher.set(path);
+      this.watchers.set(path, watcher);
+    }
+  }
+
+  close(): void {
+    for (const watcher of this.watchers.values()) watcher.close();
+    this.watchers.clear();
+  }
+}

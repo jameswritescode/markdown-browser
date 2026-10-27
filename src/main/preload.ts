@@ -7,7 +7,7 @@ const bridge: MdbBridge = {
   search: (root, query) => ipcRenderer.invoke("mdb:search", root, query),
   render: (path) => ipcRenderer.invoke("mdb:render", path),
   classifyLink: (href, docPath) => ipcRenderer.invoke("mdb:classify", href, docPath),
-  watch: (path) => ipcRenderer.send("mdb:watch", path),
+  watch: (paths) => ipcRenderer.send("mdb:watch", paths),
   onChanged: (cb) => {
     const listener = (_event: unknown, path: string) => cb(path);
     ipcRenderer.on("mdb:changed", listener);

@@ -71,7 +71,7 @@ export interface MdbBridge {
   search(root: string, query: string): Promise<SearchHit[]>;
   render(path: string): Promise<RenderedDoc | MissingDoc>;
   classifyLink(href: string, docPath: string): Promise<LinkTarget>;
-  watch(path: string | null): void;
+  watch(paths: string[]): void;
   onChanged(cb: (path: string) => void): () => void;
   openExternal(url: string): void;
   reveal(path: string): void;

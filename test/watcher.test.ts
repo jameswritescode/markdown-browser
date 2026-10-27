@@ -2,11 +2,20 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test } from "vitest";
-import { DocWatcher } from "../src/main/watcher.ts";
+import { DocWatcher, DocWatchers } from "../src/main/watcher.ts";
 
 const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms));
-let watcher: DocWatcher | null = null;
+let watcher: DocWatcher | DocWatchers | null = null;
 afterEach(() => watcher?.close());
+
+const twoFiles = () => {
+  const dir = mkdtempSync(join(tmpdir(), "mdb-watch-"));
+  const a = join(dir, "a.md");
+  const b = join(dir, "b.md");
+  writeFileSync(a, "a");
+  writeFileSync(b, "b");
+  return { a, b };
+};
 
 test("notifies on change", async () => {
   const path = join(mkdtempSync(join(tmpdir(), "mdb-watch-")), "a.md");
@@ -33,4 +42,31 @@ test("recovers after the file is deleted and created again", async () => {
   writeFileSync(path, "back");
   await sleep(1500);
   expect(seen).toContain(path);
+});
+
+test("DocWatchers notifies for each watched path", async () => {
+  const { a, b } = twoFiles();
+  const seen: string[] = [];
+  watcher = new DocWatchers((p) => seen.push(p));
+  watcher.set([a, b]);
+  await sleep(100);
+  writeFileSync(b, "b2");
+  await sleep(400);
+  expect(seen).toContain(b);
+  expect(seen).not.toContain(a);
+});
+
+test("DocWatchers stops watching a removed path", async () => {
+  const { a, b } = twoFiles();
+  const seen: string[] = [];
+  watcher = new DocWatchers((p) => seen.push(p));
+  watcher.set([a, b]);
+  watcher.set([a]);
+  await sleep(100);
+  writeFileSync(b, "b2");
+  await sleep(400);
+  expect(seen).not.toContain(b);
+  writeFileSync(a, "a2");
+  await sleep(400);
+  expect(seen).toContain(a);
 });
