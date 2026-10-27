@@ -2,7 +2,7 @@
 
 mdb is a markdown browser for the terminal. It shows markdown documents with real fonts, headings, images, and diagrams. It draws each page as pixels with the kitty graphics protocol.
 
-Use mdb to find and read the markdown files in a folder. mdb is similar to [glow](https://github.com/charmbracelet/glow), but it shows each document as a full web page.
+Use mdb to find and read the markdown files in a folder. mdb is similar to [glow](https://github.com/charmbracelet/glow), but it shows each document as a full web page. One mdb can show many documents in tabs.
 
 mdb uses [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel), the library that [terminal-browser](https://github.com/zenbu-labs/terminal-browser) uses. Mermaid diagrams are drawn with [Pele](https://github.com/obsidianmd/pele).
 
@@ -109,6 +109,8 @@ For more information about panes, read [Panes and coding agents](docs/usage.md#p
 ## Use mdb with coding agents
 
 mdb has a skill for Claude Code and Codex. With the skill, an agent can show you a document in a pane next to the conversation. For example, an agent can show you a plan that it wrote, at the section that it is talking about.
+
+All agents in one terminal tab use the same mdb pane. Each document opens in its own tab in that pane, so an agent does not replace the document of a different agent.
 
 To install the skill, run this command:
 

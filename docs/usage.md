@@ -69,7 +69,7 @@ mdb supports only YAML frontmatter. It does not support TOML frontmatter (`+++`)
 
 ### Status line
 
-The status line is at the bottom of the document. It shows the path of the document and how far you scrolled. It also shows the keys that you can use.
+The status line is at the bottom of the document. It shows the path of the document and how far you scrolled. It also shows the keys that you can use. When mdb has two or more tabs, the status line also shows the position of the tab, for example `2 of 3`.
 
 ### Find text in the document
 
@@ -103,7 +103,7 @@ The outline is on the left side. It shows the level-1, level-2, and level-3 head
 
 ### Changes to the file
 
-mdb shows the changes to the document when the file changes. mdb keeps the scroll position.
+mdb shows the changes to the document when the file changes. mdb keeps the scroll position. This also occurs in tabs that you do not see. For more information, read [Tabs](#tabs).
 
 If you delete the file, mdb shows "This file no longer exists". Press `esc` to go back to the file list.
 
@@ -115,7 +115,7 @@ If a diagram has an error, mdb shows the diagram text and the error message.
 
 ### Go back and forward
 
-Press `ctrl+[` to go back to the previous document. Press `ctrl+]` to go forward. `cmd+[` and `cmd+]` also work if your terminal sends them to mdb.
+Press `ctrl+[` to go back to the previous document. Press `ctrl+]` to go forward. `cmd+[` and `cmd+]` also work if your terminal sends them to mdb. Each tab has its own history.
 
 mdb can only see `ctrl+[` if your terminal uses the kitty keyboard protocol. Ghostty, kitty, and cmux use it. In a different terminal, `ctrl+[` is the same as `esc`, and mdb goes back to the file list.
 
@@ -133,6 +133,8 @@ Each tab has its own folder, back and forward history, scroll position, and find
 A tab shows the title of its document, as the file list does. If the document has no title, the tab shows the file name. When two tabs have the same title, the tab also shows the file name, or the name of the folder if the file names are also the same. The status line shows the full path and the position of the tab, for example `plan.md · 2 of 3 · 40%`.
 
 When the file of a tab that you do not see changes, mdb shows the new document in that tab and puts a dot on the tab. The dot goes away when you go to the tab.
+
+mdb can only see `ctrl+h` and `ctrl+l` if your terminal uses the kitty keyboard protocol. Ghostty, kitty, and cmux use it. In a different terminal, `ctrl+h` can be the same as `backspace`. Click the tabs instead.
 
 ## Panes and coding agents
 

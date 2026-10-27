@@ -38,8 +38,17 @@ Other options:
   the new document replaces the one on screen.
 - `mdb <folder>` opens the file list for a folder, where the user can search the markdown files.
 
-mdb reloads the document when the file changes. After you edit a file that mdb shows, you do
-not need to run mdb again.
+mdb reloads the document when the file changes, also in a tab that the user does not see. After
+you edit a file that mdb shows, you do not need to run mdb again. If you run mdb again for a file
+that is open, mdb goes to its tab and does not open a copy; add `--heading` to point at the
+section that you changed.
+
+The command prints what it did: `opened … in a new pane`, `opened … in a tab in the mdb pane`,
+`switched to … in the mdb pane`, or `showing … in the mdb pane`.
+
+A tab shows the title of its document: the frontmatter `title`, else the first `# heading`, else
+the file name. Give each document that you write a clear title, so that the user can tell the
+tabs apart.
 
 ## When to use it
 
