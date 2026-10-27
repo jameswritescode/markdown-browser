@@ -38,3 +38,11 @@ test("replace updates the current entry in place", () => {
   h.push({ path: "b", scrollY: 0 });
   expect(h.back()).toEqual({ path: "a", scrollY: 300 });
 });
+
+test("all lists every entry, back and forward", () => {
+  const h = new History<string>();
+  h.push("a");
+  h.push("b");
+  h.back();
+  expect(h.all()).toEqual(["a", "b"]);
+});

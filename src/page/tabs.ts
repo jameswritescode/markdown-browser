@@ -1,3 +1,4 @@
+import { isStdinKey } from "../shared/stdin-key.ts";
 import type { StartOptions } from "../shared/types.ts";
 import { el } from "./dom.ts";
 import { stepMatch } from "./find.ts";
@@ -6,13 +7,17 @@ import { tabLabels } from "./tab-labels.ts";
 import { type OpenMode, routeOpen } from "./tab-route.ts";
 
 export interface RemoteOpen {
-  path: string;
+  /** A file, a stdin key, or null for the file list of `root`. */
+  path: string | null;
   root: string;
   heading: string | null;
   mode: OpenMode;
+  /** The text of a stdin document. `path` is then its key. */
+  content?: { key: string; text: string; title: string | null };
 }
 
-export type OpenResult = "tab" | "switched" | "replaced";
+export type OpenResult = "tab" | "switched" | "replaced" | "updated";
+type Opened = { heading: boolean | null; result: OpenResult };
 
 const TAB_HINTS = " · ctrl+t new tab · ctrl+w close";
 
@@ -75,7 +80,11 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
   };
 
   const sync = () => {
-    const paths = new Set(tabs.map((tab) => tab.path()).filter((path) => path !== null));
+    const paths = new Set(
+      tabs
+        .map((tab) => tab.path())
+        .filter((path): path is string => path !== null && !isStdinKey(path)),
+    );
     window.mdb.watch([...paths]);
     const roots = new Set(tabs.filter((tab) => tab.path() === null).map((tab) => tab.root()));
     window.mdb.watchFolders([...roots]);
@@ -113,6 +122,10 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
     }
     tabs.splice(index, 1);
     changed.delete(tab);
+    // A stdin document lives only in its tab.
+    const kept = new Set(tabs.flatMap((other) => other.historyPaths()));
+    const gone = tab.historyPaths().filter((path) => isStdinKey(path) && !kept.has(path));
+    if (gone.length) window.mdb.forgetStdin([...new Set(gone)]);
     tab.destroy();
     if (index === active) {
       // The tab to the right takes its place, or the one to the left when it was last.
@@ -142,31 +155,68 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
     true,
   );
 
+  const openNow = async (request: RemoteOpen): Promise<Opened> => {
+    const { path, root, heading, content } = request;
+    if (content)
+      await window.mdb.putStdin(content.key, {
+        text: content.text,
+        title: content.title,
+        base: root,
+      });
+    const summaries = tabs.map((tab) => ({
+      path: tab.path(),
+      root: tab.root(),
+      paths: tab.historyPaths(),
+    }));
+    const route = routeOpen(summaries, active, request);
+    if (route.kind === "update") {
+      // The main process sent a change for the key; the reader re-renders it in place.
+      const tab = tabs[route.index]!;
+      if (!heading) {
+        if (route.index !== active) changed.add(tab);
+        paintBar();
+        return { heading: null, result: "updated" };
+      }
+      activate(route.index);
+      await tab.reload();
+      return { heading: tab.goToHeading(heading), result: "updated" };
+    }
+    if (route.kind === "switch") {
+      activate(route.index);
+      const tab = tabs[route.index]!;
+      return {
+        heading: heading && path ? tab.goToHeading(heading) : null,
+        result: "switched",
+      };
+    }
+    let tab: Tab;
+    if (route.kind === "new") tab = add(root);
+    else {
+      tab = tabs[route.index]!;
+      if (route.kind === "reuse" || path === null) tab.setRoot(root);
+    }
+    const result = route.kind === "replace" ? "replaced" : "tab";
+    if (path === null) {
+      await tab.showFinder();
+      return { heading: null, result };
+    }
+    const opened = await tab.open(path, { heading });
+    return { heading: opened.heading, result };
+  };
+
+  // One open at a time, so two pipes with the same title cannot make two tabs.
+  let queue: Promise<unknown> = Promise.resolve();
+
   return {
     async start() {
       const first = add(start.root);
       if (start.openPath) await first.open(start.openPath, { heading: start.heading });
       else await first.showFinder();
     },
-    async open(request: RemoteOpen): Promise<{ heading: boolean | null; result: OpenResult }> {
-      const summaries = tabs.map((tab) => ({ path: tab.path() }));
-      const route = routeOpen(summaries, active, request.path, request.mode);
-      if (route.kind === "switch") {
-        activate(route.index);
-        const tab = tabs[route.index]!;
-        return {
-          heading: request.heading ? tab.goToHeading(request.heading) : null,
-          result: "switched",
-        };
-      }
-      let tab: Tab;
-      if (route.kind === "new") tab = add(request.root);
-      else {
-        tab = tabs[route.index]!;
-        if (route.kind === "reuse") tab.setRoot(request.root);
-      }
-      const { heading } = await tab.open(request.path, { heading: request.heading });
-      return { heading, result: route.kind === "replace" ? "replaced" : "tab" };
+    open(request: RemoteOpen): Promise<Opened> {
+      const next = queue.then(() => openNow(request));
+      queue = next.catch(() => {});
+      return next;
     },
   };
 }

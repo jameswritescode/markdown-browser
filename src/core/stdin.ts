@@ -2,22 +2,14 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { StdinDoc } from "../shared/types.ts";
 
+import { STDIN_PREFIX, titledStdinKey } from "../shared/stdin-key.ts";
+
 export type { StdinDoc };
-
-export const STDIN_PREFIX = "stdin:";
-const TITLE_PREFIX = `${STDIN_PREFIX}title:`;
-
-export function isStdinKey(path: string): boolean {
-  return path.startsWith(STDIN_PREFIX);
-}
+export { STDIN_PREFIX, isStdinKey, isTitledStdinKey } from "../shared/stdin-key.ts";
 
 /** A titled key is the same for every pipe with that title, so a later pipe finds the tab. */
 export function stdinKey(title: string | null): string {
-  return title === null ? `${STDIN_PREFIX}${randomUUID()}` : `${TITLE_PREFIX}${title}`;
-}
-
-export function isTitledStdinKey(path: string): boolean {
-  return path.startsWith(TITLE_PREFIX);
+  return title === null ? `${STDIN_PREFIX}${randomUUID()}` : titledStdinKey(title);
 }
 
 /** Holds stdin documents in memory only. Nothing is written to disk. */

@@ -22,6 +22,11 @@ export class History<T> {
     return this.entries[++this.index]!;
   }
 
+  /** Every entry, back and forward. */
+  all(): readonly T[] {
+    return this.entries;
+  }
+
   get current(): T | null {
     return this.entries[this.index] ?? null;
   }

@@ -4,6 +4,7 @@ import type { OutlineItem, RenderedDoc } from "../shared/types.ts";
 import { addCopyButtons } from "./copy-code.ts";
 import { el } from "./dom.ts";
 import { findMatches, stepMatch } from "./find.ts";
+import { isStdinKey } from "../shared/stdin-key.ts";
 import { History } from "./history.ts";
 
 interface ReaderEntry {
@@ -82,7 +83,8 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     const percent = range > 0 ? Math.round((scroller.scrollTop / range) * 100) : 100;
     const tab = opts.tabInfo();
     const state = current ? `${percent}%` : "missing";
-    where.textContent = path ? `${relPath(path)} · ${tab ? `${tab} · ` : ""}${state}` : "";
+    const name = path && isStdinKey(path) ? (current?.title ?? "stdin") : path && relPath(path);
+    where.textContent = path ? `${name} · ${tab ? `${tab} · ` : ""}${state}` : "";
     if (notice) where.textContent += ` · ${notice}`;
     const finding = !findBox.hidden;
     where.hidden = finding;
@@ -437,6 +439,13 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     },
     /** The document this reader shows, even when its file is missing; null when hidden. */
     currentPath: () => (root.hidden ? null : (history.current?.path ?? null)),
+    /** Every document in this reader's history, back and forward. */
+    historyPaths: () => history.all().map((entry) => entry.path),
+    /** Renders the current document again, with its scroll position kept. */
+    async reload() {
+      const path = history.current?.path;
+      if (path && !root.hidden) await render(path, scroller.scrollTop, null);
+    },
     /** The document's title, or null when it is missing or not rendered yet. */
     title: () => current?.title ?? null,
     goToHeading(heading: string) {

@@ -94,6 +94,8 @@ export function createTab(host: HTMLElement, startRoot: string, hooks: TabHooks)
     open,
     showFinder,
     goToHeading: (heading: string) => reader.goToHeading(heading),
+    historyPaths: () => reader.historyPaths(),
+    reload: () => reader.reload(),
     /** Gives the tab a new folder. Its finder is made again for that folder. */
     setRoot(next: string) {
       if (next === root) return;

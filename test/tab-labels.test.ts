@@ -25,3 +25,14 @@ test("tabs with the same title add the file name, then the folder", () => {
 test("a tab on its finder shows the folder", () => {
   expect(tabLabels([{ path: null, root: "/x/docs", title: null }])).toEqual(["Files · docs"]);
 });
+
+test("a stdin tab shows its title, with no suffix", () => {
+  expect(
+    tabLabels([
+      { path: "stdin:title:Work summary", root: "/r", title: "Work summary" },
+      { path: "stdin:1", root: "/r", title: "Notes" },
+      { path: "stdin:2", root: "/r", title: "Notes" },
+      { path: "stdin:3", root: "/r", title: null },
+    ]),
+  ).toEqual(["Work summary", "Notes", "Notes", "stdin"]);
+});
