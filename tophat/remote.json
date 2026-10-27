@@ -1,0 +1,60 @@
+{
+  "args": ["../test/fixtures/pages/showcase.md", "--heading", "tables"],
+  "out": "../build/tophat/remote",
+  "width": 1000,
+  "height": 600,
+  "steps": [
+    {
+      "wait": 1500
+    },
+    {
+      "eval": "[document.querySelector('.reader-scroll').scrollTop > 0, Math.round(document.getElementById('tables').getBoundingClientRect().top)]",
+      "expect": [true, 16]
+    },
+    {
+      "shot": "start-heading"
+    },
+    {
+      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'test/fixtures/pages/usage.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Outline', mode: 'replace' }) })()",
+      "expect": {
+        "heading": true,
+        "result": "replaced"
+      }
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "[document.title, Math.round(document.getElementById('outline').getBoundingClientRect().top)]",
+      "expect": ["mdb usage guide", 16]
+    },
+    {
+      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'test/fixtures/pages/showcase.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Nothing like this', mode: 'replace' }) })()",
+      "expect": {
+        "heading": false,
+        "result": "replaced"
+      }
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "[document.querySelector('.reader-scroll').scrollTop, document.querySelector('.where').textContent]",
+      "expect": [0, "showcase.md · 0% · no heading matches \"Nothing like this\""]
+    },
+    {
+      "shot": "missing-heading"
+    },
+    {
+      "key": "[",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "document.title",
+      "expect": "mdb usage guide"
+    }
+  ]
+}

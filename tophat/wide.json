@@ -1,0 +1,51 @@
+{
+  "args": ["../test/fixtures/pages"],
+  "out": "../build/tophat/wide",
+  "width": 1600,
+  "height": 700,
+  "steps": [
+    {
+      "wait": 1200
+    },
+    {
+      "eval": "(() => { const p = document.querySelector('.prompt').getBoundingClientRect(); const r = document.querySelector('.row').getBoundingClientRect(); return { prompt: [Math.round(p.left), Math.round(innerWidth - p.right)], row: [Math.round(r.left), Math.round(innerWidth - r.right)] } })()",
+      "expect": {
+        "prompt": [360, 360],
+        "row": [360, 360]
+      }
+    },
+    {
+      "shot": "finder"
+    },
+    {
+      "type": "showcase"
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "eval": "(() => { const r = document.querySelector('.markdown-body').getBoundingClientRect(); return [Math.round(r.left), Math.round(innerWidth - r.right)] })()",
+      "expect": [356, 364]
+    },
+    {
+      "shot": "centered"
+    },
+    {
+      "key": "b",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "(() => { const o = document.querySelector('.outline').getBoundingClientRect(); const r = document.querySelector('.markdown-body').getBoundingClientRect(); return [Math.round(o.left), Math.round(innerWidth - r.right)] })()",
+      "expect": [230, 230]
+    },
+    {
+      "shot": "outline"
+    }
+  ]
+}

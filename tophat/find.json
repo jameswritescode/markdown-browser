@@ -1,0 +1,149 @@
+{
+  "args": ["../test/fixtures/docs/README.md"],
+  "out": "../build/tophat/find",
+  "width": 1100,
+  "height": 600,
+  "steps": [
+    {
+      "wait": 600
+    },
+    {
+      "eval": "document.querySelector('.reader .status')?.textContent",
+      "expect": "README.md · 0%// find · esc files · ctrl+b outline · ctrl+[ back"
+    },
+    {
+      "shot": "1-bar"
+    },
+    {
+      "key": "j"
+    },
+    {
+      "key": "j"
+    },
+    {
+      "eval": "document.querySelector('.reader-scroll').scrollTop",
+      "expect": 120
+    },
+    {
+      "eval": "document.querySelector('.where')?.textContent",
+      "expect": "README.md · 13%"
+    },
+    {
+      "key": "k"
+    },
+    {
+      "eval": "document.querySelector('.reader-scroll').scrollTop",
+      "expect": 60
+    },
+    {
+      "key": "j",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "document.querySelector('.reader-scroll').scrollTop",
+      "expect": 60
+    },
+    {
+      "key": "d"
+    },
+    {
+      "eval": "[document.querySelector('.reader-scroll').scrollTop, document.querySelector('.reader-scroll').clientHeight]",
+      "expect": [342, 563]
+    },
+    {
+      "key": "u"
+    },
+    {
+      "eval": "[document.querySelector('.reader-scroll').scrollTop, document.querySelector('.reader-scroll').clientHeight]",
+      "expect": [61, 563]
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "the"
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[document.querySelector('.find-count')?.textContent, document.querySelector('.hints')?.textContent]",
+      "expect": ["1 of 3", "enter done · esc cancel"]
+    },
+    {
+      "shot": "2-typing"
+    },
+    {
+      "key": "j"
+    },
+    {
+      "eval": "document.querySelector('.find-query').value",
+      "expect": "thej"
+    },
+    {
+      "key": "Backspace"
+    },
+    {
+      "key": "Return"
+    },
+    {
+      "eval": "[document.activeElement?.className, document.querySelector('.where')?.textContent]",
+      "expect": ["", "/the · 1 of 3"]
+    },
+    {
+      "key": "n"
+    },
+    {
+      "key": "n"
+    },
+    {
+      "eval": "document.querySelector('.where')?.textContent",
+      "expect": "/the · 3 of 3"
+    },
+    {
+      "key": "N",
+      "modifiers": ["shift"]
+    },
+    {
+      "eval": "document.querySelector('.where')?.textContent",
+      "expect": "/the · 2 of 3"
+    },
+    {
+      "shot": "3-matches"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "eval": "[CSS.highlights.get('mdb-find')?.size ?? 0, document.querySelector('.where')?.textContent, !!document.querySelector('.reader:not([hidden])')]",
+      "expect": [0, "README.md · 0%", true]
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "zzzz"
+    },
+    {
+      "eval": "document.querySelector('.find-count')?.textContent",
+      "expect": "no matches"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "eval": "[document.querySelector('.find').hidden, !!document.querySelector('.reader:not([hidden])')]",
+      "expect": [true, true]
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "!!document.querySelector('.finder:not([hidden])')",
+      "expect": true
+    }
+  ]
+}

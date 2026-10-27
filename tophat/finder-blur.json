@@ -1,0 +1,98 @@
+{
+  "args": ["../test/fixtures/docs"],
+  "out": "../build/tophat/finder-blur",
+  "width": 1000,
+  "height": 420,
+  "steps": [
+    {
+      "wait": 400
+    },
+    {
+      "click": ".status"
+    },
+    {
+      "eval": "document.activeElement?.className",
+      "expect": ""
+    },
+    {
+      "key": "Down"
+    },
+    {
+      "key": "j",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 2
+    },
+    {
+      "key": "k",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 1
+    },
+    {
+      "click": ".status"
+    },
+    {
+      "type": "gst"
+    },
+    {
+      "eval": "document.querySelector('.query').value",
+      "expect": "gst"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "click": ".status"
+    },
+    {
+      "key": "Return"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "eval": "document.title",
+      "expect": "Fixture Docs"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "click": ".status"
+    },
+    {
+      "key": "Down"
+    },
+    {
+      "eval": "[...document.querySelectorAll('.row')].findIndex((r) => r.classList.contains('selected'))",
+      "expect": 1
+    },
+    {
+      "type": "gst"
+    },
+    {
+      "key": "Return"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "eval": "[document.querySelector('.query').value, document.querySelectorAll('.row').length]",
+      "expect": ["gst", 1]
+    }
+  ]
+}

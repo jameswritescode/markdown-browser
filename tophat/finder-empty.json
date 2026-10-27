@@ -1,0 +1,21 @@
+{
+  "args": ["../build/tophat/empty-folder"],
+  "out": "../build/tophat/finder-empty",
+  "width": 900,
+  "height": 240,
+  "steps": [
+    {
+      "wait": 400
+    },
+    {
+      "eval": "document.querySelector('.finder .empty')?.textContent.replace(/ in .*/, ' in \u2026')",
+      "expect": "No markdown files in \u2026"
+    },
+    {
+      "shot": "empty"
+    }
+  ],
+  "files": {
+    "../build/tophat/empty-folder/": null
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "args": ["../test/fixtures/pages/showcase.md"],
+  "out": "../build/tophat/stdin",
+  "width": 1200,
+  "height": 700,
+  "steps": [
+    {
+      "wait": 1000
+    },
+    {
+      "eval": "(window.T = { repo: location.pathname.replace(/dist\\/page\\/index.html$/, ''), put: (title, text, heading = null) => window.mdbRemote.open({ path: 'stdin:title:' + title, root: T.repo + 'test/fixtures/pages', heading, mode: 'tab', content: { key: 'stdin:title:' + title, text, title } }).then((x) => x.result), folder: (r) => window.mdbRemote.open({ path: null, root: T.repo + r, heading: null, mode: 'tab' }).then((x) => x.result), labels: () => [...document.querySelectorAll('.tab .tab-label')].map((t) => t.textContent), active: () => [...document.querySelectorAll('.tab')].findIndex((t) => t.classList.contains('active')), dots: () => [...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed')) }) && true",
+      "expect": true
+    },
+    {
+      "eval": "T.put('Work summary', \"# Draft\\n\\nStep one.\\n\\nParagraph 0 of the summary, long enough to scroll.\\n\\nParagraph 1 of the summary, long enough to scroll.\\n\\nParagraph 2 of the summary, long enough to scroll.\\n\\nParagraph 3 of the summary, long enough to scroll.\\n\\nParagraph 4 of the summary, long enough to scroll.\\n\\nParagraph 5 of the summary, long enough to scroll.\\n\\nParagraph 6 of the summary, long enough to scroll.\\n\\nParagraph 7 of the summary, long enough to scroll.\\n\\nParagraph 8 of the summary, long enough to scroll.\\n\\nParagraph 9 of the summary, long enough to scroll.\\n\\nParagraph 10 of the summary, long enough to scroll.\\n\\nParagraph 11 of the summary, long enough to scroll.\\n\\nParagraph 12 of the summary, long enough to scroll.\\n\\nParagraph 13 of the summary, long enough to scroll.\\n\\nParagraph 14 of the summary, long enough to scroll.\\n\\nParagraph 15 of the summary, long enough to scroll.\\n\\nParagraph 16 of the summary, long enough to scroll.\\n\\nParagraph 17 of the summary, long enough to scroll.\\n\\nParagraph 18 of the summary, long enough to scroll.\\n\\nParagraph 19 of the summary, long enough to scroll.\\n\\nParagraph 20 of the summary, long enough to scroll.\\n\\nParagraph 21 of the summary, long enough to scroll.\\n\\nParagraph 22 of the summary, long enough to scroll.\\n\\nParagraph 23 of the summary, long enough to scroll.\\n\\nParagraph 24 of the summary, long enough to scroll.\\n\\nParagraph 25 of the summary, long enough to scroll.\\n\\nParagraph 26 of the summary, long enough to scroll.\\n\\nParagraph 27 of the summary, long enough to scroll.\\n\\nParagraph 28 of the summary, long enough to scroll.\\n\\nParagraph 29 of the summary, long enough to scroll.\\n\\nParagraph 30 of the summary, long enough to scroll.\\n\\nParagraph 31 of the summary, long enough to scroll.\\n\\nParagraph 32 of the summary, long enough to scroll.\\n\\nParagraph 33 of the summary, long enough to scroll.\\n\\nParagraph 34 of the summary, long enough to scroll.\\n\\nParagraph 35 of the summary, long enough to scroll.\\n\\nParagraph 36 of the summary, long enough to scroll.\\n\\nParagraph 37 of the summary, long enough to scroll.\\n\\nParagraph 38 of the summary, long enough to scroll.\\n\\nParagraph 39 of the summary, long enough to scroll.\\n\\nParagraph 40 of the summary, long enough to scroll.\\n\\nParagraph 41 of the summary, long enough to scroll.\\n\\nParagraph 42 of the summary, long enough to scroll.\\n\\nParagraph 43 of the summary, long enough to scroll.\\n\\nParagraph 44 of the summary, long enough to scroll.\\n\\nParagraph 45 of the summary, long enough to scroll.\\n\\nParagraph 46 of the summary, long enough to scroll.\\n\\nParagraph 47 of the summary, long enough to scroll.\\n\\nParagraph 48 of the summary, long enough to scroll.\\n\\nParagraph 49 of the summary, long enough to scroll.\\n\\nParagraph 50 of the summary, long enough to scroll.\\n\\nParagraph 51 of the summary, long enough to scroll.\\n\\nParagraph 52 of the summary, long enough to scroll.\\n\\nParagraph 53 of the summary, long enough to scroll.\\n\\nParagraph 54 of the summary, long enough to scroll.\\n\\nParagraph 55 of the summary, long enough to scroll.\\n\\nParagraph 56 of the summary, long enough to scroll.\\n\\nParagraph 57 of the summary, long enough to scroll.\\n\\nParagraph 58 of the summary, long enough to scroll.\\n\\nParagraph 59 of the summary, long enough to scroll.\\n\\nParagraph 60 of the summary, long enough to scroll.\\n\\nParagraph 61 of the summary, long enough to scroll.\\n\\nParagraph 62 of the summary, long enough to scroll.\\n\\nParagraph 63 of the summary, long enough to scroll.\\n\\nParagraph 64 of the summary, long enough to scroll.\\n\\nParagraph 65 of the summary, long enough to scroll.\\n\\nParagraph 66 of the summary, long enough to scroll.\\n\\nParagraph 67 of the summary, long enough to scroll.\\n\\nParagraph 68 of the summary, long enough to scroll.\\n\\nParagraph 69 of the summary, long enough to scroll.\\n\\nParagraph 70 of the summary, long enough to scroll.\\n\\nParagraph 71 of the summary, long enough to scroll.\\n\\nParagraph 72 of the summary, long enough to scroll.\\n\\nParagraph 73 of the summary, long enough to scroll.\\n\\nParagraph 74 of the summary, long enough to scroll.\\n\\nParagraph 75 of the summary, long enough to scroll.\\n\\nParagraph 76 of the summary, long enough to scroll.\\n\\nParagraph 77 of the summary, long enough to scroll.\\n\\nParagraph 78 of the summary, long enough to scroll.\\n\\nParagraph 79 of the summary, long enough to scroll.\\n\\n[usage](usage.md)\\n\")",
+      "expect": "tab"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "[T.labels(), T.active(), document.querySelector('.tab-pane:not(.background) .where').textContent.startsWith('Work summary · 2 of 2')]",
+      "expect": [["Markdown showcase", "Work summary"], 1, true]
+    },
+    {
+      "eval": "document.querySelectorAll('.tab')[1].title",
+      "expect": "Work summary"
+    },
+    {
+      "shot": "summary"
+    },
+    {
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop = 600",
+      "expect": 600
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "T.put('Work summary', \"# Draft\\n\\nStep two.\\n\\nParagraph 0 of the summary, long enough to scroll.\\n\\nParagraph 1 of the summary, long enough to scroll.\\n\\nParagraph 2 of the summary, long enough to scroll.\\n\\nParagraph 3 of the summary, long enough to scroll.\\n\\nParagraph 4 of the summary, long enough to scroll.\\n\\nParagraph 5 of the summary, long enough to scroll.\\n\\nParagraph 6 of the summary, long enough to scroll.\\n\\nParagraph 7 of the summary, long enough to scroll.\\n\\nParagraph 8 of the summary, long enough to scroll.\\n\\nParagraph 9 of the summary, long enough to scroll.\\n\\nParagraph 10 of the summary, long enough to scroll.\\n\\nParagraph 11 of the summary, long enough to scroll.\\n\\nParagraph 12 of the summary, long enough to scroll.\\n\\nParagraph 13 of the summary, long enough to scroll.\\n\\nParagraph 14 of the summary, long enough to scroll.\\n\\nParagraph 15 of the summary, long enough to scroll.\\n\\nParagraph 16 of the summary, long enough to scroll.\\n\\nParagraph 17 of the summary, long enough to scroll.\\n\\nParagraph 18 of the summary, long enough to scroll.\\n\\nParagraph 19 of the summary, long enough to scroll.\\n\\nParagraph 20 of the summary, long enough to scroll.\\n\\nParagraph 21 of the summary, long enough to scroll.\\n\\nParagraph 22 of the summary, long enough to scroll.\\n\\nParagraph 23 of the summary, long enough to scroll.\\n\\nParagraph 24 of the summary, long enough to scroll.\\n\\nParagraph 25 of the summary, long enough to scroll.\\n\\nParagraph 26 of the summary, long enough to scroll.\\n\\nParagraph 27 of the summary, long enough to scroll.\\n\\nParagraph 28 of the summary, long enough to scroll.\\n\\nParagraph 29 of the summary, long enough to scroll.\\n\\nParagraph 30 of the summary, long enough to scroll.\\n\\nParagraph 31 of the summary, long enough to scroll.\\n\\nParagraph 32 of the summary, long enough to scroll.\\n\\nParagraph 33 of the summary, long enough to scroll.\\n\\nParagraph 34 of the summary, long enough to scroll.\\n\\nParagraph 35 of the summary, long enough to scroll.\\n\\nParagraph 36 of the summary, long enough to scroll.\\n\\nParagraph 37 of the summary, long enough to scroll.\\n\\nParagraph 38 of the summary, long enough to scroll.\\n\\nParagraph 39 of the summary, long enough to scroll.\\n\\nParagraph 40 of the summary, long enough to scroll.\\n\\nParagraph 41 of the summary, long enough to scroll.\\n\\nParagraph 42 of the summary, long enough to scroll.\\n\\nParagraph 43 of the summary, long enough to scroll.\\n\\nParagraph 44 of the summary, long enough to scroll.\\n\\nParagraph 45 of the summary, long enough to scroll.\\n\\nParagraph 46 of the summary, long enough to scroll.\\n\\nParagraph 47 of the summary, long enough to scroll.\\n\\nParagraph 48 of the summary, long enough to scroll.\\n\\nParagraph 49 of the summary, long enough to scroll.\\n\\nParagraph 50 of the summary, long enough to scroll.\\n\\nParagraph 51 of the summary, long enough to scroll.\\n\\nParagraph 52 of the summary, long enough to scroll.\\n\\nParagraph 53 of the summary, long enough to scroll.\\n\\nParagraph 54 of the summary, long enough to scroll.\\n\\nParagraph 55 of the summary, long enough to scroll.\\n\\nParagraph 56 of the summary, long enough to scroll.\\n\\nParagraph 57 of the summary, long enough to scroll.\\n\\nParagraph 58 of the summary, long enough to scroll.\\n\\nParagraph 59 of the summary, long enough to scroll.\\n\\nParagraph 60 of the summary, long enough to scroll.\\n\\nParagraph 61 of the summary, long enough to scroll.\\n\\nParagraph 62 of the summary, long enough to scroll.\\n\\nParagraph 63 of the summary, long enough to scroll.\\n\\nParagraph 64 of the summary, long enough to scroll.\\n\\nParagraph 65 of the summary, long enough to scroll.\\n\\nParagraph 66 of the summary, long enough to scroll.\\n\\nParagraph 67 of the summary, long enough to scroll.\\n\\nParagraph 68 of the summary, long enough to scroll.\\n\\nParagraph 69 of the summary, long enough to scroll.\\n\\nParagraph 70 of the summary, long enough to scroll.\\n\\nParagraph 71 of the summary, long enough to scroll.\\n\\nParagraph 72 of the summary, long enough to scroll.\\n\\nParagraph 73 of the summary, long enough to scroll.\\n\\nParagraph 74 of the summary, long enough to scroll.\\n\\nParagraph 75 of the summary, long enough to scroll.\\n\\nParagraph 76 of the summary, long enough to scroll.\\n\\nParagraph 77 of the summary, long enough to scroll.\\n\\nParagraph 78 of the summary, long enough to scroll.\\n\\nParagraph 79 of the summary, long enough to scroll.\\n\\n[usage](usage.md)\\n\")",
+      "expect": "updated"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "[T.active(), T.dots()]",
+      "expect": [0, [false, true]]
+    },
+    {
+      "key": "l",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "[Math.abs(document.querySelector('.tab-pane:not(.background) .reader-scroll').scrollTop - 600) <= 2, document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent, T.dots()]",
+      "expect": [true, "Step two.", [false, false]]
+    },
+    {
+      "eval": "Promise.all([T.put('Twice', '# Once'), T.put('Twice', '# Again')]).then((r) => [r, T.labels()])",
+      "expect": [
+        ["tab", "updated"],
+        ["Markdown showcase", "Work summary", "Twice"]
+      ]
+    },
+    {
+      "key": "h",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').querySelector('a[href=\"usage.md\"]').click() ?? true",
+      "expect": true
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "[T.labels()[1], document.title]",
+      "expect": ["mdb usage guide", "mdb usage guide"]
+    },
+    {
+      "eval": "T.folder('test/fixtures/docs')",
+      "expect": "tab"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "eval": "[T.labels()[3], T.active()]",
+      "expect": ["Files · docs", 3]
+    },
+    {
+      "eval": "T.folder('test/fixtures/docs')",
+      "expect": "switched"
+    },
+    {
+      "shot": "folder"
+    },
+    {
+      "eval": "T.put('Work summary', '# Draft\\n\\nStep three.')",
+      "expect": "updated"
+    },
+    {
+      "eval": "T.dots()",
+      "expect": [false, true, false, false]
+    },
+    {
+      "eval": "window.mdbRemote.open({ path: 'stdin:title:Work summary', root: T.repo + 'test/fixtures/pages', heading: 'Next steps', mode: 'tab', content: { key: 'stdin:title:Work summary', text: '# Draft\\n\\nStep four.\\n\\n## Next steps\\n\\nMore.', title: 'Work summary' } }).then((x) => [x.result, x.heading])",
+      "expect": ["updated", true]
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "[T.active(), document.querySelector('.tab-pane:not(.background) .where').textContent.startsWith('Work summary'), document.querySelector('.tab-pane:not(.background) .markdown-body p').textContent]",
+      "expect": [1, true, "Step four."]
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "(document.querySelectorAll('.tab')[2].click(), true)",
+      "expect": true
+    },
+    {
+      "key": "w",
+      "modifiers": ["control"]
+    },
+    {
+      "wait": 200
+    },
+    {
+      "eval": "Promise.all([window.mdb.render('stdin:title:Work summary'), window.mdb.render('stdin:title:Twice')]).then((r) => [T.labels(), r.map((d) => 'missing' in d)])",
+      "expect": [
+        ["Markdown showcase", "Twice"],
+        [true, false]
+      ]
+    }
+  ]
+}

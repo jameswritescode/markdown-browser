@@ -1,0 +1,33 @@
+{
+  "args": ["../test/fixtures/docs"],
+  "out": "../build/tophat/search-open",
+  "width": 1000,
+  "height": 500,
+  "steps": [
+    {
+      "wait": 400
+    },
+    {
+      "key": "/"
+    },
+    {
+      "type": "kitty"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "key": "Return"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "[document.title, document.querySelector('.where')?.textContent, CSS.highlights.get('mdb-find-current')?.size]",
+      "expect": ["Setup Guide", "/kitty · 1 of 1", 1]
+    },
+    {
+      "shot": "opened"
+    }
+  ]
+}

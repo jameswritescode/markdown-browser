@@ -1,0 +1,77 @@
+{
+  "files": {
+    "../build/tophat/fresh/alpha.md": "# Alpha\n\nThe first document.\n",
+    "../build/tophat/fresh/beta.md": null,
+    "../build/tophat/fresh/gamma.md": null
+  },
+  "args": ["../build/tophat/fresh"],
+  "out": "../build/tophat/finder-fresh",
+  "width": 1000,
+  "height": 600,
+  "steps": [
+    {
+      "wait": 1000
+    },
+    {
+      "eval": "[...document.querySelectorAll('.finder:not([hidden]) .row-title')].map((t) => t.textContent)",
+      "expect": ["Alpha"]
+    },
+    {
+      "write": "../build/tophat/fresh/beta.md",
+      "text": "# Beta\n"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "eval": "[...document.querySelectorAll('.finder:not([hidden]) .row-title')].map((t) => t.textContent)",
+      "expect": ["Alpha", "Beta"]
+    },
+    {
+      "type": "alp"
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "document.title",
+      "expect": "Alpha"
+    },
+    {
+      "write": "../build/tophat/fresh/gamma.md",
+      "text": "# Gamma\n"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "eval": "[...document.querySelectorAll('.finder:not([hidden]) .row-title')].map((t) => t.textContent)",
+      "expect": ["Alpha", "Beta", "Gamma"]
+    },
+    {
+      "remove": "../build/tophat/fresh/beta.md"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "eval": "[...document.querySelectorAll('.finder:not([hidden]) .row-title')].map((t) => t.textContent)",
+      "expect": ["Alpha", "Gamma"]
+    },
+    {
+      "shot": "fresh"
+    }
+  ]
+}

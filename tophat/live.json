@@ -1,0 +1,58 @@
+{
+  "args": ["../build/tophat/live-docs/doc.md"],
+  "out": "../build/tophat/live",
+  "width": 900,
+  "height": 500,
+  "files": {
+    "../build/tophat/live-docs/doc.md": "# Live\n\nFirst version.\n\n```mermaid\nflowchart LR\n  A --> \n```\n"
+  },
+  "steps": [
+    {
+      "wait": 600
+    },
+    {
+      "shot": "1-first"
+    },
+    {
+      "eval": "document.querySelector('.diagram-error')?.textContent",
+      "expect": "Diagram error: Parse error on line 3:\n\n^\nExpecting 'NODE_STRING', got 'EOF'"
+    },
+    {
+      "write": "../build/tophat/live-docs/doc.md",
+      "text": "# Live\n\nSecond version.\n"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "document.querySelector('.markdown-body p')?.textContent",
+      "expect": "Second version."
+    },
+    {
+      "shot": "2-reloaded"
+    },
+    {
+      "remove": "../build/tophat/live-docs/doc.md"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "document.querySelector('.missing-title')?.textContent",
+      "expect": "This file no longer exists"
+    },
+    {
+      "shot": "3-deleted"
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "eval": "!!document.querySelector('.finder:not([hidden])')",
+      "expect": true
+    }
+  ]
+}

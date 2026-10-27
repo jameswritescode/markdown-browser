@@ -1,0 +1,26 @@
+{
+  "args": ["../test/fixtures/docs/README.md"],
+  "out": "../build/tophat/narrow",
+  "width": 600,
+  "height": 600,
+  "steps": [
+    {
+      "wait": 500
+    },
+    {
+      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')",
+      "expect": false
+    },
+    {
+      "shot": "narrow"
+    },
+    {
+      "key": "b",
+      "modifiers": ["control"]
+    },
+    {
+      "eval": "document.querySelector('.reader-content').classList.contains('with-outline')",
+      "expect": true
+    }
+  ]
+}
