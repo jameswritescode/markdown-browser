@@ -242,5 +242,7 @@ pnpm publish
 
 ### Test tools
 
+For the full guide, read [Testing mdb](docs/testing.md).
+
 - `pnpm tophat <script.json>` opens the mdb page in an offscreen window. It sends the keys in the script and saves screenshots and page text. The scripts are in `tophat/`. The output goes to `build/tophat/`.
 - `pnpm smoke [file or folder]` starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors to its log.

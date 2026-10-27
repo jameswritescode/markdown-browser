@@ -170,7 +170,6 @@ async function run(): Promise<void> {
       writeFileSync(resolve(base, step.write), step.text);
       await sleep(500);
     } else if ("remove" in step) {
-      const { rmSync } = await import("node:fs");
       rmSync(resolve(base, step.remove), { force: true });
       await sleep(500);
     } else if ("shot" in step) {

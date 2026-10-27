@@ -155,4 +155,6 @@ The build also copies `index.html` and `style.css` to `dist/page/`. `dist/` is n
 | `pnpm smoke`                                       | Starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors.                                            |
 | `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | TypeScript, oxlint, and oxfmt.                                                                                                                                           |
 
+For how to use these tools, read [Testing mdb](testing.md).
+
 tophat (`src/dev/tophat.ts`) uses the real IPC handlers from `src/main/ipc.ts`, but not pixel. Thus it tests the page and the main process logic, but not the drawing in the terminal or the terminal keys. Use `pnpm smoke` and a real terminal for those.
