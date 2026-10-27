@@ -6,6 +6,8 @@ export interface StdinContent {
   key: string;
   text: string;
   title: string | null;
+  /** When the CLI finished reading stdin. */
+  sentAt?: number;
 }
 
 export interface OpenMessage {
@@ -17,6 +19,8 @@ export interface OpenMessage {
   root?: string;
   mode?: "tab" | "replace";
   content?: StdinContent;
+  /** The wait token of the mdb that this CLI started, for its first document. */
+  token?: string;
 }
 
 export interface OpenRequest {
@@ -25,6 +29,7 @@ export interface OpenRequest {
   heading: string | null;
   mode: "tab" | "replace";
   content?: StdinContent;
+  token?: string;
 }
 
 /** Fills in what an older mdb leaves out: the file's folder, and a new tab. */
@@ -37,6 +42,7 @@ export function openRequest(message: OpenMessage): OpenRequest {
     heading: message.heading,
     mode: message.mode === "replace" ? "replace" : "tab",
     ...(message.content ? { content: message.content } : {}),
+    ...(message.token ? { token: message.token } : {}),
   };
 }
 

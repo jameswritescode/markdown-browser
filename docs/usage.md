@@ -176,7 +176,7 @@ mdb can show markdown that a different command writes. You do not need a file:
 gh pr view 1 --json body -q .body | mdb -
 ```
 
-- `mdb -` reads stdin until it ends. If stdin is empty, mdb writes `mdb: stdin is empty`.
+- `mdb -` reads stdin until it ends. If stdin is empty, mdb writes `mdb: stdin is empty`. If stdin has not ended after 2 seconds, mdb writes `mdb: reading stdin until it ends`. If you type the text, press `ctrl+d` to end it.
 - `… | mdb`, with no file or folder, also reads stdin. If no text comes in 5 seconds, mdb shows the file list.
 - Relative links and images start from the current folder.
 - `esc` shows the file list of the current folder.
@@ -203,7 +203,7 @@ Add `--heading` to go to a heading:
 mdb docs/plan.md --heading "Open questions"
 ```
 
-mdb compares the text to the heading text. Upper case and lower case are the same. You can also use a heading id, for example `open-questions`. If no heading matches, mdb shows the top of the document. The status line shows "no heading matches" for 5 seconds. When mdb uses an mdb pane that is already open, the command also shows a warning.
+mdb compares the text to the heading text. Upper case and lower case are the same. You can also use a heading id, for example `open-questions`. If no heading matches, mdb shows the top of the document. The status line shows "no heading matches" for 5 seconds. When mdb uses an mdb pane that is already open, or opens a new pane for stdin, the command also shows a warning.
 
 ### Terminals
 

@@ -27,6 +27,7 @@ test("a registered instance is listed until it is withdrawn", () => {
       socket: record.socket,
       tab: "w:1",
       token: "t0k",
+      protocol: 2,
       startedAt: expect.any(Number),
     },
   ]);

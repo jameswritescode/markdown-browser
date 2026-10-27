@@ -16,7 +16,15 @@ import { type StdinContent, sendControl } from "../core/control.ts";
 import { type InstanceInfo, listInstances } from "../core/registry.ts";
 import { stdinKey } from "../core/stdin.ts";
 import type { Direction, Launch } from "../shared/types.ts";
-import { chooseAction, isGone, reuseLine, splitCommand, wantsHelp, wantsSkill } from "./launch.ts";
+import {
+  chooseAction,
+  headingWarning,
+  isGone,
+  reuseLine,
+  splitCommand,
+  wantsHelp,
+  wantsSkill,
+} from "./launch.ts";
 import { installSkill } from "./skill.ts";
 import { keyDevice, readStdin, stdinHasInput } from "./stdin.ts";
 
@@ -73,10 +81,15 @@ export async function main(argv: string[]): Promise<number> {
   const piped = !launch.pathGiven && stdinHasInput();
   // --title asks for stdin as clearly as "-" does.
   const wanted = launch.stdin || (launch.title !== null && piped);
-  if (launch.title !== null && !wanted) return fail("mdb: --title works only with stdin (-)");
+  if (launch.title !== null && !wanted) return fail("mdb: --title needs markdown on stdin");
   if (wanted || piped) {
-    const text = await readStdin(process.stdin, wanted ? null : PIPE_WAIT_MS);
-    if (text?.trim()) content = { key: stdinKey(launch.title), text, title: launch.title };
+    const text = await readStdin(process.stdin, wanted ? null : PIPE_WAIT_MS, {
+      // After the first-byte wait for a plain pipe, so that an empty pipe gets no hint.
+      afterMs: wanted ? 2_000 : PIPE_WAIT_MS + 1_000,
+      say: () => process.stderr.write("mdb: reading stdin until it ends\n"),
+    });
+    if (text?.trim())
+      content = { key: stdinKey(launch.title), text, title: launch.title, sentAt: Date.now() };
     else if (wanted) return fail("mdb: stdin is empty");
   }
 
@@ -139,7 +152,8 @@ async function runHere(launch: Launch, content: StdinContent | null): Promise<nu
   );
   if (!content || !token) return exited;
   // Say why only after pixel gives the terminal back.
-  const problem = await sendWhenStarted(token, launch, content, child);
+  const sent = await sendWhenStarted(token, launch, content, child);
+  const problem = sent && "problem" in sent ? sent.problem : null;
   if (problem) child.kill("SIGTERM");
   const code = await exited;
   return problem ? fail(problem) : code;
@@ -154,31 +168,36 @@ function stdoutTty(): string | null {
   }
 }
 
-/** Waits for the mdb with this token to register, then sends it the stdin document. */
+/**
+ * Waits for the mdb with this token to register, then sends it the stdin document. Null when
+ * mdb quit first.
+ */
 async function sendWhenStarted(
   token: string,
   launch: Launch,
   content: StdinContent,
   child: ChildProcess | null,
-): Promise<string | null> {
+): Promise<{ reply: Record<string, unknown> } | { problem: string } | null> {
   const deadline = Date.now() + REGISTER_TIMEOUT_MS;
   while (Date.now() < deadline) {
     if (child && child.exitCode !== null) return null;
     const instance = listInstances().find((found) => found.token === token);
     if (instance) {
       try {
-        const reply = await sendControl(instance.socket, openMessage(launch, content));
-        return "error" in reply ? `mdb: ${reply.error}` : null;
+        const reply = await sendControl(instance.socket, openMessage(launch, content, token));
+        return "error" in reply ? { problem: `mdb: ${reply.error}` } : { reply };
       } catch (error) {
-        return `mdb: the new mdb did not take the document: ${(error as Error).message}`;
+        return {
+          problem: `mdb: the new mdb did not take the document: ${(error as Error).message}`,
+        };
       }
     }
     await sleep(100);
   }
-  return `mdb: mdb did not start within ${REGISTER_TIMEOUT_MS / 1000}s`;
+  return { problem: `mdb: mdb did not start within ${REGISTER_TIMEOUT_MS / 1000}s` };
 }
 
-function openMessage(launch: Launch, content: StdinContent | null) {
+function openMessage(launch: Launch, content: StdinContent | null, token: string | null = null) {
   return {
     cmd: "open" as const,
     path: content ? content.key : launch.start.openPath,
@@ -186,6 +205,7 @@ function openMessage(launch: Launch, content: StdinContent | null) {
     heading: launch.start.heading,
     mode: launch.replace ? ("replace" as const) : ("tab" as const),
     ...(content ? { content } : {}),
+    ...(token ? { token } : {}),
   };
 }
 
@@ -211,8 +231,8 @@ async function reuse(
   }
   if ("error" in reply) return fail(`mdb: ${reply.error}`);
   say(reuseLine(reply.result, describe(launch, content)));
-  if (launch.start.heading && reply.heading === false)
-    process.stderr.write(`mdb: no heading matches "${launch.start.heading}"\n`);
+  const warning = headingWarning(reply, launch.start.heading);
+  if (warning) process.stderr.write(`${warning}\n`);
   return 0;
 }
 
@@ -238,9 +258,11 @@ async function openSplit(
     return fail(`mdb: ${terminal.name}: ${(error as Error).message}`);
   }
   if (content && token) {
-    const problem = await sendWhenStarted(token, launch, content, null);
-    if (problem) return fail(problem);
+    const sent = await sendWhenStarted(token, launch, content, null);
+    if (!sent || "problem" in sent) return fail(sent?.problem ?? "mdb: mdb quit");
     say(`mdb: opened ${describe(launch, content)} in a new pane (${direction})`);
+    const warning = headingWarning(sent.reply, launch.start.heading);
+    if (warning) process.stderr.write(`${warning}\n`);
     return 0;
   }
   const deadline = Date.now() + REGISTER_TIMEOUT_MS;

@@ -80,6 +80,8 @@ export interface StdinDoc {
   title: string | null;
   /** The caller's folder. Relative links and images resolve against it. */
   base: string;
+  /** When the CLI finished reading stdin, so that an older pipe never replaces a newer one. */
+  sentAt?: number;
 }
 
 export interface MdbBridge {

@@ -62,3 +62,13 @@ test("a folder in replace mode replaces the front tab", () => {
 test("a folder otherwise opens a new tab, even when the front tab is on its finder", () => {
   expect(routeOpen([finder("/x")], 0, folder("/docs"))).toEqual({ kind: "new" });
 });
+
+test("a tab that waits for its first document takes only that document", () => {
+  const waiting: TabSummary = { path: null, root: "/", paths: [], waiting: true };
+  expect(routeOpen([waiting], 0, file("/c.md"))).toEqual({ kind: "new" });
+  expect(routeOpen([waiting], 0, folder("/"))).toEqual({ kind: "new" });
+  expect(routeOpen([waiting], 0, { ...file("stdin:abc"), claim: true })).toEqual({
+    kind: "reuse",
+    index: 0,
+  });
+});

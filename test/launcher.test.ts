@@ -40,7 +40,7 @@ test("--title with no pipe on stdin exits 1", () => {
     encoding: "utf8",
   });
   expect(r.status).toBe(1);
-  expect(r.stderr.trim()).toBe("mdb: --title works only with stdin (-)");
+  expect(r.stderr.trim()).toBe("mdb: --title needs markdown on stdin");
 });
 
 test("--title reads a plain pipe to its end", () => {

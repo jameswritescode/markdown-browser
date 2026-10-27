@@ -22,3 +22,23 @@ test("only a named terminal device can give pixel its keys", () => {
   expect(keyDevice("not a tty")).toBeNull();
   expect(keyDevice(null)).toBeNull();
 });
+
+test("says that it waits when a pipe stays open", async () => {
+  const stream = new PassThrough();
+  stream.write("# part");
+  let said = 0;
+  const read = readStdin(stream, null, { afterMs: 30, say: () => said++ });
+  await new Promise((done) => setTimeout(done, 60));
+  stream.end(" two");
+  expect(await read).toBe("# part two");
+  expect(said).toBe(1);
+});
+
+test("says nothing when stdin ends in time", async () => {
+  let said = 0;
+  expect(await readStdin(Readable.from(["# a"]), null, { afterMs: 30, say: () => said++ })).toBe(
+    "# a",
+  );
+  await new Promise((done) => setTimeout(done, 60));
+  expect(said).toBe(0);
+});

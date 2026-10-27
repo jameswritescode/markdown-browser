@@ -1,11 +1,20 @@
 import { fstatSync } from "node:fs";
 
-/** Reads all of stdin. When `waitFirstMs` is set and no byte arrives in time, returns null. */
+/**
+ * Reads all of stdin. When `waitFirstMs` is set and no byte arrives in time, returns null.
+ * When stdin has not ended after `hint.afterMs`, calls `hint.say` once.
+ */
 export function readStdin(
   stream: NodeJS.ReadableStream,
   waitFirstMs: number | null,
+  hint: { afterMs: number; say: () => void } | null = null,
 ): Promise<string | null> {
-  return new Promise((done, fail) => {
+  return new Promise((resolve, fail) => {
+    const slow = hint ? setTimeout(hint.say, hint.afterMs) : null;
+    const done = (text: string | null) => {
+      if (slow) clearTimeout(slow);
+      resolve(text);
+    };
     const chunks: string[] = [];
     const timer =
       waitFirstMs === null
@@ -28,6 +37,7 @@ export function readStdin(
     });
     stream.on("error", (error) => {
       if (timer) clearTimeout(timer);
+      if (slow) clearTimeout(slow);
       fail(error);
     });
   });

@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import {
   chooseAction,
   isGone,
+  headingWarning,
   reuseLine,
   splitCommand,
   wantsHelp,
@@ -74,7 +75,7 @@ test("does not reuse with --new or without a known tab", () => {
 });
 
 test("reuses the mdb pane for a folder and for stdin", () => {
-  const found = [instance(1, "t")];
+  const found = [{ ...instance(1, "t"), protocol: 2 }];
   const reuse = { kind: "reuse", instance: found[0] };
   expect(chooseAction(launch({}, null), { tty: false, tab: "t", instances: found })).toEqual(reuse);
   expect(
@@ -147,4 +148,25 @@ test("the reuse line says what the mdb pane did", () => {
   expect(reuseLine("updated", "Work summary")).toBe("mdb: updated Work summary in the mdb pane");
   // An mdb from before tabs replies without a result: it replaced the document.
   expect(reuseLine(undefined, "a.md")).toBe("mdb: showing a.md in the mdb pane");
+});
+
+test("an mdb from before folder and stdin tabs gets a new pane for them, not a file", () => {
+  const old = [instance(1, "t")];
+  const split = { kind: "split", direction: "right" };
+  expect(chooseAction(launch({}, null), { tty: false, tab: "t", instances: old })).toEqual(split);
+  expect(
+    chooseAction(launch({ stdin: true }, null), { tty: false, tab: "t", instances: old }),
+  ).toEqual(split);
+  expect(chooseAction(launch(), { tty: false, tab: "t", instances: old })).toEqual({
+    kind: "reuse",
+    instance: old[0],
+  });
+});
+
+test("a heading that matched nothing gives a warning", () => {
+  expect(headingWarning({ ok: true, heading: false }, "Nope")).toBe(
+    'mdb: no heading matches "Nope"',
+  );
+  expect(headingWarning({ ok: true, heading: true }, "Yes")).toBeNull();
+  expect(headingWarning({ ok: true, heading: false }, null)).toBeNull();
 });

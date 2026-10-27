@@ -63,8 +63,7 @@ export function parseArgs(
     pathGiven: paths.length > 0,
   });
 
-  if (title !== null && paths.length > 0)
-    return { error: "mdb: --title works only with stdin (-)" };
+  if (title !== null && paths.length > 0) return { error: "mdb: --title needs markdown on stdin" };
   if (stdin)
     return paths.length > 0 ? { error: "mdb: - takes no file or folder" } : launch(cwd, null);
   if (paths.length > 1) return { error: `mdb: expected one file or folder, got ${paths.length}` };

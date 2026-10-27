@@ -1,4 +1,4 @@
-import type { InstanceInfo } from "../core/registry.ts";
+import { type InstanceInfo, PROTOCOL } from "../core/registry.ts";
 import type { Direction, Launch } from "../shared/types.ts";
 
 export type Action =
@@ -17,7 +17,9 @@ export function chooseAction(launch: Launch, situation: Situation): Action {
   if (direction === null) return { kind: "here" };
   if (!launch.fresh && situation.tab !== null) {
     const instance = situation.instances.find((found) => found.tab === situation.tab);
-    if (instance) return { kind: "reuse", instance };
+    // An mdb from before folder and stdin tabs can take only a file.
+    const fits = launch.start.openPath !== null || (instance?.protocol ?? 0) >= PROTOCOL;
+    if (instance && fits) return { kind: "reuse", instance };
   }
   return { kind: "split", direction };
 }
@@ -57,6 +59,14 @@ export function reuseLine(result: unknown, shown: string): string {
   if (result === "updated") return `mdb: updated ${shown} in the mdb pane`;
   // "replaced", or an mdb from before tabs, which replaces the document.
   return `mdb: showing ${shown} in the mdb pane`;
+}
+
+/** The warning for a heading that matched nothing in the document mdb opened. */
+export function headingWarning(
+  reply: Record<string, unknown>,
+  heading: string | null,
+): string | null {
+  return heading && reply.heading === false ? `mdb: no heading matches "${heading}"` : null;
 }
 
 export function isGone(error: unknown): boolean {

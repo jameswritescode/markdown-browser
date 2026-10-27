@@ -2,12 +2,19 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { homedir } from "node:os";
 import { isAbsolute, join } from "node:path";
 
+/**
+ * What the control socket understands. 2: folders (`path: null`) and stdin documents.
+ * An mdb from before has no number.
+ */
+export const PROTOCOL = 2;
+
 export interface InstanceInfo {
   pid: number;
   socket: string;
   tab: string | null;
   /** The wait token this mdb was started with, so the CLI that started it can find it. */
   token: string | null;
+  protocol?: number;
   startedAt: number;
 }
 
@@ -36,6 +43,7 @@ export function registerInstance(
     socket: instanceSocket(env),
     tab,
     token,
+    protocol: PROTOCOL,
     startedAt: Date.now(),
   };
   writeFileSync(file, JSON.stringify(info));

@@ -26,8 +26,8 @@ mdb docs/plan.md --heading "Open questions"
 
 `--heading` matches the heading text without regard to case, or a heading id such as
 `open-questions`. If no heading matches, mdb opens the top of the document and its status
-line says "no heading matches". When mdb uses an existing pane, the command also prints a
-warning; when it opens a new pane, it does not.
+line says "no heading matches". When mdb uses an existing pane, or opens a new pane for stdin,
+the command also prints a warning; when it opens a new pane for a file, it does not.
 
 Other options:
 
@@ -52,7 +52,8 @@ tabs apart.
 
 ## Show markdown without a file
 
-Pipe markdown into `mdb -`. mdb writes no file, and the text is gone when the user closes the
+Pipe markdown into `mdb -`. mdb reads stdin until it ends. If it has not ended after 2 seconds,
+mdb writes `mdb: reading stdin until it ends`. mdb writes no file, and the text is gone when the user closes the
 tab. Relative links and images start from your current folder.
 
 ```sh
@@ -72,7 +73,7 @@ MD
 ```
 
 A pipe with the same title updates that tab in place, with its scroll position kept. mdb does
-not switch to the tab; the tab gets a dot. Add `--heading` to bring the tab to the front at a
+not switch to the tab. If the user does not see the tab, it gets a dot. Add `--heading` to bring the tab to the front at a
 section. Use one title for one document.
 
 A bare `mdb` with no file or folder reads a pipe on stdin. Do not run it with other text on

@@ -26,3 +26,11 @@ test("the store keeps and forgets documents", () => {
 test("a stdin document renders as a file in its base folder", () => {
   expect(docPathFor({ text: "", title: null, base: "/w" })).toBe("/w/stdin.md");
 });
+
+test("the store keeps the newer text when an older one comes late", () => {
+  const store = new StdinStore();
+  expect(store.put("k", { text: "new", title: null, base: "/w", sentAt: 2 })).toBe(true);
+  expect(store.put("k", { text: "old", title: null, base: "/w", sentAt: 1 })).toBe(false);
+  expect(store.get("k")?.text).toBe("new");
+  expect(store.put("k", { text: "newer", title: null, base: "/w", sentAt: 3 })).toBe(true);
+});

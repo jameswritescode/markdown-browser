@@ -13,7 +13,9 @@ export interface RemoteOpen {
   heading: string | null;
   mode: OpenMode;
   /** The text of a stdin document. `path` is then its key. */
-  content?: { key: string; text: string; title: string | null };
+  content?: { key: string; text: string; title: string | null; sentAt?: number };
+  /** The wait token of this mdb, when the open is the document it waits for. */
+  token?: string;
 }
 
 export type OpenResult = "tab" | "switched" | "replaced" | "updated";
@@ -60,7 +62,8 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
       cell.setAttribute("aria-selected", String(i === active));
       cell.classList.toggle("active", i === active);
       cell.classList.toggle("changed", changed.has(tab));
-      cell.title = tab.path() ?? tab.root();
+      const path = tab.path();
+      cell.title = path === null ? tab.root() : isStdinKey(path) ? labels[i]! : path;
       const close = el("button", "tab-close", "✕");
       close.type = "button";
       close.setAttribute("aria-label", "Close tab");
@@ -156,20 +159,43 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
     true,
   );
 
+  // The empty first tab of an mdb that a CLI started for one stdin document.
+  let waiting: Tab | null = null;
+
+  /** Ends the wait: the tab shows the file list, or closes when other tabs took the opens. */
+  const stopWaiting = () => {
+    const tab = waiting;
+    waiting = null;
+    if (!tab || !tabs.includes(tab) || tab.path() !== null) return;
+    if (tabs.length > 1) closeTab(tabs.indexOf(tab));
+    else void tab.showFinder();
+  };
+
   const openNow = async (request: RemoteOpen): Promise<Opened> => {
+    const claim = waiting !== null && !!request.token && request.token === start.waitToken;
+    try {
+      return await place(request, claim);
+    } finally {
+      if (claim) stopWaiting();
+    }
+  };
+
+  const place = async (request: RemoteOpen, claim: boolean): Promise<Opened> => {
     const { path, root, heading, content } = request;
     if (content)
       await window.mdb.putStdin(content.key, {
         text: content.text,
         title: content.title,
         base: root,
+        sentAt: content.sentAt,
       });
     const summaries = tabs.map((tab) => ({
       path: tab.path(),
       root: tab.root(),
       paths: tab.historyPaths(),
+      waiting: tab === waiting,
     }));
-    const route = routeOpen(summaries, active, request);
+    const route = routeOpen(summaries, active, { ...request, claim });
     if (route.kind === "update") {
       // The main process sent a change for the key; the reader re-renders it in place.
       const tab = tabs[route.index]!;
@@ -219,8 +245,9 @@ export function mountTabs(host: HTMLElement, start: StartOptions) {
       if (start.openPath) await first.open(start.openPath, { heading: start.heading });
       else if (start.waitToken) {
         // The CLI that started this mdb sends the document next; it lands in this empty tab.
+        waiting = first;
         setTimeout(() => {
-          if (tabs.includes(first) && first.path() === null) void first.showFinder();
+          if (waiting === first) stopWaiting();
         }, WAIT_FOR_OPEN_MS);
       } else await first.showFinder();
     },

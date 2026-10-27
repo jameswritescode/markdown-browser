@@ -44,8 +44,7 @@ export function registerIpc(
   });
   ipcMain.handle("mdb:put-stdin", (_event, key: string, doc: StdinDoc) => {
     const known = stdin.has(key);
-    stdin.put(key, doc);
-    if (known) contents()?.send("mdb:changed", key);
+    if (stdin.put(key, doc) && known) contents()?.send("mdb:changed", key);
   });
   ipcMain.on("mdb:forget-stdin", (_event, keys: string[]) => {
     for (const key of keys) stdin.forget(key);

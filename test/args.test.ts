@@ -126,7 +126,7 @@ test("--title names a stdin document", () => {
 });
 
 test("--title with a file or folder is an error", () => {
-  const error = { error: "mdb: --title works only with stdin (-)" };
+  const error = { error: "mdb: --title needs markdown on stdin" };
   expect(parseArgs([FIX("README.md"), "--title", "x"], "/w", {})).toEqual(error);
   expect(parseArgs([FIX("guide"), "--title", "x"], "/w", {})).toEqual(error);
 });

@@ -16,8 +16,12 @@ export function stdinKey(title: string | null): string {
 export class StdinStore {
   private docs = new Map<string, StdinDoc>();
 
-  put(key: string, doc: StdinDoc): void {
+  /** Stores the document, unless the stored one was read later. Returns false then. */
+  put(key: string, doc: StdinDoc): boolean {
+    const known = this.docs.get(key);
+    if (known && (known.sentAt ?? 0) > (doc.sentAt ?? 0)) return false;
     this.docs.set(key, doc);
+    return true;
   }
 
   get(key: string): StdinDoc | null {

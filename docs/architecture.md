@@ -50,7 +50,7 @@ flowchart LR
 4. In the main process, `src/main/main.tsx` reads the start options. It makes the pixel root, and shows the page in one transparent `WebView`.
 5. The page (`src/page/app.ts`) gets the start options with `window.mdb.start()`. It makes the first tab, and opens the file or the finder.
 
-Before step 3, the CLI reads stdin if you gave `-` or `--title`, or if you gave no file or folder and stdin is a pipe, a socket, or a file (`src/cli/stdin.ts`). Read [Stdin documents](#stdin-documents).
+Before step 3, the CLI reads stdin (`src/cli/stdin.ts`) in these cases: you gave `-`; or you gave no file or folder, and stdin is a pipe, a socket, or a file. With `--title`, that read waits for the end of stdin. Without `-` or `--title`, it stops if no text comes in 5 seconds. Read [Stdin documents](#stdin-documents).
 
 ## The page
 
@@ -113,14 +113,15 @@ A stdin document has no file. A key takes the place of its path everywhere in th
 - **Updates**: when the key is already in the store, `putStdin` sends `mdb:changed` for the key. The live reload path then renders it again, with the scroll position kept, and sets the dot on a background tab.
 - **No watchers**: the page and the main process both remove stdin keys from the watch list.
 - **Forget**: when a tab closes, the page calls `window.mdb.forgetStdin(keys)` for the stdin keys in its history that no other tab uses.
-- **A new mdb**: if no mdb runs, the CLI starts one with a random wait token in its start options (`waitToken`, or `--wait-token` in a new pane). That mdb writes the token in its registry record, and starts with an empty first tab. The CLI waits for the record, and then sends the text over the control socket. Thus the text never goes to disk, and has no length limit from the command line. If no open comes in 20 seconds, the empty tab shows the file list.
+- **A new mdb**: if no mdb runs, the CLI starts one with a random wait token in its start options (`waitToken`, or `--wait-token` in a new pane). That mdb writes the token in its registry record, and starts with an empty first tab. The CLI waits for the record, and then sends the text over the control socket. Thus the text never goes to disk, and has no length limit from the command line. The open that the CLI sends has the token too. Only that open can use the empty tab; other opens go to new tabs. After the open, or after 20 seconds with no open, the empty tab shows the file list, or closes if other tabs opened.
+- **Order**: the CLI sends the time at which it finished reading stdin (`sentAt`). The store does not replace a text with an older one, so a slow pipe cannot overwrite a newer pipe with the same title.
 - **Keys**: pixel reads keys from stdin, and it finds its pane from the name of the stdin terminal. When stdin was a pipe, the CLI opens the terminal device from `callerTty()` for pixel, and sets `PIXEL_TTY`.
 
 ## Panes and the control socket
 
 An mdb that an agent opens must be easy to find again. Two parts make this possible: the instance registry, and the control socket.
 
-- **Registry** (`src/core/registry.ts`): each running mdb writes `<pid>.json` in `~/.local/state/mdb/instances` (or `$XDG_STATE_HOME/mdb/instances`). The record has the process id, the socket path, the terminal tab, and the wait token. `listInstances` removes the records of processes that stopped.
+- **Registry** (`src/core/registry.ts`): each running mdb writes `<pid>.json` in `~/.local/state/mdb/instances` (or `$XDG_STATE_HOME/mdb/instances`). The record has the process id, the socket path, the terminal tab, the wait token, and the protocol version (`PROTOCOL`). An mdb with no protocol version is from before folder and stdin tabs. The CLI sends only a file to it, and opens a new pane for a folder or for stdin. `listInstances` removes the records of processes that stopped.
 - **Control socket** (`src/core/control.ts`): each mdb listens on `<pid>.sock` in the same folder. A message is one line of JSON. The open message is `{cmd: "open", path, root, heading, mode, content?}`. `path` is a file, a stdin key, or `null` for the file list of `root`. `content` holds the text of a stdin document. `openRequest` fills in `root` and `mode` for a message from an older mdb.
 - **Ready**: mdb writes its record only after the page calls `window.mdb.ready()`. Thus the CLI never finds an mdb that cannot open a document yet.
 
