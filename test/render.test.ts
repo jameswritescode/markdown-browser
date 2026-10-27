@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { expect, test } from "vitest";
-import { loadDoc, renderMarkdown } from "../src/core/render.ts";
+import { loadDoc, renderMarkdown, renderStdinDoc } from "../src/core/render.ts";
 import { FIX } from "./helpers.ts";
 
 const doc = renderMarkdown(readFileSync(FIX("README.md"), "utf8"), FIX("README.md"));
@@ -64,4 +64,21 @@ test("image query strings and hashes are dropped from local paths", () => {
   const r = renderMarkdown("![x](image.png?raw=true)\n\n![y](image.png#light)\n", FIX("README.md"));
   const href = pathToFileURL(FIX("image.png")).href;
   expect(r.html.match(new RegExp(`src="${href}"`, "g"))).toHaveLength(2);
+});
+
+test("a title override wins over the document's own title", () => {
+  const given = renderMarkdown("# Own\n\n![i](img.png)\n", "/w/stdin.md", "Given");
+  expect(given.title).toBe("Given");
+  expect(given.html).toMatch(/src="file:\/\/\/w\/img\.png/);
+  expect(renderMarkdown("# Own\n", "/w/stdin.md").title).toBe("Own");
+});
+
+test("a stdin document renders under its key, with links from its base folder", () => {
+  const doc = { text: "[u](usage.md)\n", title: null, base: "/w/docs" };
+  const rendered = renderStdinDoc("stdin:abc", doc);
+  expect(rendered.path).toBe("stdin:abc");
+  expect(rendered.title).toBe("stdin");
+  expect(rendered.html).toContain('href="usage.md"');
+  expect(renderStdinDoc("stdin:abc", { ...doc, text: "# Notes\n" }).title).toBe("Notes");
+  expect(renderStdinDoc("stdin:title:T", { ...doc, title: "T" }).title).toBe("T");
 });

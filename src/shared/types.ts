@@ -73,12 +73,22 @@ export interface Launch {
   title: string | null;
 }
 
+export interface StdinDoc {
+  text: string;
+  title: string | null;
+  /** The caller's folder. Relative links and images resolve against it. */
+  base: string;
+}
+
 export interface MdbBridge {
   start(): Promise<StartOptions>;
   scan(root: string): Promise<ScanResult>;
   search(root: string, query: string): Promise<SearchHit[]>;
   render(path: string): Promise<RenderedDoc | MissingDoc>;
   classifyLink(href: string, docPath: string): Promise<LinkTarget>;
+  /** Stores a stdin document in the main process. A known key re-renders as a change. */
+  putStdin(key: string, doc: StdinDoc): Promise<void>;
+  forgetStdin(keys: string[]): void;
   watch(paths: string[]): void;
   onChanged(cb: (path: string) => void): () => void;
   /** Watches these folders for markdown files that appear or go away. */

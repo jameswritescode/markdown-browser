@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
+import type { StdinDoc } from "../shared/types.ts";
+
+export type { StdinDoc };
 
 export const STDIN_PREFIX = "stdin:";
 const TITLE_PREFIX = `${STDIN_PREFIX}title:`;
@@ -15,13 +18,6 @@ export function stdinKey(title: string | null): string {
 
 export function isTitledStdinKey(path: string): boolean {
   return path.startsWith(TITLE_PREFIX);
-}
-
-export interface StdinDoc {
-  text: string;
-  title: string | null;
-  /** The caller's folder. Relative links and images resolve against it. */
-  base: string;
 }
 
 /** Holds stdin documents in memory only. Nothing is written to disk. */

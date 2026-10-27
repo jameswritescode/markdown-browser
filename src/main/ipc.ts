@@ -1,8 +1,9 @@
 import { ipcMain, shell, type WebContents } from "@zenbu-labs/pixel/electron";
 import { classifyLink, isOpenableUrl } from "../core/links.ts";
-import { loadDoc } from "../core/render.ts";
+import { loadDoc, renderStdinDoc } from "../core/render.ts";
 import { scanDocs } from "../core/scan.ts";
 import { searchDocs } from "../core/search.ts";
+import { type StdinDoc, StdinStore, docPathFor, isStdinKey } from "../core/stdin.ts";
 import type { ScanResult, StartOptions } from "../shared/types.ts";
 import { DocWatchers, FolderWatchers } from "./watcher.ts";
 
@@ -31,11 +32,28 @@ export function registerIpc(
   ipcMain.handle("mdb:search", async (_event, dir: string, query: string) =>
     searchDocs((await scan(dir)).docs, query),
   );
-  ipcMain.handle("mdb:render", (_event, path: string) => loadDoc(path));
-  ipcMain.handle("mdb:classify", (_event, href: string, docPath: string) =>
-    classifyLink(href, docPath),
+  const stdin = new StdinStore();
+  ipcMain.handle("mdb:render", (_event, path: string) => {
+    if (!isStdinKey(path)) return loadDoc(path);
+    const doc = stdin.get(path);
+    return doc ? renderStdinDoc(path, doc) : { missing: true, path };
+  });
+  ipcMain.handle("mdb:classify", (_event, href: string, docPath: string) => {
+    const doc = isStdinKey(docPath) ? stdin.get(docPath) : null;
+    return classifyLink(href, doc ? docPathFor(doc) : docPath);
+  });
+  ipcMain.handle("mdb:put-stdin", (_event, key: string, doc: StdinDoc) => {
+    const known = stdin.has(key);
+    stdin.put(key, doc);
+    if (known) contents()?.send("mdb:changed", key);
+  });
+  ipcMain.on("mdb:forget-stdin", (_event, keys: string[]) => {
+    for (const key of keys) stdin.forget(key);
+  });
+  // fs.watch on a stdin key would fail and retry for ever.
+  ipcMain.on("mdb:watch", (_event, paths: string[]) =>
+    watchers.set(paths.filter((path) => !isStdinKey(path))),
   );
-  ipcMain.on("mdb:watch", (_event, paths: string[]) => watchers.set(paths));
   const folders = new FolderWatchers((root) => contents()?.send("mdb:folder-changed", root));
   ipcMain.on("mdb:watch-folders", (_event, roots: string[]) => folders.set(roots));
   ipcMain.on("mdb:open-external", (_event, url: string) => {

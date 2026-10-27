@@ -12,6 +12,7 @@ import { type Frontmatter, splitFrontmatter } from "./frontmatter.ts";
 import { slugify } from "./heading.ts";
 import { safeDecode } from "./links.ts";
 import { titleOf } from "./scan.ts";
+import { type StdinDoc, docPathFor } from "./stdin.ts";
 
 const ALERT_TYPES = ["NOTE", "TIP", "IMPORTANT", "WARNING", "CAUTION"] as const;
 const ALERT_MARKER = new RegExp(`^\\[!(${ALERT_TYPES.join("|")})\\][ \\t]*(?:\\n|$)`, "i");
@@ -160,7 +161,11 @@ function frontmatterHtml(frontmatter: Frontmatter | null): string {
   return `<div class="frontmatter">${rows.join("")}</div>\n`;
 }
 
-export function renderMarkdown(source: string, docPath: string): RenderedDoc {
+export function renderMarkdown(
+  source: string,
+  docPath: string,
+  titleOverride: string | null = null,
+): RenderedDoc {
   const { frontmatter, body } = splitFrontmatter(source);
   const env = {};
   const tokens = markdown.parse(body, env);
@@ -168,7 +173,7 @@ export function renderMarkdown(source: string, docPath: string): RenderedDoc {
     frontmatterHtml(frontmatter) + markdown.renderer.render(tokens, markdown.options, env);
   return {
     path: docPath,
-    title: titleOf(source, basename(docPath)),
+    title: titleOverride ?? titleOf(source, basename(docPath)),
     html: sanitize(html, docPath),
     outline: outlineOf(tokens),
   };
@@ -182,4 +187,10 @@ export async function loadDoc(path: string): Promise<RenderedDoc | MissingDoc> {
     return { missing: true, path };
   }
   return renderMarkdown(source, path);
+}
+
+/** Renders a stdin document under its key, with URLs resolved against the caller's folder. */
+export function renderStdinDoc(key: string, doc: StdinDoc): RenderedDoc {
+  const title = doc.title ?? titleOf(doc.text, "stdin");
+  return { ...renderMarkdown(doc.text, docPathFor(doc), title), path: key };
 }
