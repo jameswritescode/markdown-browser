@@ -158,15 +158,42 @@ With `--split`, mdb first looks for an mdb in the same terminal tab. If it finds
 - If the current tab shows the file list, mdb shows the document in that tab.
 - If not, mdb opens the document in a new tab.
 
+For a folder, mdb opens the file list of the folder in a new tab. If a tab already shows the file list of that folder, mdb goes to that tab. With `--replace`, the current tab shows the file list.
+
 Thus, many agents in one terminal tab can show you documents in the same pane, and they do not replace the documents of each other.
 
 To show the document in the current tab, add `--replace`. Press `ctrl+[` in that tab to go back to the previous document.
 
-This works only for a file. For a folder, mdb always opens a new pane.
-
 To always open a new pane, add `--new`.
 
 mdb can find an mdb that it opened in a pane. In cmux, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
+
+### Show markdown from stdin
+
+mdb can show markdown that a different command writes. You do not need a file:
+
+```sh
+gh pr view 1 --json body -q .body | mdb -
+```
+
+- `mdb -` reads stdin until it ends. If stdin is empty, mdb writes `mdb: stdin is empty`.
+- `… | mdb`, with no file or folder, also reads stdin. If no text comes in 5 seconds, mdb shows the file list.
+- Relative links and images start from the current folder.
+- `esc` shows the file list of the current folder.
+
+mdb does not write the text to a file. When you close the tab, the text is gone.
+
+#### Give the document a title
+
+Use `--title` to name the document:
+
+```sh
+printf '# Done\n\n- Step one\n' | mdb --title "Work summary"
+```
+
+The tab shows the title. A later pipe with the same title updates the same tab, and keeps its scroll position. mdb does not go to the tab. A tab that you do not see gets a dot. To go to the tab, add `--heading`. The command writes `mdb: updated Work summary in the mdb pane`.
+
+Without `--title`, each pipe opens a new tab. The tab shows the title of the document, or `stdin`.
 
 ### Go to a heading
 

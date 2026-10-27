@@ -45,10 +45,12 @@ flowchart LR
 2. `parseArgs` (`src/core/args.ts`) makes a `Launch`. A `Launch` holds the start options (`StartOptions`: the folder, the file, the background, the heading, and the terminal tab), and the pane options (`--split`, `--size`, `--new`, `--replace`).
 3. `chooseAction` (`src/cli/launch.ts`) chooses one of three actions:
    - **here**: stdout is a terminal and there is no `--split`. The CLI starts pixel with the package folder and the start options as JSON. pixel starts Electron with `dist/main/main.js`.
-   - **reuse**: the CLI opens a file, a running mdb shows the same terminal tab, and there is no `--new`. The CLI sends the file to that mdb. Read [Panes and the control socket](#panes-and-the-control-socket).
+   - **reuse**: a running mdb shows the same terminal tab, and there is no `--new`. The CLI sends the file, the folder, or the stdin document to that mdb. Read [Panes and the control socket](#panes-and-the-control-socket).
    - **split**: in all other cases, the CLI asks the terminal for a new pane. The new pane runs `mdb` with the same options and a hidden `--tab` argument. If stdout is not a terminal (an agent's shell), the CLI acts as if you gave `--split right`.
 4. In the main process, `src/main/main.tsx` reads the start options. It makes the pixel root, and shows the page in one transparent `WebView`.
 5. The page (`src/page/app.ts`) gets the start options with `window.mdb.start()`. It makes the first tab, and opens the file or the finder.
+
+Before step 3, the CLI reads stdin if you gave `-` or `--title`, or if you gave no file or folder and stdin is a pipe, a socket, or a file (`src/cli/stdin.ts`). Read [Stdin documents](#stdin-documents).
 
 ## The page
 
@@ -103,20 +105,33 @@ The main process keeps one scan for each folder. Each tab can have a different f
 
 The page sends the paths of all the open documents with `window.mdb.watch(paths)`. `DocWatchers` (`src/main/watcher.ts`) keeps one file watcher for each path. When a file changes, the main process sends `mdb:changed` to the page. Each reader that shows that file renders it again, and keeps its scroll position. If the reader is in a background tab, the tab gets a dot.
 
+## Stdin documents
+
+A stdin document has no file. A key takes the place of its path everywhere in the page: in the history, in routing, and in the labels. With `--title`, the key is `stdin:title:<title>`, so a later pipe with that title finds the same tab. Without `--title`, the key is `stdin:<uuid>`. The page gets the key helpers from `src/shared/stdin-key.ts`, which has no Node imports.
+
+- **Storage**: the main process keeps the text in a `StdinStore` (`src/core/stdin.ts`), in memory only. The page puts the text there with `window.mdb.putStdin(key, doc)` before it routes the open. `mdb:render` and `mdb:classify` look up a key in the store. `renderStdinDoc` renders the text as if it were `stdin.md` in the caller's folder, so relative links and images work.
+- **Updates**: when the key is already in the store, `putStdin` sends `mdb:changed` for the key. The live reload path then renders it again, with the scroll position kept, and sets the dot on a background tab.
+- **No watchers**: the page and the main process both remove stdin keys from the watch list.
+- **Forget**: when a tab closes, the page calls `window.mdb.forgetStdin(keys)` for the stdin keys in its history that no other tab uses.
+- **A new mdb**: if no mdb runs, the CLI starts one with a random wait token in its start options (`waitToken`, or `--wait-token` in a new pane). That mdb writes the token in its registry record, and starts with an empty first tab. The CLI waits for the record, and then sends the text over the control socket. Thus the text never goes to disk, and has no length limit from the command line. If no open comes in 20 seconds, the empty tab shows the file list.
+- **Keys**: pixel reads keys from stdin, and it finds its pane from the name of the stdin terminal. When stdin was a pipe, the CLI opens the terminal device from `callerTty()` for pixel, and sets `PIXEL_TTY`.
+
 ## Panes and the control socket
 
 An mdb that an agent opens must be easy to find again. Two parts make this possible: the instance registry, and the control socket.
 
-- **Registry** (`src/core/registry.ts`): each running mdb writes `<pid>.json` in `~/.local/state/mdb/instances` (or `$XDG_STATE_HOME/mdb/instances`). The record has the process id, the socket path, and the terminal tab. `listInstances` removes the records of processes that stopped.
-- **Control socket** (`src/core/control.ts`): each mdb listens on `<pid>.sock` in the same folder. A message is one line of JSON. The open message is `{cmd: "open", path, root, heading, mode}`. `openRequest` fills in `root` and `mode` for a message from an older mdb.
+- **Registry** (`src/core/registry.ts`): each running mdb writes `<pid>.json` in `~/.local/state/mdb/instances` (or `$XDG_STATE_HOME/mdb/instances`). The record has the process id, the socket path, the terminal tab, and the wait token. `listInstances` removes the records of processes that stopped.
+- **Control socket** (`src/core/control.ts`): each mdb listens on `<pid>.sock` in the same folder. A message is one line of JSON. The open message is `{cmd: "open", path, root, heading, mode, content?}`. `path` is a file, a stdin key, or `null` for the file list of `root`. `content` holds the text of a stdin document. `openRequest` fills in `root` and `mode` for a message from an older mdb.
 - **Ready**: mdb writes its record only after the page calls `window.mdb.ready()`. Thus the CLI never finds an mdb that cannot open a document yet.
 
-When the main process gets an open message, it calls `window.mdbRemote.open()` in the page. `routeOpen` (`src/page/tab-route.ts`) then decides what to do, in this order:
+When the main process gets an open message, it calls `window.mdbRemote.open()` in the page. The page does one open at a time, so two pipes with the same title cannot make two tabs. `routeOpen` (`src/page/tab-route.ts`) then decides what to do, in this order:
 
-1. If a tab shows the file, go to that tab.
-2. If the front tab shows its finder, open the file in that tab.
-3. With `--replace`, open the file in the front tab.
-4. If not, open the file in a new tab.
+1. If a tab has the titled stdin key anywhere in its history, update that tab. Do not go to it, unless the message has a heading.
+2. For a folder: if a tab shows the file list of that folder, go to that tab. With `--replace`, show the file list in the front tab. If not, open the file list in a new tab.
+3. If a tab shows the file, go to that tab.
+4. If the front tab shows its finder, open the file in that tab.
+5. With `--replace`, open the file in the front tab.
+6. If not, open the file in a new tab.
 
 The reply tells the CLI what occurred. The CLI prints the line from `reuseLine`.
 

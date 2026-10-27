@@ -89,6 +89,8 @@ After you change the code or get new commits, run `pnpm build` again. You do not
 | `mdb`           | Shows the markdown files in the current folder.                      |
 | `mdb <folder>`  | Shows the markdown files in `<folder>`.                              |
 | `mdb <file.md>` | Opens `<file.md>`.                                                   |
+| `mdb -`         | Shows the markdown on stdin.                                         |
+| `… \| mdb`      | Shows the markdown on stdin, if it comes in 5 seconds.               |
 | `mdb --solid`   | Uses the terminal background color. The default page is transparent. |
 | `mdb --help`    | Shows the usage text.                                                |
 
@@ -96,13 +98,14 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 
 ### More options
 
-| Option                | Result                                                            |
-| --------------------- | ----------------------------------------------------------------- |
-| `--heading <text>`    | Goes to the first heading that matches `<text>`.                  |
-| `--split <direction>` | Opens mdb in a new pane: `right`, `left`, `down`, or `up`.        |
-| `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.              |
-| `--new`               | Opens a new pane, also when this terminal tab already shows mdb.  |
-| `--replace`           | Shows the file in the current tab of the mdb pane, not a new tab. |
+| Option                | Result                                                             |
+| --------------------- | ------------------------------------------------------------------ |
+| `--heading <text>`    | Goes to the first heading that matches `<text>`.                   |
+| `--title <text>`      | Names the stdin document. A later pipe with this title updates it. |
+| `--split <direction>` | Opens mdb in a new pane: `right`, `left`, `down`, or `up`.         |
+| `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.               |
+| `--new`               | Opens a new pane, also when this terminal tab already shows mdb.   |
+| `--replace`           | Shows the file in the current tab of the mdb pane, not a new tab.  |
 
 For more information about panes, read [Panes and coding agents](docs/usage.md#panes-and-coding-agents).
 
@@ -111,6 +114,8 @@ For more information about panes, read [Panes and coding agents](docs/usage.md#p
 mdb has a skill for Claude Code and Codex. With the skill, an agent can show you a document in a pane next to the conversation. For example, an agent can show you a plan that it wrote, at the section that it is talking about.
 
 All agents in one terminal tab use the same mdb pane. Each document opens in its own tab in that pane, so an agent does not replace the document of a different agent.
+
+An agent can also pipe markdown into mdb, with no file. For example, an agent can keep a summary of its work in one tab: `… | mdb --title "Work summary"`. Each pipe with the same title updates that tab.
 
 To install the skill, run this command:
 

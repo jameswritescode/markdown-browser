@@ -169,6 +169,7 @@ diff -r build/baseline build/after
 | `shell.json`        | The first screen when mdb starts in a folder.                                   |
 | `remote.json`       | `--heading`, and documents sent with `window.mdbRemote.open`.                   |
 | `tabs.json`         | Tabs: routing, keys, find in many tabs, background reload, labels, and closing. |
+| `stdin.json`        | Stdin documents: titled updates, two opens at once, links, folder tabs, forget. |
 
 `showcase.json` and `live.json` each show one `Diagram error` result. This is correct: `docs/showcase.md` has a diagram with an error on purpose.
 
@@ -195,7 +196,13 @@ node bin/mdb.js docs/showcase.md --split right --new
 node bin/mdb.js docs/usage.md                # opened … in a tab in the mdb pane
 node bin/mdb.js docs/showcase.md --heading tables   # switched to …
 node bin/mdb.js README.md --replace          # showing … in the mdb pane
+node bin/mdb.js docs                         # opened the file list of docs in a tab …
+printf '# One\n' | node bin/mdb.js --title Check   # opened Check in a tab …
+printf '# Two\n' | node bin/mdb.js --title Check   # updated Check in the mdb pane
+node bin/mdb.js - </dev/null                 # mdb: stdin is empty
 ```
+
+To check a pipe into mdb in the current pane, run `printf '# Hi\n' | node bin/mdb.js` in a shell pane, and make sure that the keys work. `cmux send-key` does not reach mdb. To quit mdb from a script, send the raw byte: `cmux send --surface <surface> $'\x03'`.
 
 Run `pnpm build` before these commands. An mdb that is already open uses its old code. Quit it with `ctrl+q`, or open a new pane with `--new`.
 

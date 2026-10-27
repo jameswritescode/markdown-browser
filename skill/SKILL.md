@@ -16,7 +16,7 @@ Your shell has no terminal, so mdb opens a pane to the right of the user's pane.
 If this terminal tab already shows mdb, mdb opens the file in a new tab in that pane
 instead of opening a new pane. If a tab there already shows the file, mdb goes to that
 tab. Other agents in the same terminal tab can use the same pane, and each document keeps
-its own tab. (A folder always opens a new pane.)
+its own tab. A folder opens its file list in a new tab in that pane.
 
 Point the user at a section:
 
@@ -44,11 +44,39 @@ that is open, mdb goes to its tab and does not open a copy; add `--heading` to p
 section that you changed.
 
 The command prints what it did: `opened … in a new pane`, `opened … in a tab in the mdb pane`,
-`switched to … in the mdb pane`, or `showing … in the mdb pane`.
+`switched to … in the mdb pane`, `showing … in the mdb pane`, or `updated … in the mdb pane`.
 
 A tab shows the title of its document: the frontmatter `title`, else the first `# heading`, else
 the file name. Give each document that you write a clear title, so that the user can tell the
 tabs apart.
+
+## Show markdown without a file
+
+Pipe markdown into `mdb -`. mdb writes no file, and the text is gone when the user closes the
+tab. Relative links and images start from your current folder.
+
+```sh
+gh pr view 1 --json body -q .body | mdb -
+```
+
+To keep a running summary of your work, give it a title. After each step, pipe the full summary
+again:
+
+```sh
+cat <<'MD' | mdb --title "Work summary"
+# Work summary
+
+- Added the parser.
+- Next: the tests.
+MD
+```
+
+A pipe with the same title updates that tab in place, with its scroll position kept. mdb does
+not switch to the tab; the tab gets a dot. Add `--heading` to bring the tab to the front at a
+section. Use one title for one document.
+
+A bare `mdb` with no file or folder reads a pipe on stdin. Do not run it with other text on
+stdin.
 
 ## When to use it
 
