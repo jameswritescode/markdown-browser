@@ -112,7 +112,7 @@
     },
     {
       "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
-      "expect": [1, 87]
+      "expect": [1, 100]
     },
     {
       "key": "h",
@@ -134,7 +134,7 @@
     },
     {
       "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
-      "expect": [1, 87]
+      "expect": [1, 100]
     },
     {
       "key": "t",

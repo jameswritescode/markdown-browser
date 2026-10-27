@@ -19,7 +19,7 @@
       "wait": 500
     },
     {
-      "eval": "[T.labels(), T.active(), document.querySelector('.tab-pane:not(.background) .where').textContent.startsWith('Work summary \u00b7 2 of 2')]",
+      "eval": "[T.labels(), T.active(), document.querySelector('.tab-pane:not(.background) .where').textContent.startsWith('Work summary · 2 of 2')]",
       "expect": [["Markdown showcase", "Work summary"], 1, true]
     },
     {
@@ -86,7 +86,7 @@
     },
     {
       "eval": "[T.labels()[3], T.active()]",
-      "expect": ["Files \u00b7 docs", 3]
+      "expect": ["Files · docs", 3]
     },
     {
       "eval": "T.folder('test/fixtures/docs')",
