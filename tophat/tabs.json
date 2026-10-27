@@ -1,5 +1,5 @@
 {
-  "args": ["../docs/showcase.md"],
+  "args": ["../test/fixtures/pages/showcase.md"],
   "out": "../build/tophat/tabs",
   "width": 1200,
   "height": 700,
@@ -40,7 +40,7 @@
       "expect": [true, 1]
     },
     {
-      "eval": "T.open('docs/usage.md')",
+      "eval": "T.open('test/fixtures/pages/usage.md')",
       "expect": "tab"
     },
     {
@@ -61,7 +61,7 @@
       "shot": "two-tabs"
     },
     {
-      "eval": "T.open('docs/showcase.md', 'tab', 'tables')",
+      "eval": "T.open('test/fixtures/pages/showcase.md', 'tab', 'tables')",
       "expect": "switched"
     },
     {
@@ -112,7 +112,7 @@
     },
     {
       "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
-      "expect": [1, 100]
+      "expect": [1, 61]
     },
     {
       "key": "h",
@@ -134,7 +134,7 @@
     },
     {
       "eval": "[T.active(), CSS.highlights.get('mdb-find')?.size ?? 0]",
-      "expect": [1, 100]
+      "expect": [1, 61]
     },
     {
       "key": "t",
@@ -147,7 +147,7 @@
       "eval": "[T.state(), document.activeElement?.classList.contains('query'), document.querySelector('.tab-pane:not(.background) .reader:not([hidden]) .where')?.textContent ?? document.querySelector('.tab-pane:not(.background) .finder .hints')?.textContent]",
       "expect": [
         {
-          "labels": ["Markdown showcase", "mdb usage guide", "Files · docs"],
+          "labels": ["Markdown showcase", "mdb usage guide", "Files · pages"],
           "active": 2,
           "title": "mdb"
         },
@@ -174,7 +174,7 @@
       "modifiers": ["control"]
     },
     {
-      "eval": "T.open('docs/usage.md')",
+      "eval": "T.open('test/fixtures/pages/usage.md')",
       "expect": "switched"
     },
     {
@@ -183,7 +183,7 @@
     {
       "eval": "T.state()",
       "expect": {
-        "labels": ["Markdown showcase", "mdb usage guide", "Files · docs"],
+        "labels": ["Markdown showcase", "mdb usage guide", "Files · pages"],
         "active": 1,
         "title": "mdb usage guide"
       }
@@ -205,13 +205,13 @@
     {
       "eval": "T.state()",
       "expect": {
-        "labels": ["Markdown showcase", "mdb usage guide", "Files · docs", "Fixture Docs"],
+        "labels": ["Markdown showcase", "mdb usage guide", "Files · pages", "Fixture Docs"],
         "active": 3,
         "title": "Fixture Docs"
       }
     },
     {
-      "eval": "T.open('docs/showcase.md', 'replace')",
+      "eval": "T.open('test/fixtures/pages/showcase.md', 'replace')",
       "expect": "switched"
     },
     {
@@ -220,14 +220,14 @@
     {
       "eval": "T.state()",
       "expect": {
-        "labels": ["Markdown showcase", "mdb usage guide", "Files · docs", "Fixture Docs"],
+        "labels": ["Markdown showcase", "mdb usage guide", "Files · pages", "Fixture Docs"],
         "active": 0,
         "title": "Markdown showcase"
       }
     },
     {
       "eval": "document.querySelector('.tab-pane:not(.background) .where').textContent + ' | ' + document.querySelector('.tab-pane:not(.background) .reader .hints').textContent",
-      "expect": "showcase.md · 1 of 4 · 41% | / find · esc files · ctrl+b outline · ctrl+[ back · ctrl+t new tab · ctrl+w close"
+      "expect": "showcase.md · 1 of 4 · 65% | / find · esc files · ctrl+b outline · ctrl+[ back · ctrl+t new tab · ctrl+w close"
     },
     {
       "eval": "T.open('build/tophat/tabs-live.md')",
@@ -337,10 +337,10 @@
         "labels": [
           "Markdown showcase",
           "mdb usage guide",
-          "Files · docs",
+          "Files · pages",
           "Fixture Docs",
           "Live",
-          "Files · docs"
+          "Files · pages"
         ],
         "active": 5,
         "title": "mdb"
@@ -356,7 +356,7 @@
           "labels": [
             "Markdown showcase",
             "mdb usage guide",
-            "Files · docs",
+            "Files · pages",
             "Fixture Docs",
             "Live"
           ],
@@ -411,7 +411,7 @@
           "labels": [
             "Markdown showcase",
             "mdb usage guide",
-            "Files · docs",
+            "Files · pages",
             "Fixture Docs",
             "Live",
             "One",

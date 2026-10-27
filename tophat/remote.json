@@ -1,5 +1,5 @@
 {
-  "args": ["../docs/showcase.md", "--heading", "tables"],
+  "args": ["../test/fixtures/pages/showcase.md", "--heading", "tables"],
   "out": "../build/tophat/remote",
   "width": 1000,
   "height": 600,
@@ -15,7 +15,7 @@
       "shot": "start-heading"
     },
     {
-      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'docs/usage.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Outline', mode: 'replace' }) })()",
+      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'test/fixtures/pages/usage.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Outline', mode: 'replace' }) })()",
       "expect": {
         "heading": true,
         "result": "replaced"
@@ -29,7 +29,7 @@
       "expect": ["mdb usage guide", 16]
     },
     {
-      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'docs/showcase.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Nothing like this', mode: 'replace' }) })()",
+      "eval": "(() => { const path = location.pathname.replace(/dist\\/page\\/index.html$/, 'test/fixtures/pages/showcase.md'); return window.mdbRemote.open({ path, root: path.slice(0, path.lastIndexOf('/')), heading: 'Nothing like this', mode: 'replace' }) })()",
       "expect": {
         "heading": false,
         "result": "replaced"

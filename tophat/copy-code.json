@@ -1,5 +1,5 @@
 {
-  "args": ["../docs/showcase.md"],
+  "args": ["../test/fixtures/pages/showcase.md"],
   "out": "../build/tophat/copy-code",
   "width": 1200,
   "height": 700,
@@ -9,7 +9,7 @@
     },
     {
       "eval": "[document.querySelectorAll('.markdown-body pre > code').length, document.querySelectorAll('.copy-code').length, document.querySelectorAll('.frontmatter-raw .copy-code').length]",
-      "expect": [10, 10, 0]
+      "expect": [3, 3, 0]
     },
     {
       "hover": ".code-block"

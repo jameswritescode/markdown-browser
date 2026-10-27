@@ -124,6 +124,7 @@ tophat reads `args` before it does the steps. Thus, if mdb must start in a folde
 
 ### Write a good script
 
+- **Use fixture documents, not the real docs.** Open files in `test/fixtures/`, or write them in the script with `write`. An `expect` value that comes from `docs/` or the README (a count, a title, a scroll position) breaks when someone edits that document. Only `showcase.json` uses `docs/showcase.md`, because it checks that document. Do not change `test/fixtures/pages/` to show a new feature: change `docs/showcase.md`.
 - **Check results with `eval`.** A screenshot shows how the page looks, but an `eval` result is exact and is easy to compare. Return arrays or objects that show many values at once, for example `[document.title, document.querySelectorAll('.tab').length]`.
 - **Use `?.` in `eval`.** Write `document.querySelector('.x')?.textContent`, not `document.querySelector('.x').textContent`. Then a missing element gives `null`, not an error.
 - **Wait after an action.** A render, a scan, and a file change take time. Use `wait` steps of 200 to 1,500 ms. A file change needs more than 500 ms, because the watchers wait before they tell the page.

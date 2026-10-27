@@ -1,5 +1,5 @@
 {
-  "args": ["../docs/showcase.md"],
+  "args": ["../test/fixtures/pages/showcase.md"],
   "out": "../build/tophat/stdin",
   "width": 1200,
   "height": 700,
@@ -8,7 +8,7 @@
       "wait": 1000
     },
     {
-      "eval": "(window.T = { repo: location.pathname.replace(/dist\\/page\\/index.html$/, ''), put: (title, text, heading = null) => window.mdbRemote.open({ path: 'stdin:title:' + title, root: T.repo + 'docs', heading, mode: 'tab', content: { key: 'stdin:title:' + title, text, title } }).then((x) => x.result), folder: (r) => window.mdbRemote.open({ path: null, root: T.repo + r, heading: null, mode: 'tab' }).then((x) => x.result), labels: () => [...document.querySelectorAll('.tab .tab-label')].map((t) => t.textContent), active: () => [...document.querySelectorAll('.tab')].findIndex((t) => t.classList.contains('active')), dots: () => [...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed')) }) && true",
+      "eval": "(window.T = { repo: location.pathname.replace(/dist\\/page\\/index.html$/, ''), put: (title, text, heading = null) => window.mdbRemote.open({ path: 'stdin:title:' + title, root: T.repo + 'test/fixtures/pages', heading, mode: 'tab', content: { key: 'stdin:title:' + title, text, title } }).then((x) => x.result), folder: (r) => window.mdbRemote.open({ path: null, root: T.repo + r, heading: null, mode: 'tab' }).then((x) => x.result), labels: () => [...document.querySelectorAll('.tab .tab-label')].map((t) => t.textContent), active: () => [...document.querySelectorAll('.tab')].findIndex((t) => t.classList.contains('active')), dots: () => [...document.querySelectorAll('.tab')].map((t) => t.classList.contains('changed')) }) && true",
       "expect": true
     },
     {
@@ -21,6 +21,10 @@
     {
       "eval": "[T.labels(), T.active(), document.querySelector('.tab-pane:not(.background) .where').textContent.startsWith('Work summary · 2 of 2')]",
       "expect": [["Markdown showcase", "Work summary"], 1, true]
+    },
+    {
+      "eval": "document.querySelectorAll('.tab')[1].title",
+      "expect": "Work summary"
     },
     {
       "shot": "summary"
@@ -104,7 +108,7 @@
       "expect": [false, true, false, false]
     },
     {
-      "eval": "window.mdbRemote.open({ path: 'stdin:title:Work summary', root: T.repo + 'docs', heading: 'Next steps', mode: 'tab', content: { key: 'stdin:title:Work summary', text: '# Draft\\n\\nStep four.\\n\\n## Next steps\\n\\nMore.', title: 'Work summary' } }).then((x) => [x.result, x.heading])",
+      "eval": "window.mdbRemote.open({ path: 'stdin:title:Work summary', root: T.repo + 'test/fixtures/pages', heading: 'Next steps', mode: 'tab', content: { key: 'stdin:title:Work summary', text: '# Draft\\n\\nStep four.\\n\\n## Next steps\\n\\nMore.', title: 'Work summary' } }).then((x) => [x.result, x.heading])",
       "expect": ["updated", true]
     },
     {

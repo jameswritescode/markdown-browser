@@ -1,5 +1,5 @@
 {
-  "args": ["../docs"],
+  "args": ["../test/fixtures/pages"],
   "out": "../build/tophat/wide",
   "width": 1600,
   "height": 700,
