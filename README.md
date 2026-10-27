@@ -185,6 +185,8 @@ If you installed the agent skill, also remove `~/.claude/skills/mdb` and `~/.cod
 
 To use your changes as the `mdb` command, install mdb [from a local copy](#from-a-local-copy).
 
+To learn how mdb works, read [mdb architecture](docs/architecture.md).
+
 1. Install the tools and the dependencies:
 
    ```sh
