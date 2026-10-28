@@ -88,6 +88,31 @@ stdin.
 Do not use it for short answers. Tell the user in one line what you opened, for example
 "I opened the plan in mdb, at Open questions."
 
+## Diagrams
+
+mdb draws Mermaid diagrams in the colors of the terminal. To make a part of a flowchart
+easy to see, give it a style:
+
+```mermaid
+flowchart LR
+  A[Request] --> B[Cache] --> C[Database]
+  classDef focus stroke-width:3px,font-weight:bold
+  classDef risk fill:#e45756,color:#fff
+  class B focus
+  class C risk
+  linkStyle 1 stroke:#e45756,stroke-width:2px
+```
+
+- Use `style`, `classDef` with `class`, and `linkStyle`.
+- Use styles only in `flowchart` (or `graph`) diagrams. Other diagram types, such as
+  `sequenceDiagram`, do not accept these lines, and mdb shows an error instead of the diagram.
+- Charts, such as `pie`, get their colors from mdb. You cannot change these colors.
+- Do not use `%%{init}%%`. mdb ignores it.
+- Use color only to show what is important, for example the changed part, the risk, or the
+  path that you talk about. Do not color all nodes.
+- The user's terminal can have a dark or a light background. When you set `fill`, also set
+  `color`, so that the text is easy to read.
+
 ## If it fails
 
 - `cannot open panes`: the terminal cannot be scripted. Ask the user to run the `mdb` command

@@ -111,7 +111,7 @@ If you delete the file, mdb shows "This file no longer exists". Press `esc` to g
 
 ### Diagrams
 
-mdb uses Pele to draw Mermaid diagrams. Pele uses the colors of your terminal. Pele ignores `%%{init}%%` theme settings in a diagram.
+mdb uses Pele to draw Mermaid diagrams. Pele uses the colors of your terminal. Pele ignores `%%{init}%%` theme settings in a diagram. In a flowchart, you can set the colors of nodes and lines with `style`, `classDef` and `class`, and `linkStyle`.
 
 If a diagram has an error, mdb shows the diagram text and the error message.
 
