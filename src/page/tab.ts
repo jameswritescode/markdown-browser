@@ -64,10 +64,7 @@ export function createTab(host: HTMLElement, startRoot: string, hooks: TabHooks)
         scan,
         isActive: hooks.isActive,
         hints: hooks.hints,
-        onOpen: (path, find) => {
-          finder?.hide();
-          void reader.open(path, { find });
-        },
+        onOpen: (path, find) => void open(path, { find }),
       });
     }
     finder.show();
@@ -79,9 +76,11 @@ export function createTab(host: HTMLElement, startRoot: string, hooks: TabHooks)
     if (changed === root && finder && !reader.currentPath()) void rescan();
   });
 
-  const open = (path: string, options: { heading?: string | null; find?: string } = {}) => {
+  // The finder stays on screen until the reader has the new document.
+  const open = async (path: string, options: { heading?: string | null; find?: string } = {}) => {
+    const opened = await reader.open(path, options);
     finder?.hide();
-    return reader.open(path, options);
+    return opened;
   };
 
   return {

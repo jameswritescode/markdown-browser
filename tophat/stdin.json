@@ -67,8 +67,15 @@
       ]
     },
     {
-      "key": "h",
-      "modifiers": ["control"]
+      "eval": "T.put('Twice', '# Again\\n\\nA third time.').then((r) => (document.querySelectorAll('.tab')[1].click(), r))",
+      "expect": "updated"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "eval": "T.dots()",
+      "expect": [false, false, false]
     },
     {
       "eval": "document.querySelector('.tab-pane:not(.background) .reader-scroll').querySelector('a[href=\"usage.md\"]').click() ?? true",

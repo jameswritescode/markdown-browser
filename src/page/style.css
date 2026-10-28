@@ -297,6 +297,13 @@ mark.hit {
   height: 100%;
 }
 
+.reader.loading {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .reader-content {
   display: flex;
   flex: 1;

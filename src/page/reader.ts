@@ -365,8 +365,10 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
 
   const unsubscribe = window.mdb.onChanged(async (path) => {
     if (root.hidden || history.current?.path !== path) return;
+    // The user saw the change if the tab was in front when it came, not when the render ended.
+    const unseen = !opts.isActive();
     await render(path, scroller.scrollTop, null);
-    if (!opts.isActive()) opts.onReload(path);
+    if (unseen) opts.onReload(path);
   });
 
   const showMatchStep = (by: 1 | -1) => {
@@ -375,8 +377,12 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
     showMatch();
   };
 
+  // Opens that render out of sight; see open().
+  let loads = 0;
+
   const onKey = (event: KeyboardEvent) => {
-    if (root.hidden || !opts.isActive() || event.target === findInput) return;
+    if (root.hidden || root.classList.contains("loading") || !opts.isActive()) return;
+    if (event.target === findInput) return;
     const plain = !event.metaKey && !event.ctrlKey && !event.altKey;
     const page = scroller.clientHeight * 0.9;
     if (event.key === "Escape" && findRanges.length) clearFind();
@@ -426,8 +432,19 @@ export function mountReader(host: HTMLElement, opts: ReaderOptions) {
   return {
     async open(path: string, { find, heading }: { find?: string; heading?: string | null } = {}) {
       pendingFind = find?.trim() || null;
+      // A hidden reader still has its last document. It renders the new one out of sight, with
+      // its layout, so that the last document does not flash and scrolling works.
+      const hiding = root.hidden || loads > 0;
+      if (hiding) {
+        loads++;
+        root.classList.add("loading");
+      }
       root.hidden = false;
-      return { heading: await navigate(path, null, heading?.trim() || null) };
+      try {
+        return { heading: await navigate(path, null, heading?.trim() || null) };
+      } finally {
+        if (hiding && --loads === 0) root.classList.remove("loading");
+      }
     },
     show() {
       root.hidden = false;

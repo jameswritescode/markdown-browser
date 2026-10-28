@@ -1,0 +1,37 @@
+{
+  "args": ["../test/fixtures/docs/README.md"],
+  "out": "../build/tophat/reopen",
+  "width": 1000,
+  "height": 500,
+  "steps": [
+    {
+      "wait": 600
+    },
+    {
+      "key": "Escape"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "eval": "window.seen = new Set(); const watch = () => { const reader = document.querySelector('.reader'); if (reader.checkVisibility({ visibilityProperty: true })) window.seen.add(reader.querySelector('h1')?.textContent ?? ''); requestAnimationFrame(watch); }; watch(); 'watching'",
+      "expect": "watching"
+    },
+    {
+      "type": "setup"
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "eval": "[...window.seen]",
+      "expect": ["Setup Guide"]
+    },
+    {
+      "shot": "1-second-doc"
+    }
+  ]
+}

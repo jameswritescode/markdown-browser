@@ -159,6 +159,7 @@ diff -r build/baseline build/after
 | `finder-fresh.json` | New, renamed, and deleted files show in the file list.                          |
 | `search-open.json`  | A document opened from text search, with the matches highlighted.               |
 | `reader.json`       | The reader, the outline, a link to a different document, and `esc` to the list. |
+| `reopen.json`       | A second document opened from the list does not show the first one first.       |
 | `navigation.json`   | The page cannot navigate away from mdb.                                         |
 | `find.json`         | Find in the document, and the scroll keys.                                      |
 | `live.json`         | Live reload, a deleted file, and a diagram error.                               |
