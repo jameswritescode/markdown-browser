@@ -10,21 +10,23 @@ mdb uses [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel)
 
 - macOS.
 - A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, cmux, or Rex.
-- Node.js 24 and pnpm.
-- Read access to this GitHub repository.
+- Node.js 24.
+- pnpm or npm.
 
 ## Install
 
 You can install mdb in two ways:
 
-- [From GitHub Packages](#from-github-packages). Use this to use mdb.
+- [From npm](#from-npm). Use this to use mdb.
 - [From a local copy](#from-a-local-copy). Use this to change mdb and use your changes.
 
 The two installs have the same name. When you install one, it replaces the other.
 
-### From GitHub Packages
+### From npm
 
-mdb is a private package in GitHub Packages.
+mdb is the package `@jamesnewton/mdb` on npm. The command is `mdb`.
+
+With pnpm:
 
 1. Make sure that the pnpm global bin folder is in your `PATH`. If it is not, run this command one time:
 
@@ -32,27 +34,23 @@ mdb is a private package in GitHub Packages.
    pnpm setup
    ```
 
-2. Give pnpm access to GitHub Packages. Do this one time on each computer:
+2. Install mdb:
 
    ```sh
-   gh auth refresh -s read:packages
-   echo "@jameswritescode:registry=https://npm.pkg.github.com" >> ~/.npmrc
-   echo "//npm.pkg.github.com/:_authToken=$(gh auth token)" >> ~/.npmrc
+   pnpm add -g --config.side-effects-cache=false --allow-build=@zenbu-labs/pixel @jamesnewton/mdb
    ```
-
-   If pnpm shows an error 401, make a classic personal access token with the `read:packages` scope on GitHub. Put that token in `~/.npmrc` in place of the `gh` token.
-
-3. Install mdb:
-
-   ```sh
-   pnpm add -g --config.side-effects-cache=false --allow-build=@zenbu-labs/pixel @jameswritescode/mdb
-   ```
-
-To update mdb, do step 3 again. You get the most recent release. If you use the [agent skill](#use-mdb-with-coding-agents), also run `mdb skill install` again.
 
 The `--allow-build` option lets pixel download its Electron runtime during the install.
 
 The `--config.side-effects-cache=false` option is necessary. If you do not use it, pnpm can copy Electron from its cache without the correct links. Then macOS shows the message "Electron is damaged" and does not start mdb.
+
+With npm:
+
+```sh
+npm install -g @jamesnewton/mdb
+```
+
+To update mdb, run the install command again. You get the most recent release. If you use the [agent skill](#use-mdb-with-coding-agents), also run `mdb skill install` again.
 
 ### From a local copy
 
@@ -184,7 +182,13 @@ mdb docs/showcase.md
 This command removes both types of install:
 
 ```sh
-pnpm rm -g @jameswritescode/mdb
+pnpm rm -g @jamesnewton/mdb
+```
+
+If you installed mdb with npm, use this command:
+
+```sh
+npm rm -g @jamesnewton/mdb
 ```
 
 If you installed the agent skill, also remove `~/.claude/skills/mdb` and `~/.codex/skills/mdb`.
@@ -241,7 +245,9 @@ Publish only from `main`.
 
    The "Publish" workflow runs the checks and publishes the package. It stops if the tag is not on `main`, or if the tag does not agree with the version in `package.json`.
 
-You can also publish from your computer. Your token must have the `write:packages` scope. Run `gh auth refresh -s write:packages`, then put the new `gh auth token` in `~/.npmrc`. On `main`, run:
+The workflow publishes to npm as a trusted publisher, so it needs no token. The package settings on npmjs.com must name this repository and `publish.yml` as the trusted publisher.
+
+You can also publish from your computer. You must be logged in to npm with an account that can publish `@jamesnewton/mdb`. Run `npm login` one time. On `main`, run:
 
 ```sh
 pnpm publish
@@ -255,3 +261,11 @@ For the full guide, read [Testing mdb](docs/testing.md).
 
 - `pnpm tophat:all` runs all the scripts in `tophat/` and fails if a check fails. `pnpm tophat <script.json>` runs one script. tophat opens the mdb page in an offscreen window. It sends the keys in the script and saves screenshots and page text. The scripts are in `tophat/`. The output goes to `build/tophat/`.
 - `pnpm smoke [file or folder]` starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors to its log.
+
+## Acknowledgements
+
+[terminal-browser](https://github.com/zenbu-labs/terminal-browser) by Zenbu Labs gave the idea for mdb. mdb draws into the terminal with [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel), the library that terminal-browser uses. [Pele](https://github.com/obsidianmd/pele) draws the Mermaid diagrams.
+
+## License
+
+mdb is under the [MIT license](LICENSE). Some code comes from other projects. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) gives their licenses.

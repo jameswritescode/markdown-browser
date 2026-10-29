@@ -169,7 +169,7 @@ The host is the terminal that mdb runs in. `findHost` (`src/cli/host.ts`) gives 
 | `dist/main/preload.js` | `src/main/preload.ts` | The page, before the page scripts        |
 | `dist/page/app.js`     | `src/page/app.ts`     | The page                                 |
 
-The build also copies `index.html` and `style.css` to `dist/page/`. `dist/` is not in git. `pnpm build` makes it, and `pnpm publish` builds it before it publishes.
+The build also copies `index.html` and `style.css` to `dist/page/`. It also writes `dist/THIRD_PARTY_LICENSES.txt`. That file has the license text of each package that the bundles contain. The build finds these packages in the esbuild metafiles. `dist/` is not in git. `pnpm build` makes it, and `pnpm publish` builds it before it publishes.
 
 ## Security
 

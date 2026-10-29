@@ -1,3 +1,5 @@
+// Adapted from pixel's context menu (terminal-browser, pixel/packages/pixel/src/context-menu.tsx),
+// MIT, Copyright 2026 Zenbu Labs, Inc. See THIRD_PARTY_NOTICES.md. pixel does not export its menu.
 import { Box, Text, type Theme } from "@zenbu-labs/pixel";
 
 export interface MenuItem {

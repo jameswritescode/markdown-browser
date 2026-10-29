@@ -1,7 +1,8 @@
 {
-  "name": "@jameswritescode/mdb",
+  "name": "@jamesnewton/mdb",
   "version": "0.1.0",
   "description": "A markdown browser for the terminal, drawn with real pixels.",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jameswritescode/markdown-browser.git"
@@ -13,11 +14,12 @@
     "bin",
     "dist",
     "skill",
-    "README.md"
+    "README.md",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "main": "dist/main/main.js",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "scripts": {
     "test": "vitest run",

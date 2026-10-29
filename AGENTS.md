@@ -65,6 +65,7 @@ Run `pnpm smoke` too when you change the main process, the CLI, or the build.
 - TypeScript, strict. Match the code around your change.
 - Use few comments. Write a comment only to say why, when the code cannot say it. Use `/** … */` on exported functions and types when the name does not tell the full story.
 - Do not add a dependency if a few lines of code can do the job.
+- If you copy code from another project, check that its license allows it. Add a comment at the top of the file that names the source and its license, and add the license text to `THIRD_PARTY_NOTICES.md`.
 
 ## Commits
 
@@ -74,4 +75,4 @@ Run `pnpm smoke` too when you change the main process, the CLI, or the build.
 
 ## Releases
 
-mdb is a private package in GitHub Packages: `@jameswritescode/mdb`. A `v*` tag on `main` starts `.github/workflows/publish.yml`. The tag must agree with the version in `package.json`. Do not publish or push tags unless the user asks.
+mdb is a public package on npm: `@jamesnewton/mdb`. A `v*` tag on `main` starts `.github/workflows/publish.yml`. The tag must agree with the version in `package.json`. Do not publish or push tags unless the user asks.
