@@ -166,7 +166,7 @@ To show the document in the current tab, add `--replace`. Press `ctrl+[` in that
 
 To always open a new pane, add `--new`.
 
-mdb can find an mdb that it opened in a pane. In cmux, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
+mdb can find an mdb that it opened in a pane. In cmux and Rex, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
 
 ### Show markdown from stdin
 
@@ -211,6 +211,7 @@ mdb compares the text to the heading text. Upper case and lower case are the sam
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | cmux                 | Yes.                                                                                                                                        |
 | Ghostty 1.3 or later | Yes. The first time, macOS asks if your terminal or agent can control Ghostty. Click **Allow**.                                             |
+| Rex                  | Yes.                                                                                                                                        |
 | kitty                | Yes, when remote control is on. Add `allow_remote_control socket-only` and `listen_on unix:/tmp/kitty` to `kitty.conf`, then restart kitty. |
 | tmux                 | Yes.                                                                                                                                        |
 | WezTerm              | Yes.                                                                                                                                        |
@@ -252,6 +253,32 @@ To use the terminal background color, do one of these steps:
 
 - Start mdb with `--solid`.
 - Set the environment variable `MDB_BACKGROUND=solid`.
+
+## Frame rate and frames
+
+mdb draws the page as images, and sends each frame to the terminal. Three settings change how mdb does this:
+
+| Option            | Environment variable | Values                          | Default                                |
+| ----------------- | -------------------- | ------------------------------- | -------------------------------------- |
+| `--fps <n>`       | `MDB_FPS`            | A number from `1` to `240`.     | The refresh rate of your display.      |
+| `--frames <how>`  | `MDB_FRAMES`         | `shared`, `file`, `inline`.     | mdb asks the terminal what it can use. |
+| `--present <how>` | `MDB_PRESENT`        | `full`, `patched`, `animation`. | mdb chooses for the terminal.          |
+
+An option has priority over its environment variable.
+
+- `shared` sends frames through shared memory. It is the fastest.
+- `file` sends frames as files.
+- `inline` sends frames in the escape codes. It is the slowest, but all terminals with graphics support it.
+
+`--present` sets what mdb sends for a new frame:
+
+- `full` sends the whole frame.
+- `patched` sends only the parts of the frame that changed.
+- `animation` sends the frame as a frame of a kitty animation. If the terminal cannot edit animation frames, mdb uses a different method.
+
+In Rex, the defaults are `--fps 10`, `--frames file`, and `--present animation`. Rex does not support `shared`. In a large pane, pixel apps work better in Rex at a low frame rate.
+
+When mdb opens a new pane, it gives these settings to the mdb in the new pane.
 
 ## Troubleshooting
 

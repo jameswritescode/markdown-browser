@@ -36,6 +36,8 @@ Other options:
 - `--new` opens a new pane even if the tab already shows mdb.
 - `--replace` shows the file in the pane's current tab, not a new tab. Use it only when
   the new document replaces the one on screen.
+- `--fps <n>`, `--frames shared|file|inline`, and `--present full|patched|animation` change how mdb draws. Use them only when the user
+  asks.
 - `mdb <folder>` opens the file list for a folder, where the user can search the markdown files.
 
 mdb reloads the document when the file changes, also in a tab that the user does not see. After

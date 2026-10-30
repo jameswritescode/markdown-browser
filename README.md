@@ -9,7 +9,7 @@ mdb uses [pixel](https://github.com/zenbu-labs/terminal-browser/tree/main/pixel)
 ## Requirements
 
 - macOS.
-- A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, or cmux.
+- A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, cmux, or Rex.
 - Node.js 24 and pnpm.
 - Read access to this GitHub repository.
 
@@ -106,8 +106,11 @@ You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
 | `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.               |
 | `--new`               | Opens a new pane, also when this terminal tab already shows mdb.   |
 | `--replace`           | Shows the file in the current tab of the mdb pane, not a new tab.  |
+| `--fps <n>`           | Draws at most `<n>` frames each second, from `1` to `240`.         |
+| `--frames <how>`      | Sends frames to the terminal as `shared`, `file`, or `inline`.     |
+| `--present <how>`     | Sends each frame as `full`, `patched`, or `animation`.             |
 
-For more information about panes, read [Panes and coding agents](docs/usage.md#panes-and-coding-agents).
+For more information about panes, read [Panes and coding agents](docs/usage.md#panes-and-coding-agents). For `--fps`, `--frames`, and `--present`, read [Frame rate and frames](docs/usage.md#frame-rate-and-frames).
 
 ## Use mdb with coding agents
 
@@ -125,7 +128,7 @@ mdb skill install
 
 The command writes `~/.claude/skills/mdb/SKILL.md` and `~/.codex/skills/mdb/SKILL.md`. After you update mdb, run the command again.
 
-Panes work in cmux, Ghostty 1.3 or later, kitty, tmux, and WezTerm.
+Panes work in cmux, Ghostty 1.3 or later, kitty, Rex, tmux, and WezTerm.
 
 ## Keys
 

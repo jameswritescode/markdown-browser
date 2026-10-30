@@ -25,6 +25,7 @@ test("no arguments browses the working folder", () => {
     stdin: false,
     title: null,
     pathGiven: false,
+    render: { fps: null, frames: null, present: null },
   });
 });
 
@@ -89,12 +90,9 @@ test("--heading names a heading to go to", () => {
   expect(parseArgs(["--heading"], "/w", {})).toEqual({ error: "mdb: --heading takes a value" });
 });
 
-test("the tab comes from --tab, then from cmux", () => {
+test("the tab comes from --tab, and the host finds it when there is no --tab", () => {
   expect(start(["--tab", "w1:t2"])).toMatchObject({ tab: "w1:t2" });
-  expect(start([], "/w", { CMUX_WORKSPACE_ID: "ABC" })).toMatchObject({ tab: "ABC" });
-  expect(start(["--tab=w1:t2"], "/w", { CMUX_WORKSPACE_ID: "ABC" })).toMatchObject({
-    tab: "w1:t2",
-  });
+  expect(start([], "/w", { CMUX_WORKSPACE_ID: "ABC" })).toMatchObject({ tab: null });
 });
 
 test("missing paths are an error", () => {
@@ -137,4 +135,43 @@ test("--title alone leaves the pipe check to the CLI", () => {
 
 test("--wait-token sets the start token", () => {
   expect(start(["--wait-token", "abc"])).toMatchObject({ waitToken: "abc" });
+});
+
+const render = (argv: string[], env: NodeJS.ProcessEnv = {}) => {
+  const parsed = parseArgs(argv, "/w", env);
+  return "error" in parsed ? parsed.error : parsed.render;
+};
+
+test("--fps, --frames, and --present set how pixel draws, and the flags win over their variables", () => {
+  expect(render(["--fps", "24", "--frames=inline", "--present", "full"])).toEqual({
+    fps: 24,
+    frames: "inline",
+    present: "full",
+  });
+  expect(render([], { MDB_FPS: "45", MDB_FRAMES: "shared", MDB_PRESENT: "patched" })).toEqual({
+    fps: 45,
+    frames: "shared",
+    present: "patched",
+  });
+  expect(render(["--fps=60"], { MDB_FPS: "45" })).toEqual({ fps: 60, frames: null, present: null });
+});
+
+test("a bad frame rate, frame transport, or present method is an error", () => {
+  expect(render(["--fps", "0"])).toBe("mdb: --fps takes a number from 1 to 240");
+  expect(render(["--fps", "fast"])).toBe("mdb: --fps takes a number from 1 to 240");
+  expect(render([], { MDB_FPS: "500" })).toBe("mdb: MDB_FPS takes a number from 1 to 240");
+  expect(render(["--frames", "pipe"])).toBe("mdb: --frames takes shared, file, or inline");
+  expect(render([], { MDB_FRAMES: "x" })).toBe("mdb: MDB_FRAMES takes shared, file, or inline");
+  expect(render(["--present", "gif"])).toBe("mdb: --present takes full, patched, or animation");
+  expect(render([], { MDB_PRESENT: "" })).toBe(
+    "mdb: MDB_PRESENT takes full, patched, or animation",
+  );
+});
+
+test("render options that are not given stay empty, so that the host can choose them", () => {
+  expect(render([], { REX_SESSION: "session:S", REX_BLOCK: "block:B" })).toEqual({
+    fps: null,
+    frames: null,
+    present: null,
+  });
 });

@@ -1,5 +1,5 @@
 import { type InstanceInfo, PROTOCOL } from "../core/registry.ts";
-import type { Direction, Launch } from "../shared/types.ts";
+import type { Direction, Launch, Render } from "../shared/types.ts";
 
 export type Action =
   | { kind: "here" }
@@ -36,11 +36,34 @@ export function splitCommand(
   if (waitToken) command.push(`--wait-token=${waitToken}`);
   if (start.background === "solid") command.push("--solid");
   if (start.heading) command.push(`--heading=${start.heading}`);
+  if (launch.render.fps !== null) command.push(`--fps=${launch.render.fps}`);
+  if (launch.render.frames !== null) command.push(`--frames=${launch.render.frames}`);
+  if (launch.render.present !== null) command.push(`--present=${launch.render.present}`);
   if (tab) command.push("--tab", tab);
   return command;
 }
 
-const VALUE_FLAGS = new Set(["--split", "--size", "--heading", "--tab", "--title", "--wait-token"]);
+const VALUE_FLAGS = new Set([
+  "--split",
+  "--size",
+  "--heading",
+  "--tab",
+  "--title",
+  "--wait-token",
+  "--fps",
+  "--frames",
+  "--present",
+]);
+
+/** The variables that tell pixel how to draw. */
+export function pixelEnv(render: Render): Record<string, string> {
+  const env: Record<string, string> = {};
+  if (render.fps !== null) env.PIXEL_FPS = String(render.fps);
+  // pixel's native engine reads terminal-browser's names for these settings.
+  if (render.frames !== null) env.TERMINAL_BROWSER_FRAMES = render.frames;
+  if (render.present !== null) env.TERMINAL_BROWSER_PRESENT = render.present;
+  return env;
+}
 
 export function wantsHelp(argv: string[]): boolean {
   return argv.some(
