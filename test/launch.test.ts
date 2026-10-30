@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import {
   chooseAction,
+  pixelEnv,
   isGone,
   headingWarning,
   reuseLine,
@@ -27,6 +28,7 @@ const launch = (over: Partial<Launch> = {}, openPath: string | null = "/d/a.md")
   stdin: false,
   title: null,
   pathGiven: openPath !== null,
+  render: { fps: null, frames: null, present: null },
   ...over,
 });
 const instance = (pid: number, tab: string | null): InstanceInfo => ({
@@ -169,4 +171,31 @@ test("a heading that matched nothing gives a warning", () => {
   );
   expect(headingWarning({ ok: true, heading: true }, "Yes")).toBeNull();
   expect(headingWarning({ ok: true, heading: false }, null)).toBeNull();
+});
+
+test("the split command passes the render options to the new pane", () => {
+  const drawn = launch({ render: { fps: 10, frames: "file", present: "animation" } }, "/d/a.md");
+  expect(splitCommand("n", "m", drawn, null)).toEqual([
+    "n",
+    "m",
+    "/d/a.md",
+    "--fps=10",
+    "--frames=file",
+    "--present=animation",
+  ]);
+});
+
+test("pixel gets the render options in its environment", () => {
+  expect(pixelEnv({ fps: 10, frames: "file", present: "animation" })).toEqual({
+    PIXEL_FPS: "10",
+    TERMINAL_BROWSER_FRAMES: "file",
+    TERMINAL_BROWSER_PRESENT: "animation",
+  });
+  expect(pixelEnv({ fps: null, frames: null, present: null })).toEqual({});
+});
+
+test("--fps, --frames, and --present take a value, so help after them is a value", () => {
+  expect(wantsHelp(["--fps", "-h"])).toBe(false);
+  expect(wantsHelp(["--frames", "-h"])).toBe(false);
+  expect(wantsHelp(["--present", "-h"])).toBe(false);
 });

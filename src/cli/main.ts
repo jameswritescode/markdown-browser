@@ -7,7 +7,6 @@ import {
   callerTty,
   canSplit,
   cannotOpenPanes,
-  detect,
   type Pane,
   type Terminal,
 } from "@zenbu-labs/pixel/terminal";
@@ -20,11 +19,13 @@ import {
   chooseAction,
   headingWarning,
   isGone,
+  pixelEnv,
   reuseLine,
   splitCommand,
   wantsHelp,
   wantsSkill,
 } from "./launch.ts";
+import { findHost, type Host, withDefaults } from "./host.ts";
 import { installSkill } from "./skill.ts";
 import { keyDevice, readStdin, stdinHasInput } from "./stdin.ts";
 
@@ -45,11 +46,17 @@ options:
   --size <fraction>    the size of the new pane, from 0.2 to 0.95
   --new                open a new pane, even if this terminal tab already shows mdb
   --replace            show the file in the mdb pane's current tab, not a new tab
+  --fps <n>            draw at most <n> frames each second, from 1 to 240
+  --frames <how>       send frames to the terminal as shared, file, or inline
+  --present <how>      send each frame as full, patched, or animation
 
 With no terminal on stdout (for example, in a coding agent's shell), mdb acts as if you
 gave --split right. With --split, mdb opens the document in a new tab in this terminal
 tab's mdb pane if there is one, and opens a new pane if there is not. If a tab already
 shows the document, mdb goes to that tab. A folder opens its file list in a new tab.
+
+MDB_FPS, MDB_FRAMES, and MDB_PRESENT set --fps, --frames, and --present. In Rex, the
+defaults are 10, file, and animation.
 
 mdb skill install    install the mdb skill for Claude Code and Codex
 `;
@@ -93,11 +100,12 @@ export async function main(argv: string[]): Promise<number> {
     else if (wanted) return fail("mdb: stdin is empty");
   }
 
+  const host = findHost(process.env);
   const tty = Boolean(process.stdout.isTTY);
   if (chooseAction(launch, { tty, tab: null, instances: [] }).kind === "here")
-    return runHere(launch, content);
+    return runHere(launch, content, host);
 
-  const terminal = detect(process.env);
+  const { terminal } = host;
   if (!terminal || !canSplit(terminal)) return fail(`mdb: ${cannotOpenPanes(terminal)}`);
   const callerPath = callerTty().path;
   let from: Pane | null;
@@ -118,7 +126,7 @@ export async function main(argv: string[]): Promise<number> {
   return openSplit(terminal, from, direction, launch, callerPath, content);
 }
 
-async function runHere(launch: Launch, content: StdinContent | null): Promise<number> {
+async function runHere(launch: Launch, content: StdinContent | null, host: Host): Promise<number> {
   const pixelDir = dirname(dirname(require.resolve("@zenbu-labs/pixel")));
   const pixelPackage = JSON.parse(readFileSync(join(pixelDir, "package.json"), "utf8")) as {
     bin: { pixel: string };
@@ -127,7 +135,7 @@ async function runHere(launch: Launch, content: StdinContent | null): Promise<nu
   // must be the terminal's own device: pixel finds its pane by the name, and /dev/tty
   // names no pane.
   let keys: "inherit" | number = "inherit";
-  const env = { ...process.env };
+  const env = { ...process.env, ...pixelEnv(withDefaults(launch.render, host.render)) };
   if (!process.stdin.isTTY) {
     const device = keyDevice(callerTty().path) ?? keyDevice(stdoutTty());
     try {
@@ -138,8 +146,12 @@ async function runHere(launch: Launch, content: StdinContent | null): Promise<nu
     }
     env.PIXEL_TTY = device;
   }
+  await host.ready();
   const token = content ? randomUUID() : null;
-  const start = content ? { ...launch.start, openPath: null, waitToken: token } : launch.start;
+  const tab = launch.start.tab ?? (await host.tab());
+  const start = content
+    ? { ...launch.start, tab, openPath: null, waitToken: token }
+    : { ...launch.start, tab };
   const child = spawn(
     process.execPath,
     [join(pixelDir, pixelPackage.bin.pixel), PACKAGE_ROOT, "--", JSON.stringify(start)],

@@ -26,12 +26,17 @@ const quoted = [
 ]
   .map((a) => `'${a}'`)
   .join(" ");
+// The pseudo-terminal is not the caller's terminal, so mdb must not use the defaults for that terminal.
+const env = Object.fromEntries(
+  Object.entries(process.env).filter(([name]) => !name.startsWith("REX_")),
+);
 const child = spawn(
   "script",
   ["-q", out, "sh", "-c", `stty cols 140 rows 45; PIXEL_SKIP_GRAPHICS_CHECK=1 node ${quoted}`],
   {
     stdio: ["ignore", "ignore", "ignore"],
     detached: true,
+    env,
   },
 );
 

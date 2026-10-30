@@ -42,7 +42,7 @@ flowchart LR
 ## Start mdb
 
 1. `bin/mdb.js` loads `dist/cli/main.js` and calls `main(argv)`.
-2. `parseArgs` (`src/core/args.ts`) makes a `Launch`. A `Launch` holds the start options (`StartOptions`: the folder, the file, the background, the heading, and the terminal tab), and the pane options (`--split`, `--size`, `--new`, `--replace`).
+2. `parseArgs` (`src/core/args.ts`) makes a `Launch`. A `Launch` holds the start options (`StartOptions`: the folder, the file, the background, the heading, and the terminal tab), the pane options (`--split`, `--size`, `--new`, `--replace`), and the render options (`Render`: `--fps`, `--frames`, and `--present`). The CLI gives the render options to pixel as `PIXEL_FPS`, `TERMINAL_BROWSER_FRAMES`, and `TERMINAL_BROWSER_PRESENT` (`pixelEnv` in `src/cli/launch.ts`). pixel's native engine reads the terminal-browser names for the frames and present settings. An option that the user does not give is null. The host gives the default (read [Hosts](#hosts)).
 3. `chooseAction` (`src/cli/launch.ts`) chooses one of three actions:
    - **here**: stdout is a terminal and there is no `--split`. The CLI starts pixel with the package folder and the start options as JSON. pixel starts Electron with `dist/main/main.js`.
    - **reuse**: a running mdb shows the same terminal tab, and there is no `--new`. The CLI sends the file, the folder, or the stdin document to that mdb. Read [Panes and the control socket](#panes-and-the-control-socket).
@@ -136,7 +136,23 @@ When the main process gets an open message, it calls `window.mdbRemote.open()` i
 
 The reply tells the CLI what occurred. The CLI prints the line from `reuseLine`.
 
-To find the caller's pane and open a new pane, the CLI uses `@zenbu-labs/pixel/terminal`. The terminal tab is the cmux workspace, or the tab id that the terminal gives. In cmux, an mdb that you start yourself also knows its tab, from `CMUX_WORKSPACE_ID`.
+### Hosts
+
+The host is the terminal that mdb runs in. `findHost` (`src/cli/host.ts`) gives a `Host`. A host has four parts:
+
+| Part       | Use                                                                           |
+| ---------- | ----------------------------------------------------------------------------- |
+| `terminal` | A pixel `Terminal`. It finds the caller's pane and opens new panes.           |
+| `render`   | The default render options.                                                   |
+| `tab()`    | The terminal tab of the pane, for an mdb with no `--tab`.                     |
+| `ready()`  | Resolves when the pane is ready. The CLI waits for it before it starts pixel. |
+
+`main.ts` uses only the `Host` interface. It does not check for a terminal.
+
+- **Rex** (`rexHost` in `src/cli/rex.ts`): pixel does not know Rex. The Rex host uses the `rex` command. A Rex pane is a block, and its tab is the window of the block. The default render options are 10 frames each second, file frames, and kitty animation frames. A new Rex pane starts at 80×24 with no pixel size, and gets its real size about half a second later. pixel reads the size once when it starts, and draws the page too large. Thus, in an 80×24 pane, `ready()` waits for a resize, for at most 1 second. mdb does not use the Rex host inside tmux.
+- **pixel** (`pixelHost`): all other terminals. The terminal comes from pixel's `detect`. pixel chooses the render options. In cmux, the tab comes from `CMUX_WORKSPACE_ID`.
+
+`findHost` tries the hosts in `HOSTS` in order, and uses the first that matches. If no host matches, it uses the pixel host. To support a new terminal, write a `FindHost` function that gives null in other terminals, and add it to `HOSTS`.
 
 ## The agent skill
 

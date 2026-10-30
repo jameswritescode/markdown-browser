@@ -1,10 +1,22 @@
 import { statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import type { Background, Direction, Launch } from "../shared/types.ts";
+import type { Background, Direction, Frames, Launch, Present, Render } from "../shared/types.ts";
 import { isMarkdownPath } from "./scan.ts";
 
 const DIRECTIONS: readonly string[] = ["right", "left", "down", "up"];
-const VALUE_FLAGS = new Set(["--split", "--size", "--heading", "--tab", "--title", "--wait-token"]);
+const FRAMES: readonly string[] = ["shared", "file", "inline"];
+const PRESENTS: readonly string[] = ["full", "patched", "animation"];
+const VALUE_FLAGS = new Set([
+  "--split",
+  "--size",
+  "--heading",
+  "--tab",
+  "--title",
+  "--wait-token",
+  "--fps",
+  "--frames",
+  "--present",
+]);
 
 export function parseArgs(
   argv: string[],
@@ -48,8 +60,10 @@ export function parseArgs(
   for (const flag of ["--heading", "--tab", "--title", "--wait-token"]) {
     if (values.has(flag) && !values.get(flag)) return { error: `mdb: ${flag} takes a value` };
   }
+  const render = renderOptions(values, env);
+  if ("error" in render) return render;
   const heading = values.get("--heading") ?? null;
-  const tab = values.get("--tab") ?? env.CMUX_WORKSPACE_ID ?? null;
+  const tab = values.get("--tab") ?? null;
   const title = values.get("--title") ?? null;
   const waitToken = values.get("--wait-token") ?? null;
   const launch = (root: string, openPath: string | null): Launch => ({
@@ -61,6 +75,7 @@ export function parseArgs(
     stdin,
     title,
     pathGiven: paths.length > 0,
+    render,
   });
 
   if (title !== null && paths.length > 0) return { error: "mdb: --title needs markdown on stdin" };
@@ -79,6 +94,33 @@ export function parseArgs(
   if (isDirectory) return launch(target, null);
   if (!isMarkdownPath(target)) return { error: `mdb: ${given}: not a markdown file` };
   return launch(dirname(target), target);
+}
+
+function renderOptions(
+  values: Map<string, string | undefined>,
+  env: NodeJS.ProcessEnv,
+): Render | { error: string } {
+  const given = (flag: string, variable: string): [string, string | undefined] =>
+    values.has(flag) ? [flag, values.get(flag)] : [variable, env[variable]];
+
+  const [fpsFrom, fpsText] = given("--fps", "MDB_FPS");
+  let fps: number | null = null;
+  if (fpsText !== undefined) {
+    fps = Number(fpsText);
+    if (fpsText === "" || !Number.isFinite(fps) || fps < 1 || fps > 240)
+      return { error: `mdb: ${fpsFrom} takes a number from 1 to 240` };
+  }
+  const [framesFrom, frames] = given("--frames", "MDB_FRAMES");
+  if (frames !== undefined && !FRAMES.includes(frames))
+    return { error: `mdb: ${framesFrom} takes shared, file, or inline` };
+  const [presentFrom, present] = given("--present", "MDB_PRESENT");
+  if (present !== undefined && !PRESENTS.includes(present))
+    return { error: `mdb: ${presentFrom} takes full, patched, or animation` };
+  return {
+    fps,
+    frames: (frames as Frames | undefined) ?? null,
+    present: (present as Present | undefined) ?? null,
+  };
 }
 
 function splitFlag(arg: string): [string, string | undefined] {

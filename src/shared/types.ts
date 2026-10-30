@@ -60,6 +60,19 @@ export interface StartOptions {
 
 export type Direction = "right" | "left" | "down" | "up";
 
+/** How pixel sends frames to the terminal: shared memory, a file, or in the escape codes. */
+export type Frames = "shared" | "file" | "inline";
+
+/** What pixel sends for a new frame: the whole frame, the changed parts, or a kitty animation frame. */
+export type Present = "full" | "patched" | "animation";
+
+/** How pixel draws. Null leaves the choice to pixel. */
+export interface Render {
+  fps: number | null;
+  frames: Frames | null;
+  present: Present | null;
+}
+
 export interface Launch {
   start: StartOptions;
   split: Direction | null;
@@ -73,6 +86,7 @@ export interface Launch {
   title: string | null;
   /** A file or folder was named. A plain pipe then is not read. */
   pathGiven: boolean;
+  render: Render;
 }
 
 export interface StdinDoc {

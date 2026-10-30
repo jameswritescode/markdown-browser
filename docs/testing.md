@@ -189,9 +189,11 @@ The smoke test starts the real `mdb` in a pseudo-terminal for 6 seconds. It repo
 
 All three must be good. The smoke test does not show the page. Use tophat for that.
 
+The smoke test removes the `REX_` variables. Thus, in Rex, mdb does not use the Rex defaults for `--fps`, `--frames`, and `--present` in the pseudo-terminal.
+
 ## Live checks
 
-Some parts work only in a real terminal: panes, the control socket, the terminal keys, and the right-click menu. Do these checks by hand in cmux or Ghostty. Use the code in your copy, not the installed `mdb`:
+Some parts work only in a real terminal: panes, the control socket, the terminal keys, and the right-click menu. Do these checks by hand in cmux, Ghostty, or Rex. Use the code in your copy, not the installed `mdb`:
 
 ```sh
 node bin/mdb.js docs/showcase.md --split right --new
@@ -213,6 +215,13 @@ In cmux, an agent can find and close the test pane:
 ```sh
 cmux tree                              # find the surface of the mdb pane
 cmux close-surface --surface surface:56
+```
+
+In Rex, an agent can find and close the test pane:
+
+```sh
+rex block ls -s "$REX_SESSION"        # find the block of the mdb pane (its label is mdb)
+rex block close -s "$REX_SESSION" block:…
 ```
 
 Do not close panes that you did not open.
