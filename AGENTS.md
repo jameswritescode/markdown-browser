@@ -8,7 +8,8 @@ mdb is a markdown browser for the terminal. It is an Electron app that draws int
 
 Read these documents before you change code:
 
-- [README.md](README.md): what mdb does, install, keys, options.
+- [README.md](README.md): what mdb does, install, and a quick start.
+- [docs/development.md](docs/development.md): set up, the checks, and releases.
 - [docs/architecture.md](docs/architecture.md): the CLI, the main process, and the page, and how they work together.
 - [docs/testing.md](docs/testing.md): unit tests, tophat, the smoke test, and live checks.
 - [docs/usage.md](docs/usage.md): the user guide.
@@ -52,7 +53,7 @@ Run `pnpm smoke` too when you change the main process, the CLI, or the build.
   - `src/page` has no Node access. It uses only the `window.mdb` bridge (`MdbBridge` in `src/shared/types.ts`).
   - If page code has logic that you can test alone, put it in its own module without DOM calls, for example `src/page/tab-route.ts`.
 - **Remember that the page has many tabs.** Each tab has a finder and a reader. Code in a finder or a reader must check `isActive()` before it handles keys or paints shared state such as `CSS.highlights`. Read the "Tabs" part of the architecture document.
-- **Keep the agent skill up to date.** When you change the `mdb` command, its options, or what it prints, also change `skill/SKILL.md`, the `USAGE` text in `src/cli/main.ts`, the README, and `docs/usage.md`. The skill tells other agents how to use mdb.
+- **Keep the agent skill up to date.** When you change the `mdb` command, its options, or what it prints, also change `skill/SKILL.md`, the `USAGE` text in `src/cli/main.ts`, and `docs/usage.md` (the command and key reference). Change the README too if its quick start changes. The skill tells other agents how to use mdb.
 
 ## Documentation
 
@@ -75,4 +76,4 @@ Run `pnpm smoke` too when you change the main process, the CLI, or the build.
 
 ## Releases
 
-mdb is a public package on npm: `@jamesnewton/mdb`. A `v*` tag on `main` starts `.github/workflows/publish.yml`. The tag must agree with the version in `package.json`. Do not publish or push tags unless the user asks.
+mdb is a public package on npm: `@jamesnewton/mdb`. A `v*` tag on `main` starts `.github/workflows/publish.yml`. The tag must agree with the version in `package.json`. [docs/development.md](docs/development.md) has the steps. Do not publish or push tags unless the user asks.

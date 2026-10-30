@@ -138,7 +138,7 @@ export function titleOf(doc: Doc): string {
 Shell:
 
 ```sh
-pnpm add -g ~/code/markdown-browser
+pnpm add -g @jamesnewton/mdb
 mdb docs/showcase.md --solid
 ```
 

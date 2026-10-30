@@ -280,6 +280,79 @@ In Rex, the defaults are `--fps 10`, `--frames file`, and `--present animation`.
 
 When mdb opens a new pane, it gives these settings to the mdb in the new pane.
 
+## Command reference
+
+| Command         | Result                                                               |
+| --------------- | -------------------------------------------------------------------- |
+| `mdb`           | Shows the markdown files in the current folder.                      |
+| `mdb <folder>`  | Shows the markdown files in `<folder>`.                              |
+| `mdb <file.md>` | Opens `<file.md>`.                                                   |
+| `mdb -`         | Shows the markdown on stdin.                                         |
+| `… \| mdb`      | Shows the markdown on stdin, if it comes in 5 seconds.               |
+| `mdb --solid`   | Uses the terminal background color. The default page is transparent. |
+| `mdb --help`    | Shows the usage text.                                                |
+
+You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
+
+You can also set `MDB_BACKGROUND=solid` to use the terminal background color.
+
+### Options
+
+| Option                | Result                                                             |
+| --------------------- | ------------------------------------------------------------------ |
+| `--heading <text>`    | Goes to the first heading that matches `<text>`.                   |
+| `--title <text>`      | Names the stdin document. A later pipe with this title updates it. |
+| `--split <direction>` | Opens mdb in a new pane: `right`, `left`, `down`, or `up`.         |
+| `--size <fraction>`   | Sets the size of the new pane, from `0.2` to `0.95`.               |
+| `--new`               | Opens a new pane, also when this terminal tab already shows mdb.   |
+| `--replace`           | Shows the file in the current tab of the mdb pane, not a new tab.  |
+| `--fps <n>`           | Draws at most `<n>` frames each second, from `1` to `240`.         |
+| `--frames <how>`      | Sends frames to the terminal as `shared`, `file`, or `inline`.     |
+| `--present <how>`     | Sends each frame as `full`, `patched`, or `animation`.             |
+
+For more information about panes, read [Panes and coding agents](#panes-and-coding-agents). For `--fps`, `--frames`, and `--present`, read [Frame rate and frames](#frame-rate-and-frames).
+
+## Key reference
+
+### File list keys
+
+| Key                        | Action                                                                   |
+| -------------------------- | ------------------------------------------------------------------------ |
+| Type text                  | Filter the list by file name and title.                                  |
+| `/`                        | Search the text in the documents. Use this key when the filter is empty. |
+| `↓` `↑`, `ctrl+j` `ctrl+k` | Move the selection. You can also use `ctrl+n` and `ctrl+p`.              |
+| `pagedown` `pageup`        | Move the selection 10 rows.                                              |
+| `enter`                    | Open the selected document.                                              |
+| `esc`                      | Clear the filter. In text search, go back to the filter.                 |
+| `ctrl+c`, `ctrl+q`         | Quit.                                                                    |
+
+### Tab keys
+
+These keys work in the file list and in a document.
+
+| Key                | Action                                                 |
+| ------------------ | ------------------------------------------------------ |
+| `ctrl+t`           | Open a new tab. The new tab shows the file list.       |
+| `ctrl+w`           | Close the tab. When you close the last tab, mdb stops. |
+| `ctrl+h`, `ctrl+l` | Go to the previous or the next tab.                    |
+
+### Document keys
+
+| Key                    | Action                                                                           |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `esc`                  | Go back to the file list.                                                        |
+| `j` `k`, `↓` `↑`       | Scroll down or up.                                                               |
+| `/`                    | Find text in the document.                                                       |
+| `n`, `N`               | Go to the next or the previous match.                                            |
+| `d`, `u`               | Scroll half a page down or up.                                                   |
+| `space`, `shift+space` | Scroll one page down or up.                                                      |
+| `g`, `G`               | Go to the top or the bottom.                                                     |
+| `ctrl+[`, `ctrl+]`     | Go back or forward after you follow a link.                                      |
+| `ctrl+b`               | Show or hide the outline.                                                        |
+| `cmd+c`                | Copy the selected text. In Ghostty, read [Ghostty and cmd+c](#ghostty-and-cmdc). |
+| Right-click            | Open the copy menu.                                                              |
+| `ctrl+c`, `ctrl+q`     | Quit.                                                                            |
+
 ## Troubleshooting
 
 ### mdb says that the terminal has no graphics support
@@ -297,7 +370,7 @@ pnpm copied Electron from its cache without the correct links. Do these steps:
    pnpm rm -g mdb
    ```
 
-3. Install mdb again with the `--config.side-effects-cache=false` option. The full command is in the README.
+3. Install mdb again with the `--config.side-effects-cache=false` option. The full command is in [Install](../README.md#install).
 
 ### mdb stops
 
