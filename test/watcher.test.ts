@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test } from "vitest";
@@ -27,6 +27,19 @@ test("notifies on change", async () => {
   writeFileSync(path, "two");
   await sleep(400);
   expect(seen).toContain(path);
+});
+
+test("does not notify when only the file's metadata changes", async () => {
+  const path = join(mkdtempSync(join(tmpdir(), "mdb-watch-")), "a.md");
+  writeFileSync(path, "one");
+  const seen: string[] = [];
+  watcher = new DocWatcher((p) => seen.push(p));
+  watcher.set(path);
+  await sleep(100);
+  // Spotlight and other macOS services change the metadata of new files.
+  chmodSync(path, 0o600);
+  await sleep(400);
+  expect(seen).toEqual([]);
 });
 
 test("recovers after the file is deleted and created again", async () => {
