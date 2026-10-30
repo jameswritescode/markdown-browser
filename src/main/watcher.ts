@@ -1,4 +1,4 @@
-import { type FSWatcher, watch } from "node:fs";
+import { type FSWatcher, statSync, watch } from "node:fs";
 import { isMarkdownPath } from "../core/scan.ts";
 
 const WATCH_DEBOUNCE_MS = 100;
@@ -10,13 +10,16 @@ export class DocWatcher {
   private path: string | null = null;
   private timer: NodeJS.Timeout | null = null;
   private retry: NodeJS.Timeout | null = null;
+  private stamp: string | null = null;
 
   constructor(private readonly notify: (path: string) => void) {}
 
   set(path: string | null): void {
     this.close();
     this.path = path;
-    if (path) this.arm(path, false);
+    if (!path) return;
+    this.stamp = stampOf(path);
+    this.arm(path, false);
   }
 
   private arm(path: string, recovering: boolean): void {
@@ -42,7 +45,14 @@ export class DocWatcher {
 
   private schedule(): void {
     if (this.timer) clearTimeout(this.timer);
-    this.timer = setTimeout(() => this.path && this.notify(this.path), WATCH_DEBOUNCE_MS);
+    this.timer = setTimeout(() => {
+      if (!this.path) return;
+      // macOS also reports metadata changes, for example from Spotlight.
+      const stamp = stampOf(this.path);
+      if (stamp === this.stamp) return;
+      this.stamp = stamp;
+      this.notify(this.path);
+    }, WATCH_DEBOUNCE_MS);
   }
 
   close(): void {
@@ -51,6 +61,16 @@ export class DocWatcher {
     for (const timer of [this.timer, this.retry]) if (timer) clearTimeout(timer);
     this.timer = null;
     this.retry = null;
+  }
+}
+
+/** The modification time and size of a file, or "missing". */
+function stampOf(path: string): string {
+  try {
+    const { mtimeMs, size } = statSync(path);
+    return `${mtimeMs}:${size}`;
+  } catch {
+    return "missing";
   }
 }
 

@@ -103,7 +103,7 @@ The main process keeps one scan for each folder. Each tab can have a different f
 
 ## Live reload
 
-The page sends the paths of all the open documents with `window.mdb.watch(paths)`. `DocWatchers` (`src/main/watcher.ts`) keeps one file watcher for each path. When a file changes, the main process sends `mdb:changed` to the page. Each reader that shows that file renders it again, and keeps its scroll position. If the reader is in a background tab, the tab gets a dot.
+The page sends the paths of all the open documents with `window.mdb.watch(paths)`. `DocWatchers` (`src/main/watcher.ts`) keeps one file watcher for each path. When the modification time or the size of a file changes, the main process sends `mdb:changed` to the page. macOS also reports changes to the metadata of a file, for example from Spotlight. The watcher ignores them, because they do not change the document. Each reader that shows that file renders it again, and keeps its scroll position. If the reader is in a background tab, the tab gets a dot.
 
 ## Stdin documents
 
