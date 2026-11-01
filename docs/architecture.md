@@ -149,10 +149,10 @@ The host is the terminal that mdb runs in. `findHost` (`src/cli/host.ts`) gives 
 
 `main.ts` uses only the `Host` interface. It does not check for a terminal.
 
-- **Rex** (`rexHost` in `src/cli/rex.ts`): pixel does not know Rex. The Rex host uses the `rex` command. A Rex pane is a block, and its tab is the window of the block. The default render options are 10 frames each second, file frames, and kitty animation frames. A new Rex pane starts at 80×24 with no pixel size, and gets its real size about half a second later. pixel reads the size once when it starts, and draws the page too large. Thus, in an 80×24 pane, `ready()` waits for a resize, for at most 1 second. mdb does not use the Rex host inside tmux.
-- **pixel** (`pixelHost`): all other terminals. The terminal comes from pixel's `detect`. pixel chooses the render options. In cmux, the tab comes from `CMUX_WORKSPACE_ID`.
+- **pixel** (`pixelHost`): every terminal that pixel knows. The terminal comes from pixel's `detect`. pixel chooses the render options. In cmux, the tab comes from `CMUX_WORKSPACE_ID`. In herdr, the tab comes from `HERDR_TAB_ID`. pixel draws to herdr through the herdr graphics socket.
+- **Rex** (`rexHost` in `src/cli/rex.ts`): pixel does not know Rex. The Rex host uses the `rex` command. A Rex pane is a block, and its tab is the window of the block. The default render options are 10 frames each second, file frames, and kitty animation frames. A new Rex pane starts at 80×24 with no pixel size, and gets its real size about half a second later. pixel reads the size once when it starts, and draws the page too large. Thus, in an 80×24 pane, `ready()` waits for a resize, for at most 1 second.
 
-`findHost` tries the hosts in `HOSTS` in order, and uses the first that matches. If no host matches, it uses the pixel host. To support a new terminal, write a `FindHost` function that gives null in other terminals, and add it to `HOSTS`.
+`findHost` tries the hosts in `HOSTS` in order, and uses the first that matches. The pixel host is first, when pixel finds the terminal. pixel puts multiplexers, for example tmux, before the terminals that hold them. A multiplexer gets the variables of the terminal that started it, for example the Rex variables. Thus, in tmux in Rex, mdb uses tmux. If no host matches, mdb uses the pixel host with no terminal. To support a terminal that pixel does not know, write a `FindHost` function that gives null in other terminals, and add it to `HOSTS` after the pixel host.
 
 ## The agent skill
 

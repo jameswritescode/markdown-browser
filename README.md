@@ -18,7 +18,7 @@ Use mdb to find and read the markdown files in a folder. mdb is similar to [glow
 ## Requirements
 
 - macOS.
-- A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, cmux, or Rex.
+- A terminal that supports the kitty graphics protocol, for example Ghostty, kitty, cmux, Rex, or herdr.
 - Node.js 24.
 - pnpm or npm.
 

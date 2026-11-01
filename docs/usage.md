@@ -93,6 +93,13 @@ The outline is hidden when mdb starts. Press `ctrl+b` to show or hide the outlin
 
 The outline is on the left side. It shows the level-1, level-2, and level-3 headings. The outline highlights the section that you read. Click a heading in the outline to go to that section.
 
+In herdr, `ctrl+b` is the prefix key, and herdr does not send it to mdb. To use the outline in herdr, set a different prefix in `~/.config/herdr/config.toml`, for example:
+
+```toml
+[keys]
+prefix = "ctrl+a"
+```
+
 ### Links
 
 | Link                                          | Result                                         |
@@ -166,7 +173,7 @@ To show the document in the current tab, add `--replace`. Press `ctrl+[` in that
 
 To always open a new pane, add `--new`.
 
-mdb can find an mdb that it opened in a pane. In cmux and Rex, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
+mdb can find an mdb that it opened in a pane. In cmux, Rex, and herdr, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
 
 ### Show markdown from stdin
 
@@ -211,6 +218,7 @@ mdb compares the text to the heading text. Upper case and lower case are the sam
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | cmux                 | Yes.                                                                                                                                        |
 | Ghostty 1.3 or later | Yes. The first time, macOS asks if your terminal or agent can control Ghostty. Click **Allow**.                                             |
+| herdr                | Yes. The first time, pixel sets `kitty_graphics = true` in the `[experimental]` part of the herdr configuration, and reloads it.            |
 | Rex                  | Yes.                                                                                                                                        |
 | kitty                | Yes, when remote control is on. Add `allow_remote_control socket-only` and `listen_on unix:/tmp/kitty` to `kitty.conf`, then restart kitty. |
 | tmux                 | Yes.                                                                                                                                        |

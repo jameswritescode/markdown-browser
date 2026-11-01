@@ -19,8 +19,14 @@ const PIXEL_CHOOSES: Render = { fps: null, frames: null, present: null };
 /** Gives a host when mdb runs in its terminal, and null when it does not. */
 export type FindHost = (env: NodeJS.ProcessEnv) => Host | null;
 
-/** The terminals that need their own host. The first match wins. */
-const HOSTS: FindHost[] = [rexHost];
+// pixel's own order puts multiplexers such as tmux before the terminals that hold them.
+const knownToPixel: FindHost = (env) => {
+  const host = pixelHost(env);
+  return host.terminal ? host : null;
+};
+
+/** The first match wins. Each host after pixel's is for a terminal that pixel does not know. */
+const HOSTS: FindHost[] = [knownToPixel, rexHost];
 
 export function findHost(env: NodeJS.ProcessEnv): Host {
   for (const find of HOSTS) {
@@ -35,7 +41,7 @@ function pixelHost(env: NodeJS.ProcessEnv): Host {
   return {
     terminal: detect(env),
     render: PIXEL_CHOOSES,
-    tab: async () => env.CMUX_WORKSPACE_ID ?? null,
+    tab: async () => env.CMUX_WORKSPACE_ID ?? env.HERDR_TAB_ID ?? null,
     ready: async () => {},
   };
 }
