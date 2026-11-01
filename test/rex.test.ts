@@ -16,11 +16,10 @@ function recorder(replies: Record<string, string> = {}) {
   return { calls, run };
 }
 
-test("rex is found only inside a Rex pane, and not inside tmux", () => {
+test("rex is found only inside a Rex pane", () => {
   const { run } = recorder();
   expect(rex(ENV, run)?.name).toBe("rex");
   expect(rex({ ...ENV, REX_BLOCK: undefined }, run)).toBeNull();
-  expect(rex({ ...ENV, TMUX: "/tmp/tmux" }, run)).toBeNull();
 });
 
 test("the current pane is the caller's block, and its tab is the block's window", async () => {

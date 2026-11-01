@@ -22,8 +22,7 @@ const PLACES: Record<Direction, string> = {
 export const rex: Detect = (env, run) => {
   const session = env.REX_SESSION;
   const block = env.REX_BLOCK;
-  // Inside tmux, the Rex variables come from the shell that started tmux.
-  if (!session || !block || env.TMUX) return null;
+  if (!session || !block) return null;
   const binary = env.REX_BIN_DIR ? join(env.REX_BIN_DIR, "rex") : "rex";
   const call = (args: string[]) => run(binary, args);
 

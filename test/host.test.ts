@@ -9,6 +9,8 @@ test("in Rex, the host is Rex: 10 frames each second, as kitty animation frames 
   expect(host.render).toEqual({ fps: 10, frames: "file", present: "animation" });
 });
 
+const HERDR = { HERDR_PANE_ID: "w1:p2", HERDR_TAB_ID: "w1:t1" };
+
 test("inside tmux in Rex, and in other terminals, the host is pixel's terminal", () => {
   for (const env of [{ ...REX, TMUX: "/tmp/tmux,1,0" }, { TERM_PROGRAM: "WezTerm" }]) {
     const host = findHost(env);
@@ -17,8 +19,13 @@ test("inside tmux in Rex, and in other terminals, the host is pixel's terminal",
   }
 });
 
-test("the default host knows the tab of an mdb that you start in cmux", async () => {
+test("in herdr, the host is pixel's herdr terminal", () => {
+  expect(findHost(HERDR).terminal?.name).toBe("herdr");
+});
+
+test("the default host knows the tab of an mdb that you start in cmux or herdr", async () => {
   expect(await findHost({ CMUX_WORKSPACE_ID: "ABC" }).tab()).toBe("ABC");
+  expect(await findHost(HERDR).tab()).toBe("w1:t1");
   expect(await findHost({}).tab()).toBeNull();
 });
 

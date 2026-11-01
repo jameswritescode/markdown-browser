@@ -26,9 +26,12 @@ const quoted = [
 ]
   .map((a) => `'${a}'`)
   .join(" ");
-// The pseudo-terminal is not the caller's terminal, so mdb must not use the defaults for that terminal.
+// The pseudo-terminal is not the caller's terminal, so mdb must not use the defaults for that
+// terminal. In herdr, pixel would also send the frames to the herdr pane.
 const env = Object.fromEntries(
-  Object.entries(process.env).filter(([name]) => !name.startsWith("REX_")),
+  Object.entries(process.env).filter(
+    ([name]) => !name.startsWith("REX_") && !name.startsWith("HERDR_"),
+  ),
 );
 const child = spawn(
   "script",
