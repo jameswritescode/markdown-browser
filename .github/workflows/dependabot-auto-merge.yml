@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: dependabot/fetch-metadata@v3
 
       # A minor update to a 0.x package can break the API, so only patch updates of 0.x packages merge alone.
       - name: Merge minor and patch updates when CI passes
