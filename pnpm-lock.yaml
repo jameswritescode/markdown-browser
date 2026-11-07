@@ -188,8 +188,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       pele:
-        specifier: 1.9.0
-        version: 1.9.0
+        specifier: 1.13.0
+        version: 1.13.0
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -1169,8 +1169,8 @@ packages:
   parse-srcset@1.0.2:
     resolution: {integrity: sha512-/2qh0lav6CmI15FzA3i/2Bzk2zCgQhGMkvhOhKNcBVQ1ldgpbfiNTVslmooUmWJcADi1f1kIeynbDRVzNlfR6Q==}
 
-  pele@1.9.0:
-    resolution: {integrity: sha512-KUmBt7P5JduVKQaP6FKfXiRgH3LBVIKsmdgPJZU7jD3ye6F+Z8fbms+OjivE7rWY09Qx+5X65VKe/9ywKFJ9Sw==}
+  pele@1.13.0:
+    resolution: {integrity: sha512-Ie8UKY9x00MsuR3jO6AzUwzK2Z6MIV3Tf4EDdITiuk8Uaz8K7g0R082WqsqNaSU8DdgkrRvZThzhit83mi/uiw==}
     engines: {node: '>=20'}
 
   picocolors@1.1.1:
@@ -1946,7 +1946,7 @@ snapshots:
 
   parse-srcset@1.0.2: {}
 
-  pele@1.9.0: {}
+  pele@1.13.0: {}
 
   picocolors@1.1.1: {}
 
