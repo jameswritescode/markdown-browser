@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # pixel 0.2.10 and later finds Rex itself and skips the mdb Rex host. Update it by hand.
+      - dependency-name: "@zenbu-labs/pixel"
+      # Keep the Node types on the Node version in mise.toml.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
+      # Keep the React types on the React version.
+      - dependency-name: "@types/react"
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

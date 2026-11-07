@@ -58,6 +58,24 @@ This install uses the code in your copy of the repository. The `mdb` command run
 
 After you change the code or get new commits, run `pnpm build` again. You do not need to install again. If the dependencies change, run `pnpm install` before `pnpm build`.
 
+## Dependency updates
+
+Dependabot opens pull requests each week for the npm packages and the GitHub Actions. `.github/dependabot.yml` has the settings. It groups the minor and patch updates of the dev dependencies into one pull request.
+
+The "Dependabot auto-merge" workflow turns on auto-merge for these updates:
+
+- Patch updates.
+- Minor updates, but not for packages that are at version 0.x. A 0.x minor update can break the API.
+
+GitHub merges the pull request when CI passes. Review major updates and 0.x minor updates yourself.
+
+Dependabot does not update `@zenbu-labs/pixel`. pixel 0.2.10 and later finds Rex itself and does not use the mdb Rex host. Update pixel by hand and test it in Rex.
+
+Auto-merge needs two repository settings:
+
+- "Allow auto-merge" in the general settings.
+- A rule for `main` that requires the `checks` status check. Without a required check, GitHub cannot wait for CI, and auto-merge does not work.
+
 ## Publish a release
 
 Publish only from `main`.
