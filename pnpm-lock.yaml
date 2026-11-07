@@ -173,8 +173,8 @@ importers:
         specifier: 11.12.0
         version: 11.12.0
       ignore:
-        specifier: 7.0.13
-        version: 7.0.13
+        specifier: 7.0.14
+        version: 7.0.14
       markdown-it:
         specifier: 15.0.3
         version: 15.0.3
@@ -1011,8 +1011,8 @@ packages:
     resolution: {integrity: sha512-Tz7u1i95/g2x2jz81+x0FBVhBhY5aRTvD3tXXdFaljuNdzDLJ8UGNRrTcj2cgQvAg3iW/h77Fz15nLW0L0CrZw==}
     engines: {node: '>=20.19.0'}
 
-  ignore@7.0.13:
-    resolution: {integrity: sha512-2E8Q6rh+1RRSq/YdaGsNfXsEZy9FVqv6BSSrkmZJP7BnaoPnRfKL+YaofPvP+5rzdk144qSm6i4+hvPgUcbV4Q==}
+  ignore@7.0.14:
+    resolution: {integrity: sha512-wCBiZ77u1tuWde6G/nfOtLaCTYcFDU5yCzARzK10y+rLhzYoL7a7yEemcopcc2Mzow7gZOIjnV2ym1NYmdiJOQ==}
     engines: {node: '>= 4'}
 
   is-plain-object@5.1.0:
@@ -1803,7 +1803,7 @@ snapshots:
       domutils: 4.0.2
       entities: 8.1.0
 
-  ignore@7.0.13: {}
+  ignore@7.0.14: {}
 
   is-plain-object@5.1.0: {}
 
