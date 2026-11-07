@@ -22,7 +22,7 @@ jobs:
       - name: Make sure the tag agrees with package.json
         run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
 
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v4
 
       - run: pnpm install --frozen-lockfile
 
