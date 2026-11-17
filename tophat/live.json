@@ -15,7 +15,7 @@
     },
     {
       "eval": "document.querySelector('.diagram-error')?.textContent",
-      "expect": "Diagram error: Parse error on line 3:\n\n^\nExpecting 'NODE_STRING', got 'EOF'"
+      "expect": "Diagram error: Parse error on line 2:\n  A -->\n-------^\nExpecting 'NODE_STRING', got 'EOF'"
     },
     {
       "write": "../build/tophat/live-docs/doc.md",

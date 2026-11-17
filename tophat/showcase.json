@@ -23,7 +23,7 @@
         "ok",
         "ok",
         "ok",
-        "FAILED: mdb shows the diagram text and the error message: / Diagram error: Parse error on line 3:\n\n^\nExpecting 'NODE_STRING', got 'EOF'"
+        "FAILED: mdb shows the diagram text and the error message: / Diagram error: Parse error on line 2:\n  A -->\n-------^\nExpecting 'NODE_STRING', "
       ]
     },
     {
