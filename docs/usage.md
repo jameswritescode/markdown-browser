@@ -173,6 +173,8 @@ To show the document in the current tab, add `--replace`. Press `ctrl+[` in that
 
 To always open a new pane, add `--new`.
 
+In some terminals, for example Rex, a new pane gets its size only when the terminal shows it. If you do not look at the terminal, mdb waits for that size. Then the command says `mdb starts when the terminal shows the pane`. This is not an error.
+
 mdb can find an mdb that it opened in a pane. In cmux, Rex, and herdr, it can also find an mdb that you started yourself. In other terminals, mdb cannot find an mdb that you started yourself.
 
 ### Show markdown from stdin

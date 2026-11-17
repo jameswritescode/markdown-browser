@@ -3,7 +3,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { openRequest, sendControl, serveControl } from "../src/core/control.ts";
-import { instancesDir, listInstances, registerInstance } from "../src/core/registry.ts";
+import {
+  instancesDir,
+  listInstances,
+  listWaiting,
+  markWaiting,
+  registerInstance,
+} from "../src/core/registry.ts";
 
 let state: string;
 let env: NodeJS.ProcessEnv;
@@ -44,6 +50,25 @@ test("records of dead processes and unreadable records are removed", () => {
   expect(listInstances(env).map((r) => r.pid)).toEqual([process.pid]);
   expect(existsSync(dead)).toBe(false);
   expect(existsSync(join(dir, "bad.json"))).toBe(false);
+});
+
+test("an mdb that waits before it starts is listed as waiting, not as an instance", () => {
+  const mark = markWaiting({ tab: "w:1", token: "t0k" }, env);
+  expect(listWaiting(env)).toEqual([
+    { pid: process.pid, tab: "w:1", token: "t0k", since: expect.any(Number) },
+  ]);
+  expect(listInstances(env)).toEqual([]);
+  mark.withdraw();
+  expect(listWaiting(env)).toEqual([]);
+});
+
+test("waiting records of dead processes are removed", () => {
+  const dir = instancesDir(env);
+  markWaiting({ tab: null, token: null }, env).withdraw();
+  const dead = join(dir, "999999.waiting");
+  writeFileSync(dead, JSON.stringify({ pid: 999999, tab: "w:1", token: null, since: 1 }));
+  expect(listWaiting(env)).toEqual([]);
+  expect(existsSync(dead)).toBe(false);
 });
 
 test("a control message reaches the handler and its reply comes back", async () => {

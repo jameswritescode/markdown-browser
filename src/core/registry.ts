@@ -88,3 +88,47 @@ export function listInstances(env: NodeJS.ProcessEnv = process.env): InstanceInf
   }
   return found.sort((a, b) => b.startedAt - a.startedAt);
 }
+
+/** An mdb that waits for its pane before it starts, so the CLI that opened the pane knows it runs. */
+export interface WaitingInfo {
+  pid: number;
+  tab: string | null;
+  token: string | null;
+  since: number;
+}
+
+// Not ".json": an older mdb lists every ".json" file as an instance.
+const WAITING = ".waiting";
+
+export function markWaiting(
+  { tab, token }: { tab: string | null; token: string | null },
+  env: NodeJS.ProcessEnv = process.env,
+): { withdraw(): void } {
+  const dir = instancesDir(env);
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, `${process.pid}${WAITING}`);
+  const info: WaitingInfo = { pid: process.pid, tab, token, since: Date.now() };
+  writeFileSync(file, JSON.stringify(info));
+  return { withdraw: () => rmSync(file, { force: true }) };
+}
+
+export function listWaiting(env: NodeJS.ProcessEnv = process.env): WaitingInfo[] {
+  const dir = instancesDir(env);
+  let names: string[];
+  try {
+    names = readdirSync(dir).filter((name) => name.endsWith(WAITING));
+  } catch {
+    return [];
+  }
+  const found: WaitingInfo[] = [];
+  for (const name of names) {
+    const file = join(dir, name);
+    let info: WaitingInfo | null = null;
+    try {
+      info = JSON.parse(readFileSync(file, "utf8")) as WaitingInfo;
+    } catch {}
+    if (info && typeof info.pid === "number" && alive(info.pid)) found.push(info);
+    else rmSync(file, { force: true });
+  }
+  return found;
+}
