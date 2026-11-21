@@ -12,7 +12,7 @@ import {
 } from "@zenbu-labs/pixel/terminal";
 import { parseArgs } from "../core/args.ts";
 import { type StdinContent, sendControl } from "../core/control.ts";
-import { type InstanceInfo, listInstances } from "../core/registry.ts";
+import { type InstanceInfo, listInstances, listWaiting, markWaiting } from "../core/registry.ts";
 import { stdinKey } from "../core/stdin.ts";
 import type { Direction, Launch } from "../shared/types.ts";
 import {
@@ -64,6 +64,7 @@ mdb skill install    install the mdb skill for Claude Code and Codex
 const PACKAGE_ROOT = join(__dirname, "..", "..");
 const BIN = join(PACKAGE_ROOT, "bin", "mdb.js");
 const REGISTER_TIMEOUT_MS = 15_000;
+const WAITING_NOTE = "mdb starts when the terminal shows the pane";
 // A plain pipe that sends nothing in this time is not markdown for mdb, so mdb shows the file list.
 const PIPE_WAIT_MS = 5_000;
 
@@ -146,7 +147,11 @@ async function runHere(launch: Launch, content: StdinContent | null, host: Host)
     }
     env.PIXEL_TTY = device;
   }
-  await host.ready();
+  let waiting = null as { withdraw(): void } | null;
+  await host.ready(() => {
+    waiting = markWaiting({ tab: launch.start.tab, token: launch.start.waitToken });
+  });
+  waiting?.withdraw();
   const token = content ? randomUUID() : null;
   const tab = launch.start.tab ?? (await host.tab());
   const start = content
@@ -190,9 +195,16 @@ async function sendWhenStarted(
   content: StdinContent,
   child: ChildProcess | null,
 ): Promise<{ reply: Record<string, unknown> } | { problem: string } | null> {
-  const deadline = Date.now() + REGISTER_TIMEOUT_MS;
+  let deadline = Date.now() + REGISTER_TIMEOUT_MS;
+  let told = false;
   while (Date.now() < deadline) {
     if (child && child.exitCode !== null) return null;
+    // A new pane can wait for its size until the terminal shows it, with no time limit.
+    if (listWaiting().some((found) => found.token === token)) {
+      deadline = Date.now() + REGISTER_TIMEOUT_MS;
+      if (!told) process.stderr.write(`mdb: ${WAITING_NOTE}\n`);
+      told = true;
+    }
     const instance = listInstances().find((found) => found.token === token);
     if (instance) {
       try {
@@ -257,6 +269,7 @@ async function openSplit(
   content: StdinContent | null,
 ): Promise<number> {
   const before = new Set(listInstances().map((instance) => instance.pid));
+  const waitedBefore = new Set(listWaiting().map((found) => found.pid));
   const token = content ? randomUUID() : null;
   try {
     await terminal.split!({
@@ -283,6 +296,10 @@ async function openSplit(
       listInstances().some((instance) => !before.has(instance.pid) && instance.tab === from.tab)
     ) {
       say(`mdb: opened ${describe(launch, null)} in a new pane (${direction})`);
+      return 0;
+    }
+    if (listWaiting().some((found) => !waitedBefore.has(found.pid) && found.tab === from.tab)) {
+      say(`mdb: opened ${describe(launch, null)} in a new pane (${direction}); ${WAITING_NOTE}`);
       return 0;
     }
     await sleep(100);

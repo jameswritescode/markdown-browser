@@ -35,6 +35,10 @@ async function copySelection(): Promise<void> {
 
 const root = createRoot({
   name: "mdb",
+  // pixel zooms the page when the terminal's cell size changes, as for a font zoom. A Rex pane that
+  // gets its real size after mdb starts looks like one, and the page becomes about 2.3 times too
+  // large. mdb keeps the page at zoom 1, as it does when the page loads.
+  onResize: () => view?.webContents.setZoomFactor(1),
   onKey(event) {
     if (event.kind !== "press") return false;
     if (closeMenu) {

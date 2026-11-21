@@ -30,7 +30,8 @@ const quoted = [
 // terminal. In herdr, pixel would also send the frames to the herdr pane.
 const env = Object.fromEntries(
   Object.entries(process.env).filter(
-    ([name]) => !name.startsWith("REX_") && !name.startsWith("HERDR_"),
+    ([name]) =>
+      !name.startsWith("REX_") && !name.startsWith("HERDR_") && !name.startsWith("TERM_PROGRAM"),
   ),
 );
 const child = spawn(

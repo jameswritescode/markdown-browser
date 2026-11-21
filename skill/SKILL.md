@@ -48,6 +48,10 @@ section that you changed.
 The command prints what it did: `opened … in a new pane`, `opened … in a tab in the mdb pane`,
 `switched to … in the mdb pane`, `showing … in the mdb pane`, or `updated … in the mdb pane`.
 
+If the user does not look at the terminal, a new pane can wait before mdb starts. Then the
+command prints `opened … in a new pane (…); mdb starts when the terminal shows the pane`. This
+is not an error. With stdin, the command waits until mdb starts.
+
 A tab shows the title of its document: the frontmatter `title`, else the first `# heading`, else
 the file name. Give each document that you write a clear title, so that the user can tell the
 tabs apart.
