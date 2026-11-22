@@ -189,7 +189,7 @@ The smoke test starts the real `mdb` in a pseudo-terminal for 6 seconds. It repo
 
 All three must be good. The smoke test does not show the page. Use tophat for that.
 
-The smoke test removes the `REX_` and `HERDR_` variables. Thus, in Rex, mdb does not use the Rex defaults for `--fps`, `--frames`, and `--present` in the pseudo-terminal. In herdr, pixel sends the frames to the pseudo-terminal, not to the herdr pane.
+The smoke test removes the `REX_`, `HERDR_`, and `TERM_PROGRAM` variables. Thus, in Rex, mdb does not wait for a Rex pane size in the pseudo-terminal. In herdr, pixel sends the frames to the pseudo-terminal, not to the herdr pane.
 
 ## Live checks
 
@@ -220,7 +220,7 @@ cmux close-surface --surface surface:56
 In Rex, an agent can find and close the test pane:
 
 ```sh
-rex block ls -s "$REX_SESSION"        # find the block of the mdb pane (its label is mdb)
+rex block ls -s "$REX_SESSION"        # find the block of the mdb pane (the new block)
 rex block close -s "$REX_SESSION" block:…
 ```
 

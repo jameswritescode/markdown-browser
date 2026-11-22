@@ -10,36 +10,25 @@ export interface Host {
   render: Render;
   /** The tab of the pane that mdb runs in, for an mdb with no --tab. */
   tab(): Promise<string | null>;
-  /** Resolves when the pane is ready for pixel to start. */
+  /** Resolves when the pane is ready for pixel to start. This can take a long time. */
   ready(): Promise<void>;
 }
 
 const PIXEL_CHOOSES: Render = { fps: null, frames: null, present: null };
 
-/** Gives a host when mdb runs in its terminal, and null when it does not. */
-export type FindHost = (env: NodeJS.ProcessEnv) => Host | null;
-
-// pixel's own order puts multiplexers such as tmux before the terminals that hold them.
-const knownToPixel: FindHost = (env) => {
-  const host = pixelHost(env);
-  return host.terminal ? host : null;
-};
-
-/** The first match wins. Each host after pixel's is for a terminal that pixel does not know. */
-const HOSTS: FindHost[] = [knownToPixel, rexHost];
+/** The terminals where mdb must do more than pixel does, by the name that pixel gives them. */
+const HOSTS = new Map<string, (terminal: Terminal) => Host>([["rex", rexHost]]);
 
 export function findHost(env: NodeJS.ProcessEnv): Host {
-  for (const find of HOSTS) {
-    const host = find(env);
-    if (host) return host;
-  }
-  return pixelHost(env);
+  const terminal = detect(env);
+  const own = terminal && HOSTS.get(terminal.name);
+  return terminal && own ? own(terminal) : pixelHost(terminal, env);
 }
 
-/** Every terminal that pixel knows. */
-function pixelHost(env: NodeJS.ProcessEnv): Host {
+/** Every terminal where pixel does all the work. */
+function pixelHost(terminal: Terminal | null, env: NodeJS.ProcessEnv): Host {
   return {
-    terminal: detect(env),
+    terminal,
     render: PIXEL_CHOOSES,
     tab: async () => env.CMUX_WORKSPACE_ID ?? env.HERDR_TAB_ID ?? null,
     ready: async () => {},

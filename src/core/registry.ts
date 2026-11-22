@@ -66,25 +66,39 @@ function alive(pid: number): boolean {
 }
 
 export function listInstances(env: NodeJS.ProcessEnv = process.env): InstanceInfo[] {
+  return readRecords<InstanceInfo>(env, ".json", (info) => {
+    if (info?.socket) rmSync(info.socket, { force: true });
+  }).sort((a, b) => b.startedAt - a.startedAt);
+}
+
+/**
+ * The records in the instance folder whose names end in `suffix`. Removes the records of dead
+ * processes and unreadable records, and gives each one to `removed` (null when unreadable).
+ */
+export function readRecords<T extends { pid: number }>(
+  env: NodeJS.ProcessEnv,
+  suffix: string,
+  removed: (info: T | null) => void = () => {},
+): T[] {
   const dir = instancesDir(env);
   let names: string[];
   try {
-    names = readdirSync(dir).filter((name) => name.endsWith(".json"));
+    names = readdirSync(dir).filter((name) => name.endsWith(suffix));
   } catch {
     return [];
   }
-  const found: InstanceInfo[] = [];
+  const found: T[] = [];
   for (const name of names) {
     const file = join(dir, name);
-    let info: InstanceInfo | null = null;
+    let info: T | null = null;
     try {
-      info = JSON.parse(readFileSync(file, "utf8")) as InstanceInfo;
+      info = JSON.parse(readFileSync(file, "utf8")) as T;
     } catch {}
     if (info && typeof info.pid === "number" && alive(info.pid)) found.push(info);
     else {
       rmSync(file, { force: true });
-      if (info?.socket) rmSync(info.socket, { force: true });
+      removed(info);
     }
   }
-  return found.sort((a, b) => b.startedAt - a.startedAt);
+  return found;
 }
