@@ -3,10 +3,10 @@ import { findHost, withDefaults } from "../src/cli/host.ts";
 
 const REX = { REX_SESSION: "session:S", REX_BLOCK: "block:B" };
 
-test("in Rex, the host is Rex: 10 frames each second, as kitty animation frames in files", () => {
+test("in Rex, the host is Rex: at most 60 frames each second, and pixel chooses the rest", () => {
   const host = findHost(REX);
   expect(host.terminal?.name).toBe("rex");
-  expect(host.render).toEqual({ fps: 10, frames: "file", present: "animation" });
+  expect(host.render).toEqual({ fps: 60, frames: null, present: null });
 });
 
 const HERDR = { HERDR_PANE_ID: "w1:p2", HERDR_TAB_ID: "w1:t1" };
@@ -32,8 +32,8 @@ test("the default host knows the tab of an mdb that you start in cmux or herdr",
 test("options that the user gives win over the defaults of the host", () => {
   expect(
     withDefaults(
-      { fps: 60, frames: null, present: "full" },
-      { fps: 10, frames: "file", present: "animation" },
+      { fps: 120, frames: null, present: "full" },
+      { fps: 60, frames: null, present: null },
     ),
-  ).toEqual({ fps: 60, frames: "file", present: "full" });
+  ).toEqual({ fps: 120, frames: null, present: "full" });
 });

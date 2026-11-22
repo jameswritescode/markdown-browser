@@ -3,7 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { openRequest, sendControl, serveControl } from "../src/core/control.ts";
-import { instancesDir, listInstances, registerInstance } from "../src/core/registry.ts";
+import {
+  instancesDir,
+  listInstances,
+  readRecords,
+  registerInstance,
+} from "../src/core/registry.ts";
 
 let state: string;
 let env: NodeJS.ProcessEnv;
@@ -44,6 +49,22 @@ test("records of dead processes and unreadable records are removed", () => {
   expect(listInstances(env).map((r) => r.pid)).toEqual([process.pid]);
   expect(existsSync(dead)).toBe(false);
   expect(existsSync(join(dir, "bad.json"))).toBe(false);
+});
+
+test("a kind of record is read by its suffix, and records of dead processes are removed", () => {
+  const dir = instancesDir(env);
+  registerInstance({ tab: null, token: null }, env);
+  writeFileSync(join(dir, `${process.pid}.other`), JSON.stringify({ pid: process.pid }));
+  writeFileSync(join(dir, "999999.other"), JSON.stringify({ pid: 999999 }));
+  writeFileSync(join(dir, "bad.other"), "{");
+  const removed: unknown[] = [];
+  expect(readRecords(env, ".other", (info) => removed.push(info))).toEqual([{ pid: process.pid }]);
+  expect(removed).toHaveLength(2);
+  expect(removed).toContainEqual({ pid: 999999 });
+  expect(removed).toContainEqual(null);
+  expect(existsSync(join(dir, "999999.other"))).toBe(false);
+  expect(existsSync(join(dir, "bad.other"))).toBe(false);
+  expect(listInstances(env).map((r) => r.pid)).toEqual([process.pid]);
 });
 
 test("a control message reaches the handler and its reply comes back", async () => {

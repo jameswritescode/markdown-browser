@@ -42,7 +42,7 @@ flowchart LR
 ## Start mdb
 
 1. `bin/mdb.js` loads `dist/cli/main.js` and calls `main(argv)`.
-2. `parseArgs` (`src/core/args.ts`) makes a `Launch`. A `Launch` holds the start options (`StartOptions`: the folder, the file, the background, the heading, and the terminal tab), the pane options (`--split`, `--size`, `--new`, `--replace`), and the render options (`Render`: `--fps`, `--frames`, and `--present`). The CLI gives the render options to pixel as `PIXEL_FPS`, `TERMINAL_BROWSER_FRAMES`, and `TERMINAL_BROWSER_PRESENT` (`pixelEnv` in `src/cli/launch.ts`). pixel's native engine reads the terminal-browser names for the frames and present settings. An option that the user does not give is null. The host gives the default (read [Hosts](#hosts)).
+2. `parseArgs` (`src/core/args.ts`) makes a `Launch`. A `Launch` holds the start options (`StartOptions`: the folder, the file, the background, the heading, and the terminal tab), the pane options (`--split`, `--size`, `--new`, `--replace`), and the render options (`Render`: `--fps`, `--frames`, and `--present`). The CLI gives the render options to pixel as `PIXEL_FPS`, `TERMINAL_BROWSER_FRAMES`, and `TERMINAL_BROWSER_PRESENT` (`pixelEnv` in `src/cli/launch.ts`). pixel's native engine reads the terminal-browser names for the frames and present settings. An option that the user does not give takes the default of the host (see **Hosts**). If the host has no default, the option is null, and pixel chooses.
 3. `chooseAction` (`src/cli/launch.ts`) chooses one of three actions:
    - **here**: stdout is a terminal and there is no `--split`. The CLI starts pixel with the package folder and the start options as JSON. pixel starts Electron with `dist/main/main.js`.
    - **reuse**: a running mdb shows the same terminal tab, and there is no `--new`. The CLI sends the file, the folder, or the stdin document to that mdb. Read [Panes and the control socket](#panes-and-the-control-socket).
@@ -122,6 +122,7 @@ A stdin document has no file. A key takes the place of its path everywhere in th
 An mdb that an agent opens must be easy to find again. Two parts make this possible: the instance registry, and the control socket.
 
 - **Registry** (`src/core/registry.ts`): each running mdb writes `<pid>.json` in `~/.local/state/mdb/instances` (or `$XDG_STATE_HOME/mdb/instances`). The record has the process id, the socket path, the terminal tab, the wait token, and the protocol version (`PROTOCOL`). An mdb with no protocol version is from before folder and stdin tabs. The CLI sends only a file to it, and opens a new pane for a folder or for stdin. `listInstances` removes the records of processes that stopped.
+- **Waiting** (`src/core/waiting.ts`): before mdb calls the host's `ready()`, it writes `<pid>.waiting` in the same folder, with its tab and wait token (`markWaiting`). It removes the file when `ready()` resolves. The extension is not `.json`, because an older mdb reads all `.json` files as instances. The CLI that opened the pane reads these files with `listWaiting`. `listInstances` and `listWaiting` both use `readRecords`, which also removes the records of processes that stopped. A pane that the user can see waits for about half a second, so the CLI acts only on a record that is more than 2 seconds old (`longWait`). For a file or a folder, the CLI then stops and says that mdb starts when the terminal shows the pane. For stdin, the CLI waits with no time limit and sends the text when mdb starts.
 - **Control socket** (`src/core/control.ts`): each mdb listens on `<pid>.sock` in the same folder. A message is one line of JSON. The open message is `{cmd: "open", path, root, heading, mode, content?}`. `path` is a file, a stdin key, or `null` for the file list of `root`. `content` holds the text of a stdin document. `openRequest` fills in `root` and `mode` for a message from an older mdb.
 - **Ready**: mdb writes its record only after the page calls `window.mdb.ready()`. Thus the CLI never finds an mdb that cannot open a document yet.
 
@@ -140,19 +141,25 @@ The reply tells the CLI what occurred. The CLI prints the line from `reuseLine`.
 
 The host is the terminal that mdb runs in. `findHost` (`src/cli/host.ts`) gives a `Host`. A host has four parts:
 
-| Part       | Use                                                                           |
-| ---------- | ----------------------------------------------------------------------------- |
-| `terminal` | A pixel `Terminal`. It finds the caller's pane and opens new panes.           |
-| `render`   | The default render options.                                                   |
-| `tab()`    | The terminal tab of the pane, for an mdb with no `--tab`.                     |
-| `ready()`  | Resolves when the pane is ready. The CLI waits for it before it starts pixel. |
+| Part       | Use                                                                                                                         |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `terminal` | A pixel `Terminal`. It finds the caller's pane and opens new panes.                                                         |
+| `render`   | The render options that the host uses when the user does not give them. `withDefaults` merges them with the user's options. |
+| `tab()`    | The terminal tab of the pane, for an mdb with no `--tab`.                                                                   |
+| `ready()`  | Resolves when the pane is ready. The CLI waits for it before it starts pixel. It can take a long time (see **Waiting**).    |
 
 `main.ts` uses only the `Host` interface. It does not check for a terminal.
 
-- **pixel** (`pixelHost`): every terminal that pixel knows. The terminal comes from pixel's `detect`. pixel chooses the render options. In cmux, the tab comes from `CMUX_WORKSPACE_ID`. In herdr, the tab comes from `HERDR_TAB_ID`. pixel draws to herdr through the herdr graphics socket.
-- **Rex** (`rexHost` in `src/cli/rex.ts`): pixel does not know Rex. The Rex host uses the `rex` command. A Rex pane is a block, and its tab is the window of the block. The default render options are 10 frames each second, file frames, and kitty animation frames. A new Rex pane starts at 80×24 with no pixel size, and gets its real size about half a second later. pixel reads the size once when it starts, and draws the page too large. Thus, in an 80×24 pane, `ready()` waits for a resize, for at most 1 second.
+The terminal always comes from pixel's `detect`. pixel puts multiplexers, for example tmux, before the terminals that hold them. A multiplexer gets the variables of the terminal that started it, for example the Rex variables. Thus, in tmux in Rex, mdb uses tmux.
 
-`findHost` tries the hosts in `HOSTS` in order, and uses the first that matches. The pixel host is first, when pixel finds the terminal. pixel puts multiplexers, for example tmux, before the terminals that hold them. A multiplexer gets the variables of the terminal that started it, for example the Rex variables. Thus, in tmux in Rex, mdb uses tmux. If no host matches, mdb uses the pixel host with no terminal. To support a terminal that pixel does not know, write a `FindHost` function that gives null in other terminals, and add it to `HOSTS` after the pixel host.
+`findHost` looks for the name of the terminal in `HOSTS`. If the name is there, mdb uses that host. If not, mdb uses the pixel host.
+
+- **pixel** (`pixelHost`): pixel does all the work, and chooses all render options. In cmux, the tab comes from `CMUX_WORKSPACE_ID`. In herdr, the tab comes from `HERDR_TAB_ID`. pixel draws to herdr through the herdr graphics socket.
+- **Rex** (`rexHost` in `src/cli/rex.ts`): pixel finds Rex panes and opens them. A Rex pane is a block, and its tab is the window of the block. pixel also chooses how to draw in Rex: patched frames sent as tiles, in files. mdb sets only one render option in Rex: at most 60 frames each second. pixel's default is the highest refresh rate of all the displays, for example 120 on a MacBook. On a local display, 60 is as smooth as 120. When the Rex app connects over a network, for example through Tailscale, each frame goes over the network, and more frames make Rex lag. These options are better in Rex than the options that mdb set before (10 frames each second, as kitty animation frames). A new Rex pane starts at 80×24 with 8×16 cells and no pixel size. It gets its real size when a Rex window shows it: about half a second later when Rex is in front, but possibly much later when Rex is minimized. Thus, in an 80×24 pane, `ready()` asks the terminal for the cell size (`CSI 16 t`, `queryCell` in `src/cli/pane-size.ts`). If the cells are 8×16, the pane is a new Rex pane, and `ready()` waits until the pane changes size, with no time limit. Thus, the first frames have the correct size. A real pane can also be 80×24. If the terminal does not send the cell size, `ready()` waits for at most 1 second.
+
+pixel zooms the page when the cell size of the terminal changes, as for a font zoom. A Rex pane that gets its real size after pixel starts looks like a font zoom, and the page becomes about 2.3 times too large. Thus, on each resize, the main process sets the zoom of the page to 1 (`onResize` in `src/main/main.tsx`). It also does this when the page loads.
+
+To change what mdb does in a different terminal, write a function that takes the pixel `Terminal` and gives a `Host`. Add it to `HOSTS` with the name that pixel gives the terminal.
 
 ## The agent skill
 

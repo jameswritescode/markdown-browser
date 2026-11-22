@@ -14,6 +14,7 @@ import { parseArgs } from "../core/args.ts";
 import { type StdinContent, sendControl } from "../core/control.ts";
 import { type InstanceInfo, listInstances } from "../core/registry.ts";
 import { stdinKey } from "../core/stdin.ts";
+import { listWaiting, longWait, markWaiting } from "../core/waiting.ts";
 import type { Direction, Launch } from "../shared/types.ts";
 import {
   chooseAction,
@@ -56,7 +57,7 @@ tab's mdb pane if there is one, and opens a new pane if there is not. If a tab a
 shows the document, mdb goes to that tab. A folder opens its file list in a new tab.
 
 MDB_FPS, MDB_FRAMES, and MDB_PRESENT set --fps, --frames, and --present. In Rex, the
-defaults are 10, file, and animation.
+default fps is 60.
 
 mdb skill install    install the mdb skill for Claude Code and Codex
 `;
@@ -64,6 +65,7 @@ mdb skill install    install the mdb skill for Claude Code and Codex
 const PACKAGE_ROOT = join(__dirname, "..", "..");
 const BIN = join(PACKAGE_ROOT, "bin", "mdb.js");
 const REGISTER_TIMEOUT_MS = 15_000;
+const WAITING_NOTE = "mdb starts when the terminal shows the pane";
 // A plain pipe that sends nothing in this time is not markdown for mdb, so mdb shows the file list.
 const PIPE_WAIT_MS = 5_000;
 
@@ -146,7 +148,13 @@ async function runHere(launch: Launch, content: StdinContent | null, host: Host)
     }
     env.PIXEL_TTY = device;
   }
-  await host.ready();
+  // The CLI that opened this pane ignores a short wait.
+  const waiting = markWaiting({ tab: launch.start.tab, token: launch.start.waitToken });
+  try {
+    await host.ready();
+  } finally {
+    waiting.withdraw();
+  }
   const token = content ? randomUUID() : null;
   const tab = launch.start.tab ?? (await host.tab());
   const start = content
@@ -190,9 +198,19 @@ async function sendWhenStarted(
   content: StdinContent,
   child: ChildProcess | null,
 ): Promise<{ reply: Record<string, unknown> } | { problem: string } | null> {
-  const deadline = Date.now() + REGISTER_TIMEOUT_MS;
+  let deadline = Date.now() + REGISTER_TIMEOUT_MS;
+  let told = false;
   while (Date.now() < deadline) {
     if (child && child.exitCode !== null) return null;
+    // A new pane can wait for its size until the terminal shows it, with no time limit.
+    const waiting = listWaiting().find((found) => found.token === token);
+    if (waiting) {
+      deadline = Date.now() + REGISTER_TIMEOUT_MS;
+      if (!told && longWait(waiting)) {
+        process.stderr.write(`mdb: ${WAITING_NOTE}\n`);
+        told = true;
+      }
+    }
     const instance = listInstances().find((found) => found.token === token);
     if (instance) {
       try {
@@ -257,6 +275,7 @@ async function openSplit(
   content: StdinContent | null,
 ): Promise<number> {
   const before = new Set(listInstances().map((instance) => instance.pid));
+  const splitAt = Date.now();
   const token = content ? randomUUID() : null;
   try {
     await terminal.split!({
@@ -283,6 +302,11 @@ async function openSplit(
       listInstances().some((instance) => !before.has(instance.pid) && instance.tab === from.tab)
     ) {
       say(`mdb: opened ${describe(launch, null)} in a new pane (${direction})`);
+      return 0;
+    }
+    const waits = listWaiting().filter((found) => found.tab === from.tab && found.since >= splitAt);
+    if (waits.some((found) => longWait(found))) {
+      say(`mdb: opened ${describe(launch, null)} in a new pane (${direction}); ${WAITING_NOTE}`);
       return 0;
     }
     await sleep(100);
