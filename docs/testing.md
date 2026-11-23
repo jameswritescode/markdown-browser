@@ -5,19 +5,20 @@ This document tells you how to test a change to mdb. It is for people and for co
 | Test        | Command                     | What it tests                                                                |
 | ----------- | --------------------------- | ---------------------------------------------------------------------------- |
 | Unit tests  | `pnpm test`                 | The logic in `src/core`, the CLI logic, the watchers, and pure page modules. |
-| tophat      | `pnpm tophat:all`           | The real page and the real IPC, in an offscreen Electron window.             |
+| Page tests  | `pnpm test:page`            | The real page and the real IPC, in an offscreen Electron window.             |
 | Smoke test  | `pnpm smoke [file\|folder]` | The real app in a pseudo-terminal: it starts, draws, and writes no errors.   |
 | Live checks | `node bin/mdb.js …`         | The parts that need a real terminal: panes, terminal keys, and the drawing.  |
 
 Before you commit, run all of these commands. They must pass:
 
 ```sh
-pnpm test
+pnpm test:all
 pnpm typecheck
 pnpm lint
 pnpm format:check
-pnpm tophat:all
 ```
+
+`pnpm test:all` runs the unit tests, and then the page tests.
 
 ## Unit tests
 
@@ -25,155 +26,89 @@ The unit tests use vitest. They are in `test/`, one file for each module. Fixtur
 
 Write a unit test when the code does not need the DOM or Electron. If page code has logic that you can test alone, put the logic in its own module without DOM calls. For example, `src/page/tab-route.ts` and `src/page/tab-labels.ts` are pure modules, and `test/tab-route.test.ts` and `test/tab-labels.test.ts` test them.
 
-## tophat
+## Page tests
 
-tophat runs the mdb page in an offscreen Electron window, and does the steps in a JSON script. A step can push a key, type text, click, write a file, run JavaScript in the page, or save a screenshot. Use tophat to see a change in the page, and to prove that the page does the correct thing.
+The page tests use vitest. They are in `test/page/`. Each test opens the real mdb page in an offscreen Electron window, with the real preload and the real IPC handlers. Thus scan, search, render, links, and file watching are real. The test pushes keys, clicks, and runs JavaScript in the page, and checks the results with `expect`.
 
-An `eval` step can have an `expect` value. tophat compares the result with the value. If they are not the same, tophat writes a `FAIL` line, and the script fails. A `click` or `hover` that finds no element also fails, and so does an `eval` that throws an error. tophat cannot check how a screenshot looks. Look at the screenshots yourself.
+The page tests do not use pixel to draw, and they do not use a terminal. Thus they do not test the terminal keys, the right-click menu, the control socket, or the drawing in the terminal. Use the smoke test and live checks for those.
 
-### How tophat works
+### Run the page tests
 
-`src/dev/tophat.ts` is the tophat program. `scripts/tophat.mjs` bundles it and starts it with the Electron of pixel.
-
-- tophat uses the real page (`dist/page/`) and the real IPC handlers from `src/main/ipc.ts`. Thus scan, search, render, links, and file watching are real.
-- tophat uses the real preload, plus a small `window.pixel` stand-in (`src/dev/tophat-preload.ts`). The stand-in gives the page a terminal theme.
-- tophat does not use pixel to draw. The window is offscreen, and the screenshots come from Electron. tophat does not test the terminal, the terminal keys, the right-click menu, or the control socket.
-- When the page calls `window.mdb.copy`, tophat records the text. The log ends with `clipboard: […]`.
-- When the page calls `window.mdb.quit`, tophat writes `quit` in the log.
-
-### Run the scripts
-
-To run all the scripts:
+To build mdb and run all the page tests:
 
 ```sh
-pnpm tophat:all
+pnpm test:page
 ```
 
-The last line tells you if all scripts passed, or which scripts failed. If a script fails, the command exits with code 1.
-
-To run one or more scripts:
+If you already built mdb, you can run the tests without a build. You can also give a part of a file name, or `-t` and a part of a test name:
 
 ```sh
-pnpm tophat tophat/reader.json tophat/tabs.json
+pnpm exec vitest run --config vitest.page.config.mts reader
+pnpm exec vitest run --config vitest.page.config.mts -t outline
 ```
 
-`pnpm tophat` and `pnpm tophat:all` build mdb first. If you already built mdb, you can run the scripts without a build:
+`pnpm test` does not run the page tests, because they need a build and they are slower. `pnpm test:all` runs the two types of test.
 
-```sh
-node scripts/tophat.mjs tophat/reader.json
-node scripts/tophat.mjs --all
-```
+### How the page tests work
 
-tophat writes each step result to stdout and to `log.txt` in the output folder. Screenshots go to the same folder. Each script ends with a line such as `tophat: 12 checks, 0 failed`.
+- `test/page/page.ts` gives `openPage`. `openPage` starts the Electron of pixel with `src/dev/page-harness.ts`, and gives a `Page` object.
+- The harness opens the page with `src/dev/page-driver.ts`. The harness reads one command on each stdin line, and writes the result on stdout.
+- `src/dev/page-preload.ts` adds a small `window.pixel` stand-in to the real preload. The stand-in gives the page a terminal theme.
+- `test/page/setup.ts` bundles the harness and the preload before the tests start.
+- Each test starts its own window. Thus a test does not get the state of a different test. Call `page.close()` after each test.
 
-Electron writes some lines that are not tophat output, for example `sandbox_extension … failed` and `GPU process exited`. Ignore these lines. To see only the results, filter the output:
+### The Page object
 
-```sh
-node scripts/tophat.mjs tophat/tabs.json 2>&1 | grep -E "^(FAIL|eval|shot|clipboard|quit|console|tophat)"
-```
+| Call                         | Result                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| `page.key("b", ["control"])` | Pushes a key, with modifiers if you give them. Use Electron key names, for example `Escape`. |
+| `page.type("plan")`          | Types the text, one character at a time.                                                     |
+| `page.click(selector)`       | Clicks the center of the element. Fails if the selector finds no element.                    |
+| `page.hover(selector)`       | Moves the mouse to the center of the element. Fails if the selector finds no element.        |
+| `page.scroll(700)`           | Scrolls the reader (or the page) down by the number of pixels.                               |
+| `page.eval(code)`            | Runs JavaScript in the page and gives the result. If the result is a promise, it waits.      |
+| `page.shot("top")`           | Saves `top.png` and `top.txt` in `build/page/<test file>/`.                                  |
+| `page.clipboard()`           | Gives the text that the page copied with `window.mdb.copy`, in order.                        |
+| `page.log`                   | The console messages of the page, and `quit` when the page asked mdb to quit.                |
 
-### Set the expected values
+`openPage` takes `args` (the `mdb` arguments), and also `cwd`, `width`, `height`, `theme`, and `background`. `args` are relative to `cwd`. The default `cwd` is the repository root.
 
-Add `--update` to write the result of each `eval` into the script as its `expect` value:
+`test/page/page.ts` also gives `makeFiles`, `writeFile`, `removeFile`, and `sleep`. The paths are relative to the repository root.
 
-```sh
-node scripts/tophat.mjs tophat/tabs.json --update
-pnpm exec oxfmt tophat
-```
+### Write a good page test
 
-Use `--update` when you add a script, or when you change the behavior on purpose. After `--update`, read the `git diff` of the script, and make sure that each value is correct. `--update` writes what the page does now, and that can be wrong.
-
-Do not expect values that change from run to run, for example relative times ("2d ago"), absolute paths, or images from the web. Change the `eval` so that it returns only the stable part. For example, `tophat/showcase.json` checks only the local images, and `tophat/frontmatter.json` checks the row text without the time.
-
-### Script format
-
-A script is a JSON file in `tophat/`. Paths in a script are relative to the script file.
-
-| Field        | Required | Value                                                                                                                                  |
-| ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `args`       | Yes      | The `mdb` arguments, for example `["../docs/showcase.md", "--heading", "tables"]`.                                                     |
-| `out`        | Yes      | The output folder, for example `"../build/tophat/reader"`.                                                                             |
-| `steps`      | Yes      | The steps, in order.                                                                                                                   |
-| `files`      | No       | Files to make before mdb starts: `{ "path": "text" }`. A `null` value removes the file. A path that ends in `/` makes an empty folder. |
-| `width`      | No       | The window width in pixels. The default is 1200.                                                                                       |
-| `height`     | No       | The window height in pixels. The default is 800.                                                                                       |
-| `cwd`        | No       | The working folder for `args`. The default is the folder of the script.                                                                |
-| `theme`      | No       | The terminal colors: `{ "foreground": [r, g, b], "background": [r, g, b], "ansi": [[r, g, b], …] }`.                                   |
-| `background` | No       | The window background color, for example `"#1e1e2e"`.                                                                                  |
-
-tophat reads `args` before it does the steps. Thus, if mdb must start in a folder or on a file that the script makes, put that file in `files`, not in a `write` step.
-
-### Steps
-
-| Step                                          | Result                                                                                               |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `{ "wait": 500 }`                             | Waits the number of milliseconds.                                                                    |
-| `{ "key": "j" }`                              | Pushes a key. Use Electron key names, for example `Enter`, `Escape`, `Down`, `Up`, `PageDown`.       |
-| `{ "key": "l", "modifiers": ["control"] }`    | Pushes a key with modifiers: `control`, `shift`, `alt`, or `meta`.                                   |
-| `{ "type": "plan" }`                          | Types the text, one character at a time.                                                             |
-| `{ "click": ".tab:nth-child(2)" }`            | Clicks the center of the first element that the CSS selector finds.                                  |
-| `{ "hover": ".row:nth-child(2)" }`            | Moves the mouse to the center of the element.                                                        |
-| `{ "scroll": 700 }`                           | Scrolls the reader (or the page) down by the number of pixels.                                       |
-| `{ "eval": "document.title" }`                | Runs JavaScript in the page and writes the result as JSON. If the result is a promise, tophat waits. |
-| `{ "eval": "document.title", "expect": "X" }` | Also fails the script if the result is not the same as `expect` (compared as JSON).                  |
-| `{ "write": "../build/x.md", "text": "# X" }` | Writes a file, and makes its folders. Then waits 500 ms.                                             |
-| `{ "remove": "../build/x.md" }`               | Removes a file. Then waits 500 ms.                                                                   |
-| `{ "shot": "top" }`                           | Saves `top.png` (a screenshot) and `top.txt` (the text of the page) in the output folder.            |
-
-`click` and `hover` write `FAIL … no element for <selector>` if the selector finds nothing. `eval` writes `FAIL … error: <message>` if the JavaScript throws an error. In both cases, the script continues, but it fails at the end.
-
-### Write a good script
-
-- **Use fixture documents, not the real docs.** Open files in `test/fixtures/`, or write them in the script with `write`. An `expect` value that comes from `docs/` or the README (a count, a title, a scroll position) breaks when someone edits that document. Only `showcase.json` uses `docs/showcase.md`, because it checks that document. Do not change `test/fixtures/pages/` to show a new feature: change `docs/showcase.md`.
-- **Check results with `eval`.** A screenshot shows how the page looks, but an `eval` result is exact and is easy to compare. Return arrays or objects that show many values at once, for example `[document.title, document.querySelectorAll('.tab').length]`.
-- **Use `?.` in `eval`.** Write `document.querySelector('.x')?.textContent`, not `document.querySelector('.x').textContent`. Then a missing element gives `null`, not an error.
-- **Wait after an action.** A render, a scan, and a file change take time. Use `wait` steps of 200 to 1,500 ms. A file change needs more than 500 ms, because the watchers wait before they tell the page.
+- **Prove the test first.** Write the test with the values that you want. Run it before you change the code, and make sure that it fails for the correct reason. Then change the code, and run it again.
+- **Wait for a result, not for a time.** Use `await expect.poll(() => page.eval(…)).toBe(…)`. `expect.poll` tries again until the result is correct or 5 seconds pass.
+- **Use `sleep` only to show that something does not change.** A poll passes at once if the value is already correct. For example, to show that a file change in a background tab does not change the front tab, wait, then check. A file change needs more than 500 ms, because the watchers wait before they tell the page.
+- **Do not poll code that changes the page.** `expect.poll` can run the code many times. Run code such as `T.open(…)` or `scrollTop = 400` once with `await page.eval(…)`, and then poll for the result.
+- **Use fixture documents, not the real docs.** Open files in `test/fixtures/`, or make them in `build/page-files/` with `makeFiles` and `writeFile`. Give each test file its own folder, because vitest runs the test files at the same time. Only the showcase test uses `docs/showcase.md`, because it checks that document. Do not change `test/fixtures/pages/` to show a new feature: change `docs/showcase.md`.
+- **Return many values at once.** For example, `[document.title, document.querySelectorAll('.tab').length]`. The diff then shows all of them.
+- **Use `?.` in `eval`.** Then a missing element gives `undefined`, not an error.
+- **Use `toMatchInlineSnapshot()` for large values.** Run vitest with `-u` to write the value into the test. Then read the `git diff`, and make sure that the value is correct. `-u` writes what the page does now, and that can be wrong.
+- **Do not expect values that change from run to run**, for example relative times ("2d ago"), absolute paths, or images from the web. Return only the stable part.
 - **Find the front tab.** The page can have many tabs. The front tab is `.tab-pane:not(.background)`. The visible reader is `.reader:not([hidden])`, and the visible finder is `.finder:not([hidden])`.
-- **Make helpers once.** An `eval` can make an object on `window`, and later steps can use it. `tophat/tabs.json` makes `window.T` with helpers in its first `eval`.
-- **Send a document from "outside".** `window.mdbRemote.open({ path, root, heading, mode })` does the same thing as an `mdb` command that uses an open mdb. It returns `{ heading, result }`. Build absolute paths from `location.pathname`. For an example, read `tophat/remote.json`.
-- **Write test files in `build/`.** Do not change the files in `docs/` or `test/fixtures/`. Use `files` to make a clean start, for example `"../build/tophat/fresh/old.md": null`.
-- **Prove the test first.** Write the script with the `expect` values that you want. Run it before you change the code, and make sure that it fails for the correct reason. Then change the code, and run it again.
+- **Send a document from "outside".** `window.mdbRemote.open({ path, root, heading, mode })` does the same thing as an `mdb` command that uses an open mdb. It returns `{ heading, result }`. Build absolute paths from `location.pathname`. For an example, read `test/page/remote.test.ts`.
+- **Make page helpers once.** An `eval` can make an object on `window`, and later calls can use it. `test/page/tabs.test.ts` makes `window.T`.
+- **Look at the screenshots** in `build/page/`. An `expect` value does not show if the page looks wrong.
 
-### Compare with a baseline
+### The test files
 
-The `expect` values catch most changes. A baseline also catches changes in results that have no `expect` value. If a change must not change the behavior, save the results of all scripts before the change, and compare them after the change:
-
-```sh
-mkdir -p build/baseline
-pnpm build
-for f in tophat/*.json; do
-  node scripts/tophat.mjs "$f" 2>&1 | grep -E "^(eval|shot|click|hover|clipboard|key)" > "build/baseline/$(basename "$f" .json).txt"
-done
-# Make the change, run pnpm build, run the loop again into build/after, then:
-diff -r build/baseline build/after
-```
-
-### The scripts
-
-| Script              | What it shows                                                                   |
-| ------------------- | ------------------------------------------------------------------------------- |
-| `finder.json`       | The file list, the filter, and text search.                                     |
-| `finder-blur.json`  | Keys in the file list when the query field does not have the focus.             |
-| `finder-empty.json` | A folder with no markdown files.                                                |
-| `finder-hover.json` | The selection stays when the mouse does not move.                               |
-| `finder-fresh.json` | New, renamed, and deleted files show in the file list.                          |
-| `search-open.json`  | A document opened from text search, with the matches highlighted.               |
-| `reader.json`       | The reader, the outline, a link to a different document, and `esc` to the list. |
-| `reopen.json`       | A second document opened from the list does not show the first one first.       |
-| `navigation.json`   | The page cannot navigate away from mdb.                                         |
-| `find.json`         | Find in the document, and the scroll keys.                                      |
-| `live.json`         | Live reload, a deleted file, and a diagram error.                               |
-| `frontmatter.json`  | The frontmatter property list.                                                  |
-| `showcase.json`     | All the markdown items in `docs/showcase.md`, including each diagram type.      |
-| `copy-code.json`    | The copy button on code blocks.                                                 |
-| `narrow.json`       | A narrow pane, where the outline stays hidden.                                  |
-| `wide.json`         | The centered layout in a wide pane, with and without the outline.               |
-| `shell.json`        | The first screen when mdb starts in a folder.                                   |
-| `remote.json`       | `--heading`, and documents sent with `window.mdbRemote.open`.                   |
-| `tabs.json`         | Tabs: routing, keys, find in many tabs, background reload, labels, and closing. |
-| `stdin.json`        | Stdin documents: titled updates, two opens at once, links, folder tabs, forget. |
-
-`showcase.json` and `live.json` each show one `Diagram error` result. This is correct: `docs/showcase.md` has a diagram with an error on purpose.
+| File                   | What it tests                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------- |
+| `reader.test.ts`       | The outline, a diagram, links, the history keys, a narrow window, and navigation. |
+| `find.test.ts`         | The reader scroll keys, and find in the document.                                 |
+| `finder.test.ts`       | The file list, the filter, text search, the mouse, and keys without the focus.    |
+| `finder-files.test.ts` | An empty folder, and files that are added or removed.                             |
+| `search-open.test.ts`  | Enter on a search result opens the file at the match.                             |
+| `frontmatter.test.ts`  | Frontmatter titles in the finder, and the frontmatter block in the reader.        |
+| `live.test.ts`         | The reader shows file changes and a removed file.                                 |
+| `reopen.test.ts`       | A document opened from the finder never shows the old document.                   |
+| `remote.test.ts`       | A remote open with a heading, and a heading that does not match.                  |
+| `tabs.test.ts`         | Tabs: open, switch, the state of each tab, file changes, close, and quit.         |
+| `stdin.test.ts`        | Documents from stdin in tabs.                                                     |
+| `copy-code.test.ts`    | The copy button of a code block.                                                  |
+| `wide.test.ts`         | The layout in a wide window.                                                      |
+| `showcase.test.ts`     | `docs/showcase.md`: diagrams, images, alerts, and code, with screenshots.         |
 
 ## Smoke test
 
@@ -187,7 +122,7 @@ The smoke test starts the real `mdb` in a pseudo-terminal for 6 seconds. It repo
 - `kitty graphics sent`: mdb sent images to the terminal.
 - `log errors`: the number of errors in the pixel log (`~/.local/state/pixel/logs/`).
 
-All three must be good. The smoke test does not show the page. Use tophat for that.
+All three must be good. The smoke test does not show the page. Use the page tests for that.
 
 The smoke test removes the `REX_`, `HERDR_`, and `TERM_PROGRAM` variables. Thus, in Rex, mdb does not wait for a Rex pane size in the pseudo-terminal. In herdr, pixel sends the frames to the pseudo-terminal, not to the herdr pane.
 
@@ -233,4 +168,4 @@ herdr pane close <pane_id>
 
 Do not close panes that you did not open.
 
-tophat cannot send keys through the terminal. Thus, check new keys in a real terminal too. mdb sees `ctrl+[`, `ctrl+h`, and `ctrl+l` only if the terminal uses the kitty keyboard protocol.
+The page tests cannot send keys through the terminal. Thus, check new keys in a real terminal too. mdb sees `ctrl+[`, `ctrl+h`, and `ctrl+l` only if the terminal uses the kitty keyboard protocol.

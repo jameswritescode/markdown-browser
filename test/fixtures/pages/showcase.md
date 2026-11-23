@@ -5,7 +5,7 @@ tags: [fixture]
 
 # Markdown showcase
 
-A fixed document for the tophat scripts. Do not change it to show a new feature: change
+A fixed document for the page tests. Do not change it to show a new feature: change
 `docs/showcase.md` for that.
 
 ## Text

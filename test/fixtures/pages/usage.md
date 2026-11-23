@@ -1,6 +1,6 @@
 # mdb usage guide
 
-A fixed document for the tophat scripts. It uses the word mdb a known number of times.
+A fixed document for the page tests. It uses the word mdb a known number of times.
 
 ## File list
 

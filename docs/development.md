@@ -14,11 +14,10 @@ To learn how mdb works, read [mdb architecture](architecture.md).
 2. Run the checks:
 
    ```sh
-   pnpm test
+   pnpm test:all
    pnpm typecheck
    pnpm lint
    pnpm format:check
-   pnpm tophat:all
    ```
 
 3. Build and start mdb from the repository:
@@ -118,5 +117,5 @@ npm lets you add a trusted publisher only to a package that exists. So publish t
 
 For the full guide, read [Testing mdb](testing.md).
 
-- `pnpm tophat:all` runs all the scripts in `tophat/` and fails if a check fails. `pnpm tophat <script.json>` runs one script. tophat opens the mdb page in an offscreen window. It sends the keys in the script and saves screenshots and page text. The scripts are in `tophat/`. The output goes to `build/tophat/`.
+- `pnpm test:page` builds mdb, then runs the page tests in `test/page/`. A page test opens the mdb page in an offscreen window, pushes keys, and checks the page.
 - `pnpm smoke [file or folder]` starts mdb in a pseudo-terminal for 6 seconds. It makes sure that mdb stays open, sends kitty graphics, and writes no errors to its log.

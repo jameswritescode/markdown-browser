@@ -18,15 +18,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm test
+      - run: pnpm test:all
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
-      - run: pnpm tophat:all
 
-      - name: Keep the tophat output when a check fails
+      - name: Keep the page test screenshots when a check fails
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: tophat
-          path: build/tophat
+          name: page-tests
+          path: build/page
