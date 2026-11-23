@@ -11,7 +11,7 @@ Read these documents before you change code:
 - [README.md](README.md): what mdb does, install, and a quick start.
 - [docs/development.md](docs/development.md): set up, the checks, and releases.
 - [docs/architecture.md](docs/architecture.md): the CLI, the main process, and the page, and how they work together.
-- [docs/testing.md](docs/testing.md): unit tests, tophat, the smoke test, and live checks.
+- [docs/testing.md](docs/testing.md): unit tests, page tests, the smoke test, and live checks.
 - [docs/usage.md](docs/usage.md): the user guide.
 
 ## Tools
@@ -23,31 +23,31 @@ Read these documents before you change code:
 
 ## Commands
 
-| Command             | Use                                                                 |
-| ------------------- | ------------------------------------------------------------------- |
-| `pnpm build`        | Builds `dist/` with esbuild. `dist/` is not in git.                 |
-| `pnpm test`         | Unit tests (vitest).                                                |
-| `pnpm typecheck`    | TypeScript.                                                         |
-| `pnpm lint`         | oxlint.                                                             |
-| `pnpm format`       | Formats all files with oxfmt. `pnpm format:check` only checks.      |
-| `pnpm tophat:all`   | Builds, then runs every script in `tophat/` and checks the results. |
-| `pnpm tophat <f>`   | Builds, then runs one tophat script.                                |
-| `pnpm smoke [path]` | Starts the real mdb in a pseudo-terminal for 6 seconds.             |
-| `node bin/mdb.js …` | Runs your copy of mdb. Run `pnpm build` first.                      |
+| Command             | Use                                                            |
+| ------------------- | -------------------------------------------------------------- |
+| `pnpm build`        | Builds `dist/` with esbuild. `dist/` is not in git.            |
+| `pnpm test`         | Unit tests (vitest).                                           |
+| `pnpm test:page`    | Builds, then runs the page tests in `test/page/` (vitest).     |
+| `pnpm test:all`     | Runs `pnpm test`, then `pnpm test:page`.                       |
+| `pnpm typecheck`    | TypeScript.                                                    |
+| `pnpm lint`         | oxlint.                                                        |
+| `pnpm format`       | Formats all files with oxfmt. `pnpm format:check` only checks. |
+| `pnpm smoke [path]` | Starts the real mdb in a pseudo-terminal for 6 seconds.        |
+| `node bin/mdb.js …` | Runs your copy of mdb. Run `pnpm build` first.                 |
 
 Before you commit, these must pass:
 
 ```sh
-pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm tophat:all
+pnpm test:all && pnpm typecheck && pnpm lint && pnpm format:check
 ```
 
 Run `pnpm smoke` too when you change the main process, the CLI, or the build.
 
 ## How to work
 
-- **Write the test first.** For logic, write a unit test. For page behavior, write or extend a tophat script with `expect` values. Run it, and see it fail for the correct reason before you change the code. [docs/testing.md](docs/testing.md) tells you how.
-- **Look at the page.** After a page change, look at the tophat screenshots in `build/tophat/`. An `expect` value does not show if the page looks wrong.
-- **Check terminal behavior live.** tophat does not use the terminal. For panes, the control socket, terminal keys, and the right-click menu, test by hand with `node bin/mdb.js`. An mdb that is already open runs its old code. Close only the panes that you opened.
+- **Write the test first.** For logic, write a unit test. For page behavior, write a page test in `test/page/`. Run it, and see it fail for the correct reason before you change the code. [docs/testing.md](docs/testing.md) tells you how.
+- **Look at the page.** After a page change, look at the screenshots in `build/page/`. An `expect` value does not show if the page looks wrong.
+- **Check terminal behavior live.** The page tests do not use the terminal. For panes, the control socket, terminal keys, and the right-click menu, test by hand with `node bin/mdb.js`. An mdb that is already open runs its old code. Close only the panes that you opened.
 - **Keep the layers apart.**
   - `src/core` has no Electron and no DOM imports. The CLI and the main process both use it.
   - `src/page` has no Node access. It uses only the `window.mdb` bridge (`MdbBridge` in `src/shared/types.ts`).
@@ -59,7 +59,7 @@ Run `pnpm smoke` too when you change the main process, the CLI, or the build.
 
 - Write the documents in `docs/`, the README, and the skill in ASD-STE100 (Simplified Technical English), where possible: short sentences, active voice, one instruction in each sentence, and simple words.
 - `docs/superpowers/` is for local planning files (designs and plans). It is in `.gitignore`. Do not commit it.
-- When you change how mdb works, update `docs/architecture.md`. When you change a test tool or add a tophat script, update `docs/testing.md`.
+- When you change how mdb works, update `docs/architecture.md`. When you change a test tool, update `docs/testing.md`.
 
 ## Code style
 

@@ -29,9 +29,9 @@
     "format:check": "oxfmt --check",
     "build": "node scripts/build.mjs",
     "prepack": "pnpm build",
-    "tophat": "pnpm build && node scripts/tophat.mjs",
-    "tophat:all": "pnpm build && node scripts/tophat.mjs --all",
-    "smoke": "pnpm build && node scripts/smoke.mjs"
+    "smoke": "pnpm build && node scripts/smoke.mjs",
+    "test:page": "pnpm build && vitest run --config vitest.page.config.mts",
+    "test:all": "pnpm test && pnpm test:page"
   },
   "dependencies": {
     "@zenbu-labs/pixel": "0.3.2",
