@@ -1,5 +1,5 @@
 import { type ChildProcess, spawn } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { expect } from "vitest";
@@ -11,6 +11,8 @@ const ELECTRON = join(
   root,
   "node_modules/@zenbu-labs/pixel/electron/dist/Electron.app/Contents/MacOS/pixel",
 );
+
+const STDERR_KEEP = 4000;
 
 export const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms));
 
@@ -72,10 +74,17 @@ export async function openPage(options: PageOptions): Promise<Page> {
   const config: PageConfig = { ...options, cwd: resolve(root, options.cwd ?? ".") };
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
+  // Each Electron gets its own user data. Electrons that share one disk cache can crash.
+  mkdirSync(join(root, "build", "page-data"), { recursive: true });
+  const userData = mkdtempSync(join(root, "build", "page-data", "electron-"));
   const child: ChildProcess = spawn(
     ELECTRON,
-    [join(root, "build/dev/page-harness.js"), JSON.stringify(config)],
-    { env, stdio: ["pipe", "pipe", "ignore"] },
+    [
+      join(root, "build/dev/page-harness.js"),
+      JSON.stringify(config),
+      `--user-data-dir=${userData}`,
+    ],
+    { env, stdio: ["pipe", "pipe", "pipe"] },
   );
 
   const log: string[] = [];
@@ -86,12 +95,23 @@ export async function openPage(options: PageOptions): Promise<Page> {
     ready = done;
     failed = fail;
   });
+  const failAll = (error: Error) => {
+    failed(error);
+    for (const call of waiting.values()) call.fail(error);
+    waiting.clear();
+  };
+  // Keep the end of stderr, so that a crash tells why.
+  let stderr = "";
+  child.stderr!.on("data", (data) => (stderr = (stderr + data).slice(-STDERR_KEEP)));
+  const withStderr = (text: string) =>
+    new Error(stderr ? `${text}\nElectron stderr:\n${stderr}` : text);
   createInterface({ input: child.stdout! }).on("line", (line) => {
     if (!line.startsWith(PREFIX)) return;
     const message = JSON.parse(line.slice(PREFIX.length));
     if (message.event === "ready") ready();
     else if (message.event === "error") failed(new Error(message.message));
     else if (message.event === "console") log.push(`console.${message.level}: ${message.message}`);
+    else if (message.event === "gone") failAll(withStderr(`The page stopped: ${message.reason}`));
     else if (message.event) log.push(message.event);
     else {
       const call = waiting.get(message.id);
@@ -100,11 +120,9 @@ export async function openPage(options: PageOptions): Promise<Page> {
       else call?.done(message.value);
     }
   });
-  child.on("exit", (code) => {
-    const error = new Error(`Electron exited with code ${code}`);
-    failed(error);
-    for (const call of waiting.values()) call.fail(error);
-    waiting.clear();
+  child.on("exit", (code, signal) => {
+    rmSync(userData, { recursive: true, force: true });
+    failAll(withStderr(`Electron exited with code ${code}, signal ${signal}`));
   });
   await started;
 

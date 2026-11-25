@@ -56,6 +56,8 @@ pnpm exec vitest run --config vitest.page.config.mts -t outline
 - `src/dev/page-preload.ts` adds a small `window.pixel` stand-in to the real preload. The stand-in gives the page a terminal theme.
 - `test/page/setup.ts` bundles the harness and the preload before the tests start.
 - Each test starts its own window. Thus a test does not get the state of a different test. Call `page.close()` after each test.
+- Each Electron gets its own user data folder in `build/page-data/`. Electron processes that share one folder share one disk cache, and they can crash.
+- If Electron stops, or the page stops, the test fails at once. The error gives the end of the Electron stderr.
 
 ### The Page object
 
