@@ -168,4 +168,30 @@ herdr pane close <pane_id>
 
 Do not close panes that you did not open.
 
+### Find the mdb that you opened
+
+Other mdb processes can run on the computer, for example in a different Rex session or a different cmux workspace. Each mdb writes a record in `~/.local/state/mdb/instances/` (or in `$XDG_STATE_HOME/mdb/instances/`). The record gives the `pid` of mdb and its `tab`. The newest record is not always your mdb. Thus, do not use the newest record. Do these steps:
+
+1. Before you open the pane, list the records.
+2. Open the pane.
+3. List the records again. Find the record that has a new `pid` and the `tab` of your pane.
+
+```sh
+dir="${XDG_STATE_HOME:-$HOME/.local/state}/mdb/instances"
+ls "$dir"/*.json                       # before
+node bin/mdb.js docs/showcase.md --split right --new
+ls "$dir"/*.json                       # after: find the new file
+cat "$dir"/<pid>.json                  # make sure that "tab" is your tab
+```
+
+The `tab` is different in each terminal:
+
+| Terminal | `tab` of your pane                                                       |
+| -------- | ------------------------------------------------------------------------ |
+| Rex      | The `window_id` of your block in `rex block ls -s "$REX_SESSION" --json` |
+| cmux     | `$CMUX_WORKSPACE_ID`                                                     |
+| herdr    | `$HERDR_TAB_ID`                                                          |
+
+The `mdb` command uses the same rule. It sends a document only to an mdb in the tab of the caller. Do not measure, stop, or close an mdb that you did not open.
+
 The page tests cannot send keys through the terminal. Thus, check new keys in a real terminal too. mdb sees `ctrl+[`, `ctrl+h`, and `ctrl+l` only if the terminal uses the kitty keyboard protocol.
