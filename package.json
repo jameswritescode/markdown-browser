@@ -34,7 +34,7 @@
     "test:all": "pnpm test && pnpm test:page"
   },
   "dependencies": {
-    "@zenbu-labs/pixel": "0.3.2",
+    "@zenbu-labs/pixel": "0.3.4",
     "highlight.js": "11.12.0",
     "ignore": "7.0.16",
     "markdown-it": "15.0.3",
